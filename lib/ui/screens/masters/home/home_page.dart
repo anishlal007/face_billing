@@ -1,12 +1,18 @@
-import 'package:facebilling/ui/screens/pages/Item_location_master.dart';
+import 'package:facebilling/ui/screens/pages/location_master.dart';
 import 'package:facebilling/ui/screens/pages/country_master.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/menu_item.dart';
 import '../../pages/Unit_master.dart';
+import '../../pages/area_master_page.dart';
 import '../../pages/dashboard_page.dart';
+import '../../pages/hns_master_page.dart';
 import '../../pages/item_group_master.dart';
 import '../../pages/item_make_master.dart';
+import '../../pages/item_make_master_page.dart';
+import '../../pages/state_master_page.dart';
 import '../../pages/transactions_page.dart';
+import '../../pages/tax_master_page.dart';
+import '../../pages/user_master_page.dart';
 import 'side_menu.dart';
 import 'top_navbar.dart';
 import 'home_body.dart';
@@ -50,10 +56,40 @@ class _HomePageState extends State<HomePage> {
         MenuItemData(
           title: "Item make master",
           icon: Icons.ac_unit,
-          page: const ItemMakeMasterScreen(),
+          page: const ItemMakeMasterPage(),
         ),
         MenuItemData(
           title: " Location Master",
+          icon: Icons.ac_unit,
+          page: const ItemLocationMasterScreen(),
+        ),
+        MenuItemData(
+          title: " Hsn Master",
+          icon: Icons.ac_unit,
+          page: const HnsMasterPage(),
+        ),
+        MenuItemData(
+          title:  "TAX Master",
+          icon: Icons.ac_unit,
+          page: const TaxMasterPage(),
+        ),
+        MenuItemData(
+          title: "Area Master",
+          icon: Icons.ac_unit,
+          page: const AreaMasterPage(),
+        ),
+        MenuItemData(
+          title: "State Master",
+          icon: Icons.ac_unit,
+          page: const StateMasterPage(),
+        ),
+        MenuItemData(
+          title: "User Master",
+          icon: Icons.ac_unit,
+          page: const UserMasterPage(),
+        ),
+        MenuItemData(
+          title: "Finance Master",
           icon: Icons.ac_unit,
           page: const ItemLocationMasterScreen(),
         ),
