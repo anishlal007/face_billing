@@ -10,6 +10,8 @@ import '../../pages/item_group_master.dart';
 import '../../pages/item_make_master.dart';
 import '../../pages/item_make_master_page.dart';
 import '../../pages/state_master_page.dart';
+import '../../pages/supplier_grpup_master_page.dart';
+import '../../pages/supplier_master_page.dart';
 import '../../pages/transactions_page.dart';
 import '../../pages/tax_master_page.dart';
 import '../../pages/user_master_page.dart';
@@ -92,6 +94,16 @@ class _HomePageState extends State<HomePage> {
           title: "Finance Master",
           icon: Icons.ac_unit,
           page: const ItemLocationMasterScreen(),
+        ),
+        MenuItemData(
+          title: "Supplier Master",
+          icon: Icons.ac_unit,
+          page: const SupplierMasterPage(),
+        ),
+        MenuItemData(
+          title: "Supplier Group Master",
+          icon: Icons.ac_unit,
+          page: const SupplierGrpupMasterPage(),
         ),
       ],
     ),
