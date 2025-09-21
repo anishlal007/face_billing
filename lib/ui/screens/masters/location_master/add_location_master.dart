@@ -1,3 +1,4 @@
+import 'package:facebilling/core/const.dart';
 import 'package:facebilling/data/models/unit/add_unit_request.dart';
 import 'package:facebilling/data/models/unit/unit_response.dart';
 import 'package:facebilling/data/services/unit_service.dart';
@@ -78,7 +79,7 @@ class _AddLocationMasterState extends State<AddLocationMaster> {
   itemLocationName: _unitNameController.text.trim(),
   cratedUserCode:  DateTime.now().toIso8601String(),     // if this is the "user code"
   createdDate: DateTime.now().toIso8601String(),     // required by API
-  updatedUserCode: 1001,                             // hardcoded or from logged-in user
+  updatedUserCode: loadData.userCode.toString(),                             // hardcoded or from logged-in user
   updatedDate: DateTime.now().toIso8601String(),     // current timestamp
   activeStatus: _activeStatus ? 1 : 0,
 );
@@ -92,7 +93,7 @@ print(request);
   itemLocationName: _unitNameController.text.trim(),
   cratedUserCode:  DateTime.now().toIso8601String(),     // if this is the "user code"
   createdDate: DateTime.now().toIso8601String(),     // required by API
-  updatedUserCode: 1001,                             // hardcoded or from logged-in user
+  updatedUserCode: loadData.userCode.toString(),                             // hardcoded or from logged-in user
   updatedDate: DateTime.now().toIso8601String(),     // current timestamp
   activeStatus: _activeStatus ? 1 : 0,
 );

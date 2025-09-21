@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 
-class CustomDropdownField extends StatefulWidget {
+class CustomDropdownField<T> extends StatefulWidget {
   final String? title;
   final String? hintText;
   final IconData? prefixIcon;
-  final List<String> items;
-  final String? initialValue;
-  final ValueChanged<String?>? onChanged;
+  final List<DropdownMenuItem<T>> items;
+  final T? initialValue;
+  final ValueChanged<T?>? onChanged;
   final bool isValidate;
-  final String? Function(String?)? validator;
+  final String? Function(T?)? validator;
   final bool isEdit;
+  final TextEditingController? controller; // optional controller
 
   const CustomDropdownField({
     super.key,
@@ -22,31 +23,53 @@ class CustomDropdownField extends StatefulWidget {
     this.isValidate = false,
     this.validator,
     this.isEdit = false,
+    this.controller,
   });
 
   @override
-  State<CustomDropdownField> createState() => _CustomDropdownFieldState();
+  State<CustomDropdownField<T>> createState() => _CustomDropdownFieldState<T>();
 }
 
-class _CustomDropdownFieldState extends State<CustomDropdownField> {
-  String? _selectedValue;
+class _CustomDropdownFieldState<T> extends State<CustomDropdownField<T>> {
+  T? _selectedValue;
   String? _errorText;
 
   @override
   void initState() {
     super.initState();
-    _selectedValue = widget.initialValue; // default null → empty dropdown
+
+    // If controller is provided, try to parse its value to T
+    if (widget.controller != null && widget.controller!.text.isNotEmpty) {
+      final textValue = widget.controller!.text;
+      if (T == int) {
+        _selectedValue = int.tryParse(textValue) as T?;
+      } else if (T == double) {
+        _selectedValue = double.tryParse(textValue) as T?;
+      } else {
+        _selectedValue = textValue as T?;
+      }
+    } else {
+      _selectedValue = widget.initialValue;
+    }
   }
 
-  void _validate(String? value) {
+  void _onValueChanged(T? value) {
+    setState(() => _selectedValue = value);
+
+    if (widget.controller != null) {
+      widget.controller!.text = value.toString();
+    }
+
+    if (widget.onChanged != null) widget.onChanged!(value);
+  }
+
+  void _validate(T? value) {
     if (widget.isValidate && widget.validator != null) {
       setState(() {
         _errorText = widget.validator!(value);
       });
     } else {
-      setState(() {
-        _errorText = null;
-      });
+      setState(() => _errorText = null);
     }
   }
 
@@ -58,43 +81,23 @@ class _CustomDropdownFieldState extends State<CustomDropdownField> {
         if (widget.title != null)
           Padding(
             padding: const EdgeInsets.only(bottom: 6),
-            child: Text(
-              widget.title!,
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: Colors.black87,
-              ),
-            ),
+            child: Text(widget.title!,
+                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
           ),
-        DropdownButtonFormField<String>(
+        DropdownButtonFormField<T>(
           value: _selectedValue,
           hint: Text(widget.hintText ?? "Select"),
           icon: const Icon(Icons.arrow_drop_down),
           decoration: InputDecoration(
             prefixIcon: widget.prefixIcon != null ? Icon(widget.prefixIcon) : null,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
             errorText: _errorText,
           ),
-          items: widget.items
-              .map((item) => DropdownMenuItem(
-                    value: item,
-                    child: Text(item),
-                  ))
-              .toList(),
-          onChanged: widget.isEdit
-              ? null
-              : (value) {
-                  setState(() {
-                    _selectedValue = value;
-                  });
-                  _validate(value);
-                  if (widget.onChanged != null) {
-                    widget.onChanged!(value);
-                  }
-                },
+          items: widget.items,
+          onChanged: widget.isEdit ? null : (value) {
+            _onValueChanged(value);
+            _validate(value);
+          },
         ),
       ],
     );

@@ -1,11 +1,14 @@
+import 'package:facebilling/core/const.dart';
 import 'package:flutter/material.dart';
 
 
 
 import '../../../../data/models/hns_master/add_hns_model.dart';
 import '../../../../data/models/hns_master/hns_master_list_model.dart';
+import '../../../../data/models/tax_master/tax_master_list_model.dart'  as tax;
 import '../../../../data/services/hns_master_service.dart' show HnsMasterService;
 import '../../../../data/services/tax_master_service.dart';
+import '../../../widgets/custom_dropdown_text_field.dart';
 import '../../../widgets/custom_switch.dart';
 import '../../../widgets/custom_text_field.dart';
 import '../../../widgets/gradient_button.dart';
@@ -27,27 +30,34 @@ class AddHnsMasterPage extends StatefulWidget {
 class _AddHnsMasterPageState extends State<AddHnsMasterPage> {
   final _formKey = GlobalKey<FormState>();
   final HnsMasterService _service = HnsMasterService();
-
+  final TaxMasterService _taxService = TaxMasterService();
   bool _activeStatus = true;
   bool _loading = false;
+  bool _taxLoading = true;
   String? _message;
-
+  String? error;
+  String?gstPercentage;
   late TextEditingController _unitIdController;
   late TextEditingController _unitNameController;
+  late TextEditingController _taxNameController;
   // late TextEditingController _createdUserController;
-
+  tax.TaxMasterListModel? taxMasterListModel;
   final FocusNode _unitIdFocus = FocusNode();
   final FocusNode _unitNameFocus = FocusNode();
+  final FocusNode _taxNameFocus = FocusNode();
   // final FocusNode _createdUserFocus = FocusNode();
-
+dynamic _taxCode;
   @override
   void initState() {
     super.initState();
-
+_loadTax();
     _unitIdController =
         TextEditingController(text: widget.unitInfo?.hsnCode.toString() ?? "");
     _unitNameController =
         TextEditingController(text: widget.unitInfo?.hsnName ?? "");
+       //  _taxCode = widget.unitInfo?.gstPercentage;
+    _taxNameController =
+        TextEditingController(text: widget.unitInfo?.gstPercentage.toString() ?? "");
     // _createdUserController = TextEditingController(
     //     text: widget.countryInfo?.createdUserCode?.toString() ?? "1001");
     _activeStatus = (widget.unitInfo?.activeStatus ?? 1) == 1;
@@ -57,13 +67,27 @@ class _AddHnsMasterPageState extends State<AddHnsMasterPage> {
   void dispose() {
     _unitIdController.dispose();
     _unitNameController.dispose();
-    // _createdUserController.dispose();
+     _taxNameController.dispose();
     _unitIdFocus.dispose();
     _unitNameFocus.dispose();
-    // _createdUserFocus.dispose();
+     _taxNameFocus.dispose();
     super.dispose();
   }
-
+  Future<void> _loadTax() async {
+    final response = await _taxService.getTaxMaster();
+    if (response.isSuccess) {
+      setState(() {
+        taxMasterListModel = response.data!;
+        _taxLoading = false;
+        error = null;
+      });
+    } else {
+      setState(() {
+        error = response.error;
+        _taxLoading = false;
+      });
+    }
+  }
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -77,9 +101,9 @@ class _AddHnsMasterPageState extends State<AddHnsMasterPage> {
 
 final request = AddHnsModel(
   hsnName: _unitNameController.text.trim(),   // ❌ not in model
-  cratedUserCode: DateTime.now().toIso8601String(),    // ✅ but should be user ID, not DateTime
+  cratedUserCode: loadData.userCode,    // ✅ but should be user ID, not DateTime
   gstPercentage:0,       // ✅ correct
-  hsnNo: "1001",                               // ✅ int
+  hsnNo: _unitIdController.text.trim(),                                 // ✅ int
   cessPercentage: 0,       // ✅ correct
   activeStatus: _activeStatus ? 1 : 0,                 // ✅ correct
 );
@@ -90,10 +114,11 @@ print(request);
     } else {
       // EDIT mode
  final updated =  AddHnsModel(
+  
   hsnName: _unitNameController.text.trim(),   // ❌ not in model
-  cratedUserCode: DateTime.now().toIso8601String(),    // ✅ but should be user ID, not DateTime
+  cratedUserCode: loadData.userCode,    // ✅ but should be user ID, not DateTime
   gstPercentage:0,       // ✅ correct
-  hsnNo: "1001",                               // ✅ int
+  hsnNo: _unitIdController.text.trim(),                               // ✅ int
   cessPercentage: 0,       // ✅ correct
   activeStatus: _activeStatus ? 1 : 0,                 // ✅ correct
 );
@@ -121,6 +146,13 @@ print(request);
     if (widget.unitInfo != oldWidget.unitInfo) {
       _unitIdController.text = widget.unitInfo?.hsnCode.toString() ?? "";
       _unitNameController.text = widget.unitInfo?.hsnName ?? "";
+      _taxCode = widget.unitInfo?.gstPercentage; //
+      print(_taxCode);
+      print(_taxCode);
+   //  _taxCode = widget.unitInfo?. gstPercentage?? 0;
+      _taxNameController.text = _taxCode?.toString() ?? ""; 
+     print("_taxNameController");
+     print(_taxNameController.text);
       // _createdUserController.text =
       //     widget.countryInfo?.createdUserCode?.toString() ?? "1001";
       _activeStatus = (widget.unitInfo?.activeStatus ?? 1) == 1;
@@ -129,6 +161,9 @@ print(request);
 
   @override
   Widget build(BuildContext context) {
+       if (_taxLoading) return const Center(child: CircularProgressIndicator());
+    if (error != null) return Center(child: Text("Error: $error"));
+
     final isEdit = widget.unitInfo != null;
 
     return Padding(
@@ -155,6 +190,8 @@ print(request);
                 setState(() {
                   _unitIdController.text = country.hsnCode.toString() ?? "";
                   _unitNameController.text = country.hsnName ?? "";
+               _taxCode = widget.unitInfo?.gstPercentage; //
+                         _taxNameController.text = _taxCode?.toString() ?? ""; 
                   // _createdUserController.text =
                   //     country.createdUserCode?.toString() ?? "1001";
                   _activeStatus = (country.activeStatus ?? 1) == 1;
@@ -180,20 +217,20 @@ print(request);
                 });
               },
             ),
-            // CustomTextField(
-            //   title: "Location Code",
-            //   hintText: "Enter Location Code",
-            //   controller: _unitIdController,
-            //   prefixIcon: Icons.flag_circle,
-            //   isValidate: true,
-            //   validator: (value) =>
-            //       value == null || value.isEmpty ? "Enter unit ID" : null,
-            //   focusNode: _unitIdFocus,
-            //   textInputAction: TextInputAction.next,
-            //   onEditingComplete: () {
-            //     FocusScope.of(context).requestFocus(_unitNameFocus);
-            //   },
-            // ),
+            CustomTextField(
+              title: "HSN Code",
+              hintText: "Enter HSN Code",
+              controller: _unitIdController,
+              prefixIcon: Icons.flag_circle,
+              isValidate: true,
+              validator: (value) =>
+                  value == null || value.isEmpty ? "Enter unit ID" : null,
+              focusNode: _unitIdFocus,
+              textInputAction: TextInputAction.next,
+              onEditingComplete: () {
+                FocusScope.of(context).requestFocus(_unitNameFocus);
+              },
+            ),
             const SizedBox(height: 16),
             CustomTextField(
               title: "HNS Name",
@@ -210,6 +247,31 @@ print(request);
               },
             ),
             const SizedBox(height: 16),
+CustomDropdownField<int>(
+  title: "Select GST",
+  hintText: "Choose a GST",
+  items: taxMasterListModel!.info!
+      .map((e) => DropdownMenuItem<int>(
+            value: e.taxPercentage,
+            child: Text("${e.taxName} (${e.taxPercentage}%)"),
+          ))
+      .toList(),
+  initialValue: _taxCode, // ✅ use int value here
+  onChanged: (value) {
+    setState(() {
+      _taxCode = value;  // update dropdown selection
+      _taxNameController.text = value.toString(); // update text controller if needed
+    });
+
+    final selected = taxMasterListModel!.info
+        ?.firstWhere((c) => c.taxCode == value, orElse: () => null as tax.Info);
+
+    print("Selected: ${selected?.taxPercentage}");
+    print("TAX Code: ${selected?.taxCode}");
+  },
+  isValidate: true,
+  validator: (value) => value == null ? "Please select a GST" : null,
+),
             // CustomTextField(
             //   title: "Create User",
             //   controller: _createdUserController,

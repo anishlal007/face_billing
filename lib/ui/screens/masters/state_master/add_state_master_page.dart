@@ -231,20 +231,24 @@ print(request);
               },
             ),
             const SizedBox(height: 16),
-CustomDropdownField(
+CustomDropdownField<String>(
   title: "Select Country",
   hintText: "Choose a country",
   items: country!.info
-          ?.map((e) => e?.countryName ?? "")
-          .toList() ?? [], // ✅ list of country names
-  initialValue: null, // 🔹 empty at first
+          ?.map((e) => DropdownMenuItem<String>(
+                value: e?.countryName ?? "", // 🔹 value = country name
+                child: Text(e?.countryName ?? ""), // 🔹 UI label
+              ))
+          .toList() ?? [],
+  initialValue: null, // 🔹 empty initially
   onChanged: (value) {
     print("Selected: $value");
-    // Optionally get the code from info list
+
     final selected = country!.info?.firstWhere(
       (c) => c?.countryName == value,
       orElse: () => null,
     );
+
     print("Country Code: ${selected?.countryCode}");
   },
   isValidate: true,

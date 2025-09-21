@@ -5,10 +5,9 @@ import '../../../core/colors.dart';
 
 
 
-import '../../../data/models/state_master/state_master_list_model.dart';
-import '../masters/hns_master/hns_master_list_page.dart' show HnsMasterListPage;
-import '../masters/state_master/add_state_master_page.dart';
-import '../masters/state_master/state_master_list_page.dart';
+import '../../../data/models/supplier_master/supplier_master_list_model.dart';
+import '../masters/supplier_master/Add_supplier_master_page.dart';
+import '../masters/supplier_master/supplier_master_list_page.dart';
 
 
 
@@ -69,7 +68,7 @@ class _SupplierMasterPageState extends State<SupplierMasterPage> {
       body: isMobile
           ? Padding(
               padding: const EdgeInsets.all(18.0),
-              child: StateMasterListPage(
+              child: SupplierMasterListPage(
                 refreshList: refreshList,
                 onEdit: (country) {
                   _showAddEditBottomSheet(
@@ -84,7 +83,7 @@ class _SupplierMasterPageState extends State<SupplierMasterPage> {
                   flex: 5,
                   child: Padding(
                     padding: const EdgeInsets.all(18.0),
-                    child: StateMasterListPage(
+                    child: SupplierMasterListPage(
                       refreshList: refreshList,
                       onEdit: (country) {
                         setState(() {

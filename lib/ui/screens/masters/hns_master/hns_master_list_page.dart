@@ -74,8 +74,8 @@ class _HnsMasterListPageState extends State<HnsMasterListPage> {
         return ListCardWidget(
           title: info.hsnName ?? "",
           subtitle: "Code: ${info.hsnCode.toString() ?? ""}",
-          initials:  "NA",
-          //initials: info.unitId?.substring(0, 2).toUpperCase() ?? "NA",
+          //initials:  "NA",
+          initials: info.hsnName?.substring(0, 2).toUpperCase() ?? "NA",
           onEdit: () {
             widget.onEdit(info);
           },
@@ -83,7 +83,7 @@ class _HnsMasterListPageState extends State<HnsMasterListPage> {
             final confirm = await showDialog<bool>(
               context: context,
               builder: (context) => AlertDialog(
-                title: const Text("Delete Unit"),
+                title: const Text("Delete Hsn"),
                 content:
                     Text("Are you sure you want to delete ${info.hsnName}?"),
                 actions: [

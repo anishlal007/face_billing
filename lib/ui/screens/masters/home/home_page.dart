@@ -4,7 +4,10 @@ import 'package:flutter/material.dart';
 import '../../../../core/menu_item.dart';
 import '../../pages/Unit_master.dart';
 import '../../pages/area_master_page.dart';
+import '../../pages/customer_group_master_page.dart';
+import '../../pages/customer_master_page.dart';
 import '../../pages/dashboard_page.dart';
+import '../../pages/finance_year_master.dart';
 import '../../pages/hns_master_page.dart';
 import '../../pages/item_group_master.dart';
 import '../../pages/item_make_master.dart';
@@ -104,6 +107,21 @@ class _HomePageState extends State<HomePage> {
           title: "Supplier Group Master",
           icon: Icons.ac_unit,
           page: const SupplierGrpupMasterPage(),
+        ),
+        MenuItemData(
+          title: "Customer Master",
+          icon: Icons.person,
+          page: const CustomerMasterPage(),
+        ),
+        MenuItemData(
+          title: "Customer Group Master",
+          icon: Icons.person_3,
+          page: const CustomerGroupMasterPage(),
+        ),
+        MenuItemData(
+          title: "Finance Year Master",
+          icon: Icons.money,
+          page: const FinanceYearMaster(),
         ),
       ],
     ),

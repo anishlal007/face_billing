@@ -2,9 +2,9 @@ class AddLocationMasterReq {
   String? itemLocationName;
   String? cratedUserCode; // must stay "CratedUserCode"
   String? createdDate;
-  int? updatedUserCode;
+  dynamic updatedUserCode;
   String? updatedDate;
-  int? activeStatus;
+  dynamic activeStatus;
 
   AddLocationMasterReq({
     this.itemLocationName,

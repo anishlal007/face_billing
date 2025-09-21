@@ -1,3 +1,4 @@
+import 'package:facebilling/data/models/supplier_group_master/supplier_group_master_list_model.dart';
 import 'package:flutter/material.dart';
 
 import '../../../core/colors.dart';
@@ -5,10 +6,9 @@ import '../../../core/colors.dart';
 
 
 
-import '../../../data/models/state_master/state_master_list_model.dart';
-import '../masters/hns_master/hns_master_list_page.dart' show HnsMasterListPage;
-import '../masters/state_master/add_state_master_page.dart';
-import '../masters/state_master/state_master_list_page.dart';
+
+import '../masters/supplier_group_master/add_supplier_group_master_page.dart';
+import '../masters/supplier_group_master/supplier_group_master_list_page.dart';
 
 
 
@@ -48,7 +48,7 @@ class _SupplierGrpupMasterPageState extends State<SupplierGrpupMasterPage> {
         child: SizedBox(
           height:
               MediaQuery.of(context).size.height * 0.85, // almost full screen
-          child: AddSupplierGrpupMasterPage(
+          child: AddSupplierGroupMasterPage(
             unitInfo: unit,
             onSaved: (success) {
               Navigator.pop(context); // close sheet
@@ -69,7 +69,7 @@ class _SupplierGrpupMasterPageState extends State<SupplierGrpupMasterPage> {
       body: isMobile
           ? Padding(
               padding: const EdgeInsets.all(18.0),
-              child: StateMasterListPage(
+              child: SupplierGroupMasterListPage(
                 refreshList: refreshList,
                 onEdit: (country) {
                   _showAddEditBottomSheet(
@@ -84,7 +84,7 @@ class _SupplierGrpupMasterPageState extends State<SupplierGrpupMasterPage> {
                   flex: 5,
                   child: Padding(
                     padding: const EdgeInsets.all(18.0),
-                    child: StateMasterListPage(
+                    child: SupplierGroupMasterListPage(
                       refreshList: refreshList,
                       onEdit: (country) {
                         setState(() {
@@ -103,7 +103,7 @@ class _SupplierGrpupMasterPageState extends State<SupplierGrpupMasterPage> {
                   flex: 5,
                   child: Padding(
                     padding: const EdgeInsets.all(18.0),
-                    child: AddSupplierGrpupMasterPage(
+                    child: AddSupplierGroupMasterPage(
                       unitInfo: editingUnit,
                       onSaved: _onSaved,
                     ),
