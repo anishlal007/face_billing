@@ -11,8 +11,9 @@ import '../models/state_master/state_master_list_model.dart';
 
 class StateMasterService {
   final Dio _dio = ApiClient.dio;
-  
- Future<ApiResponse<Country>> getCountries() async {
+
+
+  Future<ApiResponse<Country>> getCountries() async {
     try {
       final response = await _dio.get("countrymaster");
 

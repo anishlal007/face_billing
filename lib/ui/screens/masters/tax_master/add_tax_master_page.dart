@@ -37,11 +37,11 @@ class _AddTaxMasterPageState extends State<AddTaxMasterPage> {
 
   late TextEditingController _unitIdController;
   late TextEditingController _unitNameController;
-  // late TextEditingController _createdUserController;
+   late TextEditingController _taxPercentageController;
 
   final FocusNode _unitIdFocus = FocusNode();
   final FocusNode _unitNameFocus = FocusNode();
-  // final FocusNode _createdUserFocus = FocusNode();
+  final FocusNode __taxPercentageFocus = FocusNode();
 
   @override
   void initState() {
@@ -51,6 +51,8 @@ class _AddTaxMasterPageState extends State<AddTaxMasterPage> {
         TextEditingController(text: widget.unitInfo?.taxCode.toString() ?? "");
     _unitNameController =
         TextEditingController(text: widget.unitInfo?.taxName ?? "");
+    _taxPercentageController =
+        TextEditingController(text: widget.unitInfo?.taxPercentage.toString() ?? "");
     // _createdUserController = TextEditingController(
     //     text: widget.countryInfo?.createdUserCode?.toString() ?? "1001");
     _activeStatus = (widget.unitInfo?.activeStatus ?? 1) == 1;
@@ -60,10 +62,10 @@ class _AddTaxMasterPageState extends State<AddTaxMasterPage> {
   void dispose() {
     _unitIdController.dispose();
     _unitNameController.dispose();
-    // _createdUserController.dispose();
+     _taxPercentageController.dispose();
     _unitIdFocus.dispose();
     _unitNameFocus.dispose();
-    // _createdUserFocus.dispose();
+    __taxPercentageFocus.dispose();
     super.dispose();
   }
 
@@ -79,6 +81,9 @@ class _AddTaxMasterPageState extends State<AddTaxMasterPage> {
       // ADD mode
 
 final request = AddTaxModelReq(
+  taxType: 1,
+  taxPercentage:_taxPercentageController.text.trim() ,
+  taxId: _unitIdController.text.trim(),
   taxName: _unitNameController.text.trim(),   // ❌ not in model
   cratedUserCode: DateTime.now().toIso8601String(),    // ✅ but should be user ID, not DateTime
   createdDate: DateTime.now().toIso8601String(),       // ✅ correct
@@ -93,6 +98,9 @@ print(request);
     } else {
       // EDIT mode
  final updated = AddTaxModelReq(
+  taxType: 1,
+  taxPercentage:_taxPercentageController.text.trim() ,
+  taxId: _unitIdController.text.trim(),
   taxName: _unitNameController.text.trim(),   // ❌ not in model
   cratedUserCode: DateTime.now().toIso8601String(),    // ✅ but should be user ID, not DateTime
   createdDate: DateTime.now().toIso8601String(),       // ✅ correct
@@ -124,6 +132,7 @@ print(request);
     if (widget.unitInfo != oldWidget.unitInfo) {
       _unitIdController.text = widget.unitInfo?.taxCode.toString() ?? "";
       _unitNameController.text = widget.unitInfo?.taxName ?? "";
+        _taxPercentageController.text = widget.unitInfo?.taxPercentage ?.toString() ?? "";
       // _createdUserController.text =
       //     widget.countryInfo?.createdUserCode?.toString() ?? "1001";
       _activeStatus = (widget.unitInfo?.activeStatus ?? 1) == 1;
@@ -158,8 +167,7 @@ print(request);
                 setState(() {
                   _unitIdController.text = country.taxCode.toString() ?? "";
                   _unitNameController.text = country.taxName ?? "";
-                  // _createdUserController.text =
-                  //     country.createdUserCode?.toString() ?? "1001";
+                  _taxPercentageController.text = country.taxPercentage ?.toString() ?? "";
                   _activeStatus = (country.activeStatus ?? 1) == 1;
                 });
 
@@ -183,20 +191,7 @@ print(request);
                 });
               },
             ),
-            // CustomTextField(
-            //   title: "Location Code",
-            //   hintText: "Enter Location Code",
-            //   controller: _unitIdController,
-            //   prefixIcon: Icons.flag_circle,
-            //   isValidate: true,
-            //   validator: (value) =>
-            //       value == null || value.isEmpty ? "Enter unit ID" : null,
-            //   focusNode: _unitIdFocus,
-            //   textInputAction: TextInputAction.next,
-            //   onEditingComplete: () {
-            //     FocusScope.of(context).requestFocus(_unitNameFocus);
-            //   },
-            // ),
+        
             const SizedBox(height: 16),
             CustomTextField(
               title: "TAX Name",
@@ -213,6 +208,37 @@ print(request);
               },
             ),
             const SizedBox(height: 16),
+                CustomTextField(
+              title: "Tax Code",
+              hintText: "Enter Tax Code",
+              controller: _unitIdController,
+              prefixIcon: Icons.flag_circle,
+              isValidate: true,
+              validator: (value) =>
+                  value == null || value.isEmpty ? "Enter Tax Code" : null,
+              focusNode: _unitIdFocus,
+              textInputAction: TextInputAction.next,
+              onEditingComplete: () {
+                FocusScope.of(context).requestFocus(_unitNameFocus);
+              },
+            ),
+            
+            const SizedBox(height: 16),
+                CustomTextField(
+              title: "Tax Percentage",
+              hintText: "Enter TaxPercentage",
+              controller: _taxPercentageController,
+              prefixIcon: Icons.percent,
+              isValidate: true,
+              validator: (value) =>
+                  value == null || value.isEmpty ? "Enter TaxPercentage" : null,
+              focusNode: __taxPercentageFocus,
+              textInputAction: TextInputAction.next,
+              onEditingComplete: () {
+                FocusScope.of(context).requestFocus(__taxPercentageFocus);
+              },
+            ),
+            
             // CustomTextField(
             //   title: "Create User",
             //   controller: _createdUserController,

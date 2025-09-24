@@ -231,6 +231,7 @@ print(request);
                 FocusScope.of(context).requestFocus(_unitNameFocus);
               },
             ),
+          
             const SizedBox(height: 16),
             CustomTextField(
               title: "HNS Name",
@@ -272,6 +273,7 @@ CustomDropdownField<int>(
   isValidate: true,
   validator: (value) => value == null ? "Please select a GST" : null,
 ),
+     
             // CustomTextField(
             //   title: "Create User",
             //   controller: _createdUserController,

@@ -1,13 +1,13 @@
 class AddTaxModelReq {
   String? taxId;
   String? taxName;
-  int? taxPercentage;
-  int? taxType;
+  dynamic taxPercentage;
+  dynamic taxType;
   String? cratedUserCode;
   String? createdDate;
-  int? updatedUserCode;
+  dynamic updatedUserCode;
   String? updatedDate;
-  int? activeStatus;
+  dynamic activeStatus;
 
   AddTaxModelReq(
       {this.taxId,

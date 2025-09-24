@@ -1,31 +1,20 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 
 import '../api/api_client.dart';
 import '../api/api_response.dart';
-import '../models/country/add_country_request.dart';
 import '../models/country/country_response.dart';
+import '../models/product/add_product_request.dart';
+import '../models/product/product_master_list_model.dart';
+import '../models/user_master/add_user_master_model.dart';
+
+import '../models/user_master/user_master_list_model.dart';
 
 class ProductService {
   final Dio _dio = ApiClient.dio;
-
-  /// ADD Country (POST) -> /countrymaster
-  Future<ApiResponse<bool>> addProduct(AddCountryRequest request) async {
-    try {
-      final response = await _dio.post("products", data: request.toJson());
-
-      // Assume API returns success status
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        return ApiResponse(data: true);
-      } else {
-        return ApiResponse(error: "Failed to add country");
-      }
-    } catch (e) {
-      return ApiResponse(error: e.toString());
-    }
-  }
-
-  /// LIST Countries (GET) -> /countrymaster
-  Future<ApiResponse<Country>> getCountries() async {
+  
+ Future<ApiResponse<Country>> getCountries() async {
     try {
       final response = await _dio.get("countrymaster");
 
@@ -38,15 +27,41 @@ class ProductService {
       return ApiResponse(error: e.toString());
     }
   }
-
-  /// Search Countries (GET) -> /countrymaster
-  Future<ApiResponse<Country>> getCountriesSearch(String q) async {
+  Future<ApiResponse<bool>> addProductService(AddProductMasterModel request) async {
     try {
-      final response = await _dio.get("countries/search?q=$q");
+      final response = await _dio.post("products", data: request.toJson());
+print("Sending JSON: ${jsonEncode(request.toJson())}");
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return ApiResponse(data: true);
+      } else {
+        return ApiResponse(error: "Failed to add Loction");
+      }
+    } catch (e) {
+      return ApiResponse(error: e.toString());
+    }
+  }
+
+  Future<ApiResponse<ProductMasterListModel>> getSProductService() async {
+    try {
+      final response = await _dio.get("products");
 
       final responseData = response.data;
 
-      final countryResponse = Country.fromJson(responseData);
+      final countryResponse = ProductMasterListModel.fromJson(responseData);
+
+      return ApiResponse(data: countryResponse);
+    } catch (e) {
+      return ApiResponse(error: e.toString());
+    }
+  }
+
+  Future<ApiResponse<ProductMasterListModel>> getProductServiceSearch(String q) async {
+    try {
+      final response = await _dio.get("item/search?q=$q");
+
+      final responseData = response.data;
+
+      final countryResponse = ProductMasterListModel.fromJson(responseData);
 
       return ApiResponse(data: countryResponse);
     } catch (e) {
@@ -55,21 +70,19 @@ class ProductService {
   }
 
   /// INFO Country (GET) -> /countrymaster/{id}
-  Future<ApiResponse<Country>> getCountryById(String id) async {
+  Future<ApiResponse<ProductMasterListModel>> getProductServiceById(String id) async {
     try {
-      final response = await _dio.get("countrymaster/$id");
-      return ApiResponse(data: Country.fromJson(response.data));
+      final response = await _dio.get("products/$id");
+      return ApiResponse(data: ProductMasterListModel.fromJson(response.data));
     } catch (e) {
       return ApiResponse(error: e.toString());
     }
   }
 
   /// EDIT Country (PUT) -> /countrymaster
-  Future<ApiResponse<bool>> updateCountry(
-      int id, AddCountryRequest request) async {
+  Future<ApiResponse<bool>> updateProductService(dynamic id, AddProductMasterModel request) async {
     try {
-      final response =
-          await _dio.put("countrymaster/$id", data: request.toJson());
+      final response = await _dio.put("products/$id", data: request.toJson());
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         return ApiResponse(data: true);
@@ -83,10 +96,9 @@ class ProductService {
   }
 
   /// DELETE Country (DELETE) -> /countrymaster
-  Future<ApiResponse<bool>> deleteCountry(int id) async {
-    print("countrymaster/$id");
+  Future<ApiResponse<bool>> deleteProductService(dynamic id) async {
     try {
-      await _dio.delete("countrymaster/$id");
+      await _dio.delete("products/$id");
       return ApiResponse(data: true);
     } catch (e) {
       return ApiResponse(error: e.toString());

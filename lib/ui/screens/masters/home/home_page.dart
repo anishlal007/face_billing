@@ -1,9 +1,11 @@
 import 'package:facebilling/ui/screens/pages/location_master.dart';
 import 'package:facebilling/ui/screens/pages/country_master.dart';
+import 'package:facebilling/ui/screens/pages/purchase_master_page.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/menu_item.dart';
 import '../../pages/Unit_master.dart';
 import '../../pages/area_master_page.dart';
+import '../../pages/company_master_page.dart';
 import '../../pages/customer_group_master_page.dart';
 import '../../pages/customer_master_page.dart';
 import '../../pages/dashboard_page.dart';
@@ -12,6 +14,7 @@ import '../../pages/hns_master_page.dart';
 import '../../pages/item_group_master.dart';
 import '../../pages/item_make_master.dart';
 import '../../pages/item_make_master_page.dart';
+import '../../pages/product_master_page.dart';
 import '../../pages/state_master_page.dart';
 import '../../pages/supplier_grpup_master_page.dart';
 import '../../pages/supplier_master_page.dart';
@@ -89,6 +92,11 @@ class _HomePageState extends State<HomePage> {
           page: const StateMasterPage(),
         ),
         MenuItemData(
+          title: "Company Master",
+          icon: Icons.ac_unit,
+          page: const CompanyMasterPage(),
+        ), 
+        MenuItemData(
           title: "User Master",
           icon: Icons.ac_unit,
           page: const UserMasterPage(),
@@ -122,6 +130,16 @@ class _HomePageState extends State<HomePage> {
           title: "Finance Year Master",
           icon: Icons.money,
           page: const FinanceYearMaster(),
+        ),
+        MenuItemData(
+          title: "Product Master",
+          icon: Icons.money,
+          page: const ProductMasterPage(),
+        ),
+        MenuItemData(
+          title: "Purchase Master",
+          icon: Icons.money,
+          page: const PurchaseMasterPage(),
         ),
       ],
     ),
