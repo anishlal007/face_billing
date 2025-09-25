@@ -78,7 +78,7 @@ class _SupplierMasterPageState extends State<SupplierMasterPage> {
             )
           : Row(
               children: [
-                // Left side: Country list
+       /*         // Left side: Country list
                 Expanded(
                   flex: 5,
                   child: Padding(
@@ -97,7 +97,7 @@ class _SupplierMasterPageState extends State<SupplierMasterPage> {
                 const SizedBox(width: 20),
                 Container(color: gray, width: 1),
                 const SizedBox(width: 20),
-                // Right side: Add/Edit form
+                // Right side: Add/Edit form*/
                 Expanded(
                   flex: 5,
                   child: Padding(
