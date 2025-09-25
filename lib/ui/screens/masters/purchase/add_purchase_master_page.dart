@@ -15,6 +15,8 @@ import '../../../widgets/custom_dropdown_text_field.dart';
 import '../../../widgets/custom_switch.dart';
 import '../../../widgets/custom_text_field.dart';
 import '../../../widgets/gradient_button.dart';
+import '../../../widgets/gst_calc_table.dart';
+import '../../../widgets/label_textfield.dart';
 import '../../../widgets/product_drop_down_field.dart';
 import '../../../widgets/product_search_field.dart';
 import '../../../widgets/search_dropdown_field.dart';
@@ -50,7 +52,9 @@ class _AddPurchaseMasterPageState extends State<AddPurchaseMasterPage> {
 
 master. GetAllMasterListModel?getAllMasterListModel;
 product. ProductMasterListModel?productMasterListModel;
-
+List<product.Info> _searchResults = [];
+bool _showSubTable = false;
+int? _activeRowIndex; // to know which row we are editing
  
   late TextEditingController _supplierNameController;
   late TextEditingController _supplierInvoicNoController;
@@ -62,6 +66,20 @@ product. ProductMasterListModel?productMasterListModel;
   late TextEditingController _paymentModeController;
   late TextEditingController _basedOnController;
   late TextEditingController _accountNameController;
+  late TextEditingController _subTotalValueController;
+  late TextEditingController _gstValueController;
+  late TextEditingController _discountController;
+  late TextEditingController _roundOffController;
+  late TextEditingController _frightChargesController;
+  late TextEditingController _netAmountController;
+  late TextEditingController _sgstpreController;
+  late TextEditingController _cgstpreController;
+  late TextEditingController _igstpreController;
+  late TextEditingController _sgstAmtController;
+  late TextEditingController _cgstAmtController;
+  late TextEditingController _igstAmtController;
+  late TextEditingController _totalGstAmtController;
+  late TextEditingController _qtyTotalController;
 
 
 
@@ -88,6 +106,20 @@ final TextEditingController itemNameController = TextEditingController();
   final FocusNode _paymentModeFocus = FocusNode();
   final FocusNode _basedOnFocus = FocusNode();
   final FocusNode _accountNameFocus = FocusNode();
+  final FocusNode _gstValueFocus = FocusNode();
+  final FocusNode _subTotalFocus = FocusNode();
+  final FocusNode _discountFocus = FocusNode();
+  final FocusNode _roundOFfFocus = FocusNode();
+  final FocusNode _frightFocus = FocusNode();
+  final FocusNode _netAmountFocus = FocusNode();
+    late FocusNode _sgstpreFocus;
+  late FocusNode _cgstpreFocus;
+  late FocusNode _igstpreFocus;
+  late FocusNode _sgstAmtFocus;
+  late FocusNode _cgstAmtFocus;
+  late FocusNode _igstAmtFocus;
+  late FocusNode _totalGstAmtFocus;
+  late FocusNode _qtyTotalFocus;
   @override
   void initState() {
     super.initState();
@@ -103,8 +135,31 @@ final TextEditingController itemNameController = TextEditingController();
     _paymentModeController = TextEditingController(text: widget.unitInfo?.paymentType.toString() ?? "");
     _basedOnController = TextEditingController(text:  "");
     _accountNameController = TextEditingController(text:  "");
+    _subTotalValueController = TextEditingController(text:  "");
+    _gstValueController = TextEditingController(text:  "");
+    _discountController = TextEditingController(text:  "");
+    _roundOffController = TextEditingController(text:  "");
+    _frightChargesController = TextEditingController(text:  "");
+    _netAmountController = TextEditingController(text:  "");
 
-   
+    _sgstpreController = TextEditingController(text: '');
+    _cgstpreController = TextEditingController(text: '');
+    _igstpreController = TextEditingController(text: '');
+    _sgstAmtController = TextEditingController(text: '');
+    _cgstAmtController = TextEditingController(text: '');
+    _igstAmtController = TextEditingController(text: '');
+    _totalGstAmtController = TextEditingController(text: '');
+    _qtyTotalController = TextEditingController(text: '');
+
+    // Initialize focus nodes
+    _sgstpreFocus = FocusNode();
+    _cgstpreFocus = FocusNode();
+    _igstpreFocus = FocusNode();
+    _sgstAmtFocus = FocusNode();
+    _cgstAmtFocus = FocusNode();
+    _igstAmtFocus = FocusNode();
+    _totalGstAmtFocus = FocusNode();
+    _qtyTotalFocus = FocusNode();
   }
 Future<void> _loadList() async {
 
@@ -151,7 +206,24 @@ Future<void> _loadList() async {
     _paymentModeController.dispose();
     _basedOnController.dispose();
     _accountNameController.dispose();
+    _sgstpreController.dispose();
+    _cgstpreController.dispose();
+    _igstpreController.dispose();
+    _sgstAmtController.dispose();
+    _cgstAmtController.dispose();
+    _igstAmtController.dispose();
+    _totalGstAmtController.dispose();
+    _qtyTotalController.dispose();
 
+    // Dispose focus nodes
+    _sgstpreFocus.dispose();
+    _cgstpreFocus.dispose();
+    _igstpreFocus.dispose();
+    _sgstAmtFocus.dispose();
+    _cgstAmtFocus.dispose();
+    _igstAmtFocus.dispose();
+    _totalGstAmtFocus.dispose();
+    _qtyTotalFocus.dispose();
     // 🔹 Dispose FocusNodes
     _supNameFocus.dispose();
     _itemNameFocus.dispose();
@@ -471,267 +543,381 @@ print(request);
         //           ],
         //         ),
         //       ),
-         
-         SizedBox(
-      height: 500,
-       child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-         child: SingleChildScrollView(
-           scrollDirection: Axis.vertical,
-           child: 
-           DataTable(
-          border: TableBorder.all(color: Colors.grey.shade300),
-          headingRowColor: MaterialStateProperty.all(Colors.blue.shade50),
-          columns: const [
-            DataColumn(label: Text("SL No")),
-            DataColumn(label: Text("Item Code")),
-            DataColumn(label: Text("Item Name")),
-            DataColumn(label: Text("Back No")),
-            DataColumn(label: Text("Expiry")),
-            DataColumn(label: Text("HSN Code")),
-            DataColumn(label: Text("FreeQty")),
-            DataColumn(label: Text("MRP/Rate")),
-            // DataColumn(label: Text("Net Rate")),
-            // DataColumn(label: Text("Net Value")),
-            DataColumn(label: Text("Purchase Rate")),
-            DataColumn(label: Text("Sales Rate")),
-            DataColumn(label: Text("GST Value")),
-            DataColumn(label: Text("Action")),
-          ],
-          rows: List.generate(items.length, (index) {
-            final item = items[index];
-             final controller = controllers[index];
-            return DataRow(cells: [
-              DataCell(Text("${index + 1}")),
-         
-              // Item Code
-              DataCell(TextFormField(
-               // onTap: () => _showItemSelection(context),
-                initialValue: item.itemCode?.toString() ?? '',
-                keyboardType: TextInputType.number,
-                onChanged: (val) => item.itemCode = int.tryParse(val),
-              )),
-         DataCell(
-  ProductSearchField<product.Info>(
-    hintText: "Search Product",
-    fetchItems: (q) async {
-      final response = await _productService.getProductServiceSearch(q);
-      if (response.isSuccess) {
-        return List<product.Info>.from(response.data?.info ?? []);
-      }
-      return [];
-    },
-    columnHeaders: ["Code", "Barcode", "Name", "UOM", "Qty", "Rate"],
-    rowBuilder: (item) => <DataCell>[
-      DataCell(Text(item.itemCode.toString())),
-      DataCell(Text(item.batchNoRequired.toString())),
-      DataCell(Text(item.itemName ?? "")),
-      DataCell(Text(item.expiryDateFormat ?? "")),
-      DataCell(Text(item.maximumStockQty.toString())),
-      DataCell(Text(item.mRPRate.toString())),
-    ],
-   onSelected: (selected) {
-  setState(() {
-    // 1️⃣ Update the current main table row
-    item.itemCode = selected.itemCode;
-    item.itemName = selected.itemName ?? '';
-    item.batchNoRequired = selected.batchNoRequired ?? 0;
-    item.expiryDateFormat = selected.expiryDateFormat ?? '';
-    item.hSNCode = selected.hSNCode ?? '';
-    item.maximumStockQty = selected.maximumStockQty ?? 0;
-    item.mRPRate = selected.mRPRate ?? 0;
-    item.salesRate = selected.salesRate ?? 0;
-    item.gstPercentage = selected.gstPercentage ?? 0;
-
-    // 2️⃣ Update controllers for this row
-    controller.itemCodeController.text = item.itemCode?.toString() ?? '';
-    controller.itemNameController.text = item.itemName ?? '';
-    controller.batchNoController.text = item.batchNoRequired.toString();
-    controller.expiryController.text = item.expiryDateFormat ?? '';
-    controller.hsnController.text = item.hSNCode ?? '';
-    controller.qtyController.text = item.maximumStockQty.toString();
-    controller.mrpController.text = item.mRPRate.toString();
-    controller.salesRateController.text = item.salesRate.toString();
-    controller.gstController.text = item.gstPercentage.toString();
-
-    // 3️⃣ Add a new empty row if this is the last row
-    if (index == items.length - 1) {
-      items.add(product.Info());
-      controllers.add(ItemRowControllers());
-    }
-  });
-
-  // 4️⃣ Clear the search field inside ProductSearchField
-  //    (so user sees a clean row after selection)
-  Future.delayed(Duration(milliseconds: 100), () {
-    //_controller.clear();
-    //setState(() => _results = []);
-  });
-},
-  ),
-),
-              // Item Name with API search
-//               DataCell(
-//           ProductSearchDropdownField<product.Info>(
-//   hintText: "Search Product",
-//   prefixIcon: Icons.search,
-//   fetchItems: (q) async {
-//     final response = await _productService.getProductServiceSearch(q);
-//     if (response.isSuccess) {
-//       final infoList = response.data?.info;
-//       if (infoList != null) {
-//         // cast each element to product.Info
-//         return List<product.Info>.from(infoList);
-//       }
-//     }
-//     return <product.Info>[];
-//   },
-//   displayString: (item) => item.itemName ?? "",
-//   onSelected: (item) {
-//     print("Selected: ${item.itemName}");
-//   },
-//   columnHeaders: ["Code", "Barcode", "Name", "UOM", "Qty", "Rate"],
-//   rowBuilder: (product.Info item) => <DataCell>[
-//     DataCell(Text(item.itemCode.toString())),
-//     DataCell(Text(item.batchNoRequired.toString())),
-//     DataCell(Text(item.itemName ?? "")),
-//     DataCell(Text(item.expiryDateFormat ?? "")),
-//     DataCell(Text(item.maximumStockQty.toString())),
-//     DataCell(Text(item.mRPRate.toString())),
-//   ],
-// ),
-//           //       SearchDropdownField<product.Info>(
-//           //   hintText: "Search Item",
-//           //   fetchItems: (q) async {
-//           //     final response = await _productService.getProductServiceSearch(q);
-//           //     if (response.isSuccess) return response.data?.info ?? [];
-//           //     return [];
-//           //   },
-//           //   displayString: (unit) => unit.itemName ?? "",
-//           //   onSelected: (selected) {
-//           //     setState(() {
-//           //       // Update the item
-//           //       item.itemCode = selected.itemCode;
-//           //       item.itemName = selected.itemName ?? '';
-//           //       item.batchNoRequired = selected.batchNoRequired ?? 0;
-//           //       item.expiryDateFormat = selected.expiryDateFormat ?? '';
-//           //       item.hSNCode = selected.hSNCode ?? '';
-//           //       item.maximumStockQty = selected.maximumStockQty ?? 0;
-//           //       item.mRPRate = selected.mRPRate ?? 0;
-//           //       item.salesRate = selected.salesRate ?? 0;
-//           //       item.gstPercentage = selected.gstPercentage ?? 0;
-         
-//           //       // Update controllers for this row only
-//           //       controller.itemCodeController.text = item.itemCode?.toString() ?? '';
-//           //       controller.itemNameController.text = item.itemName!;
-//           //       controller.batchNoController.text = item.batchNoRequired.toString();
-//           //       controller.expiryController.text = item.expiryDateFormat!;
-//           //       controller.hsnController.text = item.hSNCode!;
-//           //       controller.qtyController.text = item.maximumStockQty.toString();
-//           //       controller.mrpController.text = item.mRPRate.toString();
-//           //       controller.salesRateController.text = item.salesRate.toString();
-//           //       controller.gstController.text = item.gstPercentage.toString();
-         
-//           //       // Add new empty row if last row is filled
-//           //       if (index == items.length - 1) {
-//           //         items.add(product.Info());
-//           //         controllers.add(ItemRowControllers());
-//           //       }
-//           //     });
-//           //   },
-//           // )
-         
-//           ),
-         
-         
-              // Batch No
-              DataCell(TextFormField(
-                controller:controller.batchNoController ,
-               // initialValue: item.batchNoRequired.toString(),
-                onChanged: (val) => item.batchNoRequired = int.parse(val),
-              )),
-         
-              // Expiry
-              DataCell(TextFormField(
-                controller:controller.expiryController ,
-                ///initialValue: item.expiryDateFormat,
-                onChanged: (val) => item.expiryDateFormat = val,
-              )),
-         
-              // HSN Code
-              DataCell(TextFormField(
-               controller:controller.hsnController ,
-                onChanged: (val) => item.hSNCode = val,
-              )),
-         
-              // Qty
-              DataCell(TextFormField(
-               controller:controller.qtyController ,
-                keyboardType: TextInputType.number,
-                onChanged: (val) => item.maximumStockQty = int.tryParse(val) ?? 0,
-              )),
-         
-              // MRP/Rate
-              DataCell(TextFormField(
-             controller:controller.mrpController ,
-                keyboardType: TextInputType.number,
-                onChanged: (val) => item.mRPRate = int.tryParse(val) ?? 0,
-              )),
-         
-              // Net Rate
-              // DataCell(TextFormField(
-              //   keyboardType: TextInputType.number,
-              //   onChanged: (val) => item.netRate = double.tryParse(val) ?? 0,
-              // )),
-         
-              // // Net Value
-              // DataCell(Text(item.netValue.toStringAsFixed(2))),
-         
-              // Sale Rate
-              DataCell(TextFormField(
-                controller:controller.salesRateController ,
-                keyboardType: TextInputType.number,
-                onChanged: (val) => item.salesRate = int.tryParse(val) ?? 0,
-              )),
-         
-              // GST %
-              DataCell(TextFormField(
-               controller:controller.gstController ,
-                keyboardType: TextInputType.number,
-                onChanged: (val) => item.gstPercentage = int.tryParse(val) ?? 0,
-              )),
-         
-              // GST Value
-              DataCell(TextFormField(
-               controller:controller.gstController ,
-                keyboardType: TextInputType.number,
-                onChanged: (val) => item.gstPercentage = int.tryParse(val) ?? 0,
-              )),
-         
-              // Delete
-              DataCell(IconButton(
-                icon: const Icon(Icons.delete, color: Colors.red),
-                onPressed: () {
-                  setState(() {
-                    items.removeAt(index);
-                    if (items.isEmpty) items.add(product.Info());
-                  });
-                },
-              )),
-            ]);
-          }),
+//          Sl.No
+// Item Id
+// Item Name
+// Back.No
+// Exp.Date
+// HSN Code
+// VOM
+// Qty
+// FreeQty
+// Purchase Rate
+// MRP Rate
+         SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+           child: SingleChildScrollView(
+             scrollDirection: Axis.vertical,
+             child: 
+             DataTable(
+              showCheckboxColumn: false,
+            border: TableBorder.all(color: Colors.grey.shade300),
+            headingRowColor: MaterialStateProperty.all(Colors.blue),
+            columns: const [
+              DataColumn(label: Text("SL No")),
+              DataColumn(label: Text("Item Id")),
+              DataColumn(label: Text("Item Name")),
+              DataColumn(label: Text("Back No")),
+              DataColumn(label: Text("Expiry")),
+              DataColumn(label: Text("VOM")),
+              DataColumn(label: Text("HSN Code")),
+              DataColumn(label: Text("FreeQty")),
+              DataColumn(label: Text("MRP/Rate")),
+              // DataColumn(label: Text("Net Rate")),
+              // DataColumn(label: Text("Net Value")),
+              DataColumn(label: Text("Purchase Rate")),
+              DataColumn(label: Text("Sales Rate")),
+              //DataColumn(label: Text("GST Value")),
+              DataColumn(label: Text("Action")),
+            ],
+            rows: List.generate(items.length, (index) {
+              final item = items[index];
+               final controller = controllers[index];
+              return DataRow(cells: [
+                DataCell(Text("${index + 1}")),
+           
+                // Item Code
+                DataCell(TextFormField(
+                 // onTap: () => _showItemSelection(context),
+                  initialValue: item.itemCode?.toString() ?? '',
+                  keyboardType: TextInputType.number,
+                  onChanged: (val) => item.itemCode = int.tryParse(val),
+                )),
+                DataCell(
+           TextFormField(
+             controller: controller.itemNameController,
+             decoration: InputDecoration(
+               hintText: "",
+             ),
+             onChanged: (val) async {
+               if (val.isNotEmpty) {
+          final response = await _productService.getProductServiceSearch(val);
+          if (response.isSuccess) {
+            setState(() {
+              _searchResults = response.data?.info ?? [];
+              _showSubTable = _searchResults.isNotEmpty;
+              _activeRowIndex = index; // track which row user is editing
+            });
+          }
+               } else {
+          setState(() {
+            _searchResults.clear();
+            _showSubTable = false;
+            _activeRowIndex = null;
+          });
+               }
+             },
            ),
          ),
-       ),
+                // DataCell(TextFormField(
+                //  // onTap: () => _showItemSelection(context),
+                //   initialValue: item.itemName?.toString() ?? '',
+                //   keyboardType: TextInputType.number,
+                //   onChanged: (val) => item.itemCode = int.tryParse(val),
+                // )),
+         
+           
+                // Batch No
+                DataCell(TextFormField(
+                  controller:controller.batchNoController ,
+                 // initialValue: item.batchNoRequired.toString(),
+                  onChanged: (val) => item.batchNoRequired = int.parse(val),
+                )),
+           
+                // Expiry
+                DataCell(TextFormField(
+                  controller:controller.expiryController ,
+                  ///initialValue: item.expiryDateFormat,
+                  onChanged: (val) => item.expiryDateFormat = val,
+                )),
+           
+                // HSN Code
+                DataCell(TextFormField(
+                 controller:controller.hsnController ,
+                  onChanged: (val) => item.hSNCode = val,
+                )),
+           
+                // Qty
+                DataCell(TextFormField(
+                 controller:controller.qtyController ,
+                  keyboardType: TextInputType.number,
+                  onChanged: (val) => item.maximumStockQty = int.tryParse(val) ?? 0,
+                )),
+           
+                // MRP/Rate
+                DataCell(TextFormField(
+               controller:controller.mrpController ,
+                  keyboardType: TextInputType.number,
+                  onChanged: (val) => item.mRPRate = int.tryParse(val) ?? 0,
+                )),
+           
+                // Net Rate
+                // DataCell(TextFormField(
+                //   keyboardType: TextInputType.number,
+                //   onChanged: (val) => item.netRate = double.tryParse(val) ?? 0,
+                // )),
+           
+                // // Net Value
+                // DataCell(Text(item.netValue.toStringAsFixed(2))),
+           
+                // Sale Rate
+                DataCell(TextFormField(
+                  controller:controller.salesRateController ,
+                  keyboardType: TextInputType.number,
+                  onChanged: (val) => item.salesRate = int.tryParse(val) ?? 0,
+                )),
+           
+                // GST %
+                DataCell(TextFormField(
+                 controller:controller.gstController ,
+                  keyboardType: TextInputType.number,
+                  onChanged: (val) => item.gstPercentage = int.tryParse(val) ?? 0,
+                )),
+           
+                // GST Value
+                DataCell(TextFormField(
+                 controller:controller.gstController ,
+                  keyboardType: TextInputType.number,
+                  onChanged: (val) => item.gstPercentage = int.tryParse(val) ?? 0,
+                )),
+           
+                // Delete
+                DataCell(IconButton(
+                  icon: const Icon(Icons.delete, color: Colors.red),
+                  onPressed: () {
+                    setState(() {
+                      items.removeAt(index);
+                      if (items.isEmpty) items.add(product.Info());
+                    });
+                  },
+                )),
+              ]);
+            }),
+             ),
+           ),
          ),
       
-      const SizedBox(height: 100,)
+      const SizedBox(height: 20,),
+       if (!_showSubTable)
+       SizedBox(height: 200,),
+      if (_showSubTable)
+  SizedBox(
+    height: 800,
+    child: SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        child: DataTable(
+          showCheckboxColumn: false,
+          border: TableBorder.all(color: Colors.grey.shade300),
+          headingRowColor: MaterialStateProperty.all(Colors.blue),
+          columns: const [
+           DataColumn(label: Text("SL No")),
+              DataColumn(label: Text("Item Id")),
+              DataColumn(label: Text("Item Name")),
+              DataColumn(label: Text("Back No")),
+              DataColumn(label: Text("Expiry")),
+              DataColumn(label: Text("VOM")),
+              DataColumn(label: Text("HSN Code")),
+              DataColumn(label: Text("FreeQty")),
+              DataColumn(label: Text("MRP/Rate")),
+              // DataColumn(label: Text("Net Rate")),
+              // DataColumn(label: Text("Net Value")),
+              DataColumn(label: Text("Purchase Rate")),
+              DataColumn(label: Text("Sales Rate")),
+          ],
+        rows: _searchResults.asMap().entries.map((entry) {
+  final index = entry.key;   // <-- gives you the index
+  final p = entry.value;     // <-- this is your Info object
+
+  return DataRow(
+    onSelectChanged: (_) {
+      setState(() {
+        if (_activeRowIndex != null) {
+          final item = items[_activeRowIndex!];
+          final controller = controllers[_activeRowIndex!];
+
+          // update model
+          item.itemCode        = p.itemCode;
+          item.itemName        = p.itemName ?? '';
+          item.batchNoRequired = p.batchNoRequired ?? 0;
+          item.expiryDateFormat= p.expiryDateFormat ?? '';
+          item.hSNCode         = p.hSNCode ?? '';
+          item.maximumStockQty = p.maximumStockQty ?? 0;
+          item.mRPRate         = p.mRPRate ?? 0;
+          item.salesRate       = p.salesRate ?? 0;
+          item.gstPercentage   = p.gstPercentage ?? 0;
+
+          // update controllers
+          controller.itemCodeController.text   = item.itemCode?.toString() ?? '';
+          controller.itemNameController.text   = item.itemName ?? '';
+          controller.batchNoController.text    = item.batchNoRequired.toString();
+          controller.expiryController.text     = item.expiryDateFormat ?? '';
+          controller.hsnController.text        = item.hSNCode ?? '';
+          controller.qtyController.text        = item.maximumStockQty.toString();
+          controller.mrpController.text        = item.mRPRate.toString();
+          controller.salesRateController.text  = item.salesRate.toString();
+          controller.gstController.text        = item.gstPercentage.toString();
+
+          // ✅ Add new empty row if last row was just filled
+          if (_activeRowIndex == items.length - 1) {
+            items.add(product.Info());
+            controllers.add(ItemRowControllers());
+          }
+
+          // hide sub-table
+          _showSubTable = false;
+          _searchResults.clear();
+          _activeRowIndex = null;
+        }
+      });
+    },
+    cells: [
+      DataCell(Text("${index + 1}")), // ✅ now index works
+      DataCell(Text(p.itemCode?.toString() ?? "")),
+      DataCell(Text(p.itemName ?? "")),
+      DataCell(Text(p.batchNoRequired.toString())),
+      DataCell(Text(p.expiryDateFormat ?? "")),
+      DataCell(Text(p.hSNCode.toString())),
+      DataCell(Text(p.maximumStockQty.toString())),
+      DataCell(Text(p.maximumStockQty.toString())),
+      DataCell(Text(p.mRPRate.toString())),
+      DataCell(Text(p.purchaseRate.toString())),
+      DataCell(Text(p.salesRate.toString())),
+    ],
+  );
+}).toList(),
+        ),
+      ),
+    ),
+  ),
+      
               ],
             ),
         
           ),
         ),
       ),
+  bottomNavigationBar: Container(
+  color: Colors.white,
+  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+  child: SingleChildScrollView(
+    scrollDirection: Axis.horizontal, // allow horizontal scroll
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        GstDataTableWidget(),
+        const SizedBox(width: 16),
+        Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            LabeledTextField(
+              focusNode: _sgstpreFocus,
+              label: "SGST %",
+              controller: _sgstpreController,
+              readOnly: false,
+            ),
+            LabeledTextField(
+              focusNode: _cgstpreFocus,
+              label: "CGST %",
+              controller: _cgstpreController,
+              readOnly: true,
+            ),
+            LabeledTextField(
+              focusNode: _igstpreFocus,
+              label: "IGST %",
+              controller: _igstpreController,
+              readOnly: true,
+            ),
+          ],
+        ),
+        const SizedBox(width: 16),
+        Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            LabeledTextField(
+              focusNode: _sgstAmtFocus,
+              label: "SGST Amount",
+              controller: _sgstAmtController,
+              readOnly: true,
+            ),
+            LabeledTextField(
+              focusNode: _cgstAmtFocus,
+              label: "CGST Amount",
+              controller: _cgstAmtController,
+              readOnly: true,
+            ),
+            LabeledTextField(
+              focusNode: _igstAmtFocus,
+              label: "IGST Amount",
+              controller: _igstAmtController,
+              readOnly: true,
+            ),
+            LabeledTextField(
+              focusNode: _totalGstAmtFocus,
+              label: "Total GST Amount",
+              controller: _totalGstAmtController,
+              readOnly: true,
+            ),
+          ],
+        ),
+        const SizedBox(width: 16),
+        Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            LabeledTextField(
+              focusNode: _subTotalFocus,
+              label: "Sub Total Value",
+              controller: _subTotalValueController,
+              readOnly: true,
+            ),
+            LabeledTextField(
+              focusNode: _gstValueFocus,
+              label: "GST Value",
+              controller: _gstValueController,
+              readOnly: true,
+            ),
+            LabeledTextField(
+              focusNode: _discountFocus,
+              label: "Discount",
+              controller: _discountController,
+              readOnly: true,
+            ),
+            LabeledTextField(
+              focusNode: _roundOFfFocus,
+              label: "Round Off",
+              controller: _roundOffController,
+              readOnly: true,
+            ),
+            LabeledTextField(
+              focusNode: _frightFocus,
+              label: "Freight Charges",
+              controller: _frightChargesController,
+              readOnly: true,
+            ),
+            LabeledTextField(
+              focusNode: _roundOFfFocus,
+              label: "Net Amount",
+              controller: _netAmountController,
+              readOnly: true,
+            ),
+          ],
+        ),
+      ],
+    ),
+  ),
+),
+   
     );
   
   }

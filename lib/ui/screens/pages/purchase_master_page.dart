@@ -65,60 +65,14 @@ class _PurchaseMasterPageState extends State<PurchaseMasterPage> {
   @override
   Widget build(BuildContext context) {
     final isMobile = MediaQuery.of(context).size.width < 600;
-
-    return Scaffold(
+ return Scaffold(
       backgroundColor: lightgray,
-      body: isMobile
-          ? Padding(
-              padding: const EdgeInsets.all(18.0),
-              child: UserMasterListPage(
-                refreshList: refreshList,
-                onEdit: (country) {
-                  _showAddEditBottomSheet(
-                      country as Info?); // ✅ open bottom sheet for edit
-                },
-              ),
-            )
-          : Row(
-              children: [
-               
-                // Left side: Country list
-                Expanded(
-                  flex: 5,
-                  child: Padding(
-                    padding: const EdgeInsets.all(18.0),
-                    child: AddPurchaseMasterPage(
-                       unitInfo: editingUnit,
-                       onSaved: _onSaved,
-                     ),
-                  ),
-                ),
-                const SizedBox(width: 20),
-                Container(color: gray, width: 1),
-                const SizedBox(width: 20),
-                // Right side: Add/Edit form
-                // Expanded(
-                //   flex: 5,
-                //   child: Padding(
-                //     padding: const EdgeInsets.all(18.0),
-                //     child: AddPurchaseMasterPage(
-                //       unitInfo: editingUnit,
-                //       onSaved: _onSaved,
-                //     ),
-                //   ),
-                // ),
-           
-              ],
-            ),
-      floatingActionButton: isMobile
-          ? FloatingActionButton.extended(
-              backgroundColor: primary,
-              foregroundColor: white,
-              onPressed: () => _showAddEditBottomSheet(null), // ✅ Add Country
-              label: const Text("Add Country"),
-              icon: const Icon(Icons.add),
-            )
-          : null,
+      body: AddPurchaseMasterPage(
+        unitInfo: editingUnit,
+        onSaved: _onSaved,
+      ),
     );
+   
+ 
   }
 }

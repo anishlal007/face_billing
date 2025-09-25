@@ -14,6 +14,7 @@ class CustomTextField extends StatefulWidget {
   final bool isValidate;
   final String? Function(String?)? validator;
   final bool isEdit;
+  final bool autoFocus;
 
   const CustomTextField({
     super.key,
@@ -30,6 +31,7 @@ class CustomTextField extends StatefulWidget {
     this.isValidate = false,
     this.validator,
     this.isEdit = false,
+    this.autoFocus = false,
   });
 
   @override
@@ -76,6 +78,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
               widget.isNumeric ? TextInputType.number : TextInputType.text,
           enabled: !widget.isEdit,
           onChanged: widget.isEdit ? null : _validate,
+          autofocus: widget.autoFocus,
           decoration: InputDecoration(
             hintText: widget.hintText,
             prefixIcon:

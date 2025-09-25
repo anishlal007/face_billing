@@ -2,27 +2,20 @@ import 'package:flutter/material.dart';
 
 import '../../../core/colors.dart';
 
-
-
-
-
 import '../../../data/models/product/product_master_list_model.dart';
 import '../masters/product_master/add_product_master_page.dart';
 import '../masters/user_master/add_user_master_page.dart';
 import '../masters/user_master/user_master_list_page.dart';
 
-
-
 class ProductMasterPage extends StatefulWidget {
   const ProductMasterPage({super.key});
 
   @override
-  State<ProductMasterPage> createState() =>
-      _ProductMasterPageState();
+  State<ProductMasterPage> createState() => _ProductMasterPageState();
 }
 
 class _ProductMasterPageState extends State<ProductMasterPage> {
-   Info? editingUnit;
+  Info? editingUnit;
   bool refreshList = false;
 
   void _onSaved(bool success) {
@@ -67,57 +60,52 @@ class _ProductMasterPageState extends State<ProductMasterPage> {
 
     return Scaffold(
       backgroundColor: lightgray,
-      body: isMobile
-          ? Padding(
-              padding: const EdgeInsets.all(18.0),
-              child: UserMasterListPage(
-                refreshList: refreshList,
-                onEdit: (country) {
-                  _showAddEditBottomSheet(
-                      country as Info?); // ✅ open bottom sheet for edit
-                },
-              ),
-            )
-          : Row(
-              children: [
-               
-                // Left side: Country list
-                Expanded(
-                  flex: 5,
-                  child: Padding(
-                    padding: const EdgeInsets.all(18.0),
-                    child: AddProductMasterPage(
-                       unitInfo: editingUnit,
-                       onSaved: _onSaved,
-                     ),
-                  ),
-                ),
-                const SizedBox(width: 20),
-                Container(color: gray, width: 1),
-                const SizedBox(width: 20),
-                // Right side: Add/Edit form
-                // Expanded(
-                //   flex: 5,
-                //   child: Padding(
-                //     padding: const EdgeInsets.all(18.0),
-                //     child: AddProductMasterPage(
-                //       unitInfo: editingUnit,
-                //       onSaved: _onSaved,
-                //     ),
-                //   ),
-                // ),
-           
-              ],
-            ),
-      floatingActionButton: isMobile
-          ? FloatingActionButton.extended(
-              backgroundColor: primary,
-              foregroundColor: white,
-              onPressed: () => _showAddEditBottomSheet(null), // ✅ Add Country
-              label: const Text("Add Country"),
-              icon: const Icon(Icons.add),
-            )
-          : null,
+      body: AddProductMasterPage(
+        unitInfo: editingUnit,
+        onSaved: _onSaved,
+      ),
     );
+
+    //   isMobile
+    //       ? Padding(
+    //           padding: const EdgeInsets.all(18.0),
+    //           child: UserMasterListPage(
+    //             refreshList: refreshList,
+    //             onEdit: (country) {
+    //               _showAddEditBottomSheet(
+    //                   country as Info?); // ✅ open bottom sheet for edit
+    //             },
+    //           ),
+    //         )
+    //       : Row(
+    //           children: [
+
+    //             // Left side: Country list
+    //             Expanded(
+    //               flex: 5,
+    //               child: Padding(
+    //                 padding: const EdgeInsets.all(18.0),
+    //                 child: AddProductMasterPage(
+    //                    unitInfo: editingUnit,
+    //                    onSaved: _onSaved,
+    //                  ),
+    //               ),
+    //             ),
+    //             const SizedBox(width: 20),
+    //             Container(color: gray, width: 1),
+    //             const SizedBox(width: 20),
+
+    //           ],
+    //         ),
+    //   floatingActionButton: isMobile
+    //       ? FloatingActionButton.extended(
+    //           backgroundColor: primary,
+    //           foregroundColor: white,
+    //           onPressed: () => _showAddEditBottomSheet(null), // ✅ Add Country
+    //           label: const Text("Add Country"),
+    //           icon: const Icon(Icons.add),
+    //         )
+    //       : null,
+    // );
   }
 }

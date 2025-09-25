@@ -1,6 +1,11 @@
-import 'package:facebilling/ui/widgets/product_drop_down_field.dart';
+import 'dart:async';
 import 'package:flutter/material.dart';
+
+// small typedefs so the file is self-contained
+typedef FetchCallback<T extends Object> = Future<List<T>> Function(String query);
+typedef RowBuilder<T extends Object> = List<DataCell> Function(T option);
 typedef OnSelected<T extends Object> = void Function(T selected);
+
 class ProductSearchField<T extends Object> extends StatefulWidget {
   final FetchCallback<T> fetchItems;
   final RowBuilder<T> rowBuilder;
@@ -21,17 +26,18 @@ class ProductSearchField<T extends Object> extends StatefulWidget {
   State<ProductSearchField<T>> createState() => _ProductSearchFieldState<T>();
 }
 
-class _ProductSearchFieldState<T extends Object> extends State<ProductSearchField<T>> {
+class _ProductSearchFieldState<T extends Object>
+    extends State<ProductSearchField<T>> {
   final TextEditingController _controller = TextEditingController();
   List<T> _results = [];
   bool _loading = false;
+  Timer? _debounce;
 
   Future<void> _search(String query) async {
     if (query.isEmpty) {
       setState(() => _results = []);
       return;
     }
-
     setState(() => _loading = true);
     final results = await widget.fetchItems(query);
     setState(() {
@@ -40,8 +46,35 @@ class _ProductSearchFieldState<T extends Object> extends State<ProductSearchFiel
     });
   }
 
+  void _onChanged(String query) {
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+    _debounce = Timer(const Duration(milliseconds: 400), () {
+      _search(query);
+    });
+  }
+
+  void _handleSelect(T item) {
+    print("✅ ProductSearchField - selected: ${item.toString()}");
+
+    widget.onSelected?.call(item);
+
+    setState(() {
+      _controller.clear();
+      _results.clear();
+    });
+  }
+
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    _controller.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
+    final hasQuery = _controller.text.isNotEmpty;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -60,49 +93,42 @@ class _ProductSearchFieldState<T extends Object> extends State<ProductSearchFiel
                     ),
                   )
                 : null,
-          //  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
           ),
-          onChanged: _search,
+          onChanged: _onChanged,
+          onSubmitted: _search,
         ),
         const SizedBox(height: 8),
-        if (_results.isNotEmpty || _loading)
+        if (_loading)
+          const Center(child: CircularProgressIndicator())
+        else if (hasQuery && _results.isEmpty)
+          const Padding(
+            padding: EdgeInsets.all(12.0),
+            child: Text("No results found"),
+          )
+        else if (_results.isNotEmpty)
           Container(
             decoration: BoxDecoration(
               border: Border.all(color: Colors.grey.shade300),
               borderRadius: BorderRadius.circular(8),
             ),
-            constraints: BoxConstraints(
-              maxHeight: 300, // adjust height as needed
+            constraints: const BoxConstraints(maxHeight: 300),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: DataTable(
+                showCheckboxColumn: false,
+                headingRowColor:
+                    MaterialStateProperty.all(Colors.blue[50]),
+                columns: widget.columnHeaders
+                    .map((h) => DataColumn(label: Text(h)))
+                    .toList(),
+                rows: _results.map((item) {
+                  return DataRow(
+                    onSelectChanged: (_) => _handleSelect(item),
+                    cells: widget.rowBuilder(item),
+                  );
+                }).toList(),
+              ),
             ),
-            child: _loading
-                ? const Center(
-                    child: Padding(
-                      padding: EdgeInsets.all(16.0),
-                      child: CircularProgressIndicator(),
-                    ),
-                  )
-                : SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: SingleChildScrollView(
-                      child: DataTable(
-                        headingRowColor:
-                            MaterialStateProperty.all(Colors.blue[50]),
-                        columns: widget.columnHeaders
-                            .map((h) => DataColumn(label: Text(h)))
-                            .toList(),
-                        rows: _results.map((item) {
-                          return DataRow(
-                            cells: widget.rowBuilder(item),
-                            onSelectChanged: (_) {
-                              if (widget.onSelected != null) {
-                                widget.onSelected!(item);
-                              }
-                            },
-                          );
-                        }).toList(),
-                      ),
-                    ),
-                  ),
           ),
       ],
     );

@@ -7,7 +7,8 @@ import '../../../../data/models/product/add_product_request.dart';
 import '../../../../data/models/product/product_master_list_model.dart';
 import '../../../../data/services/get_all_master_service.dart';
 import '../../../../data/services/product_service.dart';
-import '../../../../data/services/tax_master_service.dart' show TaxMasterService;
+import '../../../../data/services/tax_master_service.dart'
+    show TaxMasterService;
 import '../../../widgets/custom_dropdown_text_field.dart';
 import '../../../widgets/custom_switch.dart';
 import '../../../widgets/custom_text_field.dart';
@@ -29,21 +30,28 @@ class AddProductMasterPage extends StatefulWidget {
 
 class _AddProductMasterPageState extends State<AddProductMasterPage> {
   final _formKey = GlobalKey<FormState>();
+
   ///services
   final ProductService _service = ProductService();
   final GetAllMasterService _getAllMasterService = GetAllMasterService();
-  int? _taxCode,_itemGroup,_itemUnit,_itemMake;
+  int? _taxCode, _itemGroup, _itemUnit, _itemMake, _itemGeneric;
   bool _activeStatus = true;
   bool _loading = false;
-  bool _nonScheduledItem = false,_scheduledItem=true,_expiryRequired=false,_isNarocotic=false,_isBatchNumbeRequired=false,_isDiscountReq=false;
+  bool _nonScheduledItem = true,
+      _scheduledItem = true,
+      _expiryRequired = true,
+      _isNarocotic = true,
+      _isBatchNumbeRequired = true,
+      _isDiscountReq = true;
   String? _message;
-    bool _getAllLoading = true;
+  bool _getAllLoading = true;
 
   String? error;
-///model
 
-master. GetAllMasterListModel?getAllMasterListModel;
-   late TextEditingController _itemIdController;
+  ///model
+
+  master.GetAllMasterListModel? getAllMasterListModel;
+  late TextEditingController _itemIdController;
   late TextEditingController _itemNameController;
   late TextEditingController _itemTypeController;
   late TextEditingController _itemGroupCodeController;
@@ -77,6 +85,7 @@ master. GetAllMasterListModel?getAllMasterListModel;
   final FocusNode _itemIdFocus = FocusNode();
   final FocusNode _itemNameFocus = FocusNode();
   final FocusNode _itemTypeFocus = FocusNode();
+  final FocusNode _itemGroupFocus = FocusNode();
   final FocusNode _itemGroupCodeFocus = FocusNode();
   final FocusNode _itemUnitCodeFocus = FocusNode();
   final FocusNode _itemMakeCodeFocus = FocusNode();
@@ -107,40 +116,72 @@ master. GetAllMasterListModel?getAllMasterListModel;
   @override
   void initState() {
     super.initState();
-_loadList();
-    _itemIdController = TextEditingController(text: widget.unitInfo?.itemID ?? "");
-    _itemNameController = TextEditingController(text: widget.unitInfo?.itemName ?? "");
-    _itemTypeController = TextEditingController(text: widget.unitInfo?.itemType?.toString() ?? "");
-    _itemGroupCodeController = TextEditingController(text: widget.unitInfo?.itemGroupCode?.toString() ?? "");
-    _itemUnitCodeController = TextEditingController(text: widget.unitInfo?.itemUnitCode?.toString() ?? "");
-    _itemMakeCodeController = TextEditingController(text: widget.unitInfo?.itemMakeCode?.toString() ?? "");
-    _itemGenericCodeController = TextEditingController(text: widget.unitInfo?.itemGenericCode?.toString() ?? "");
-    _nonScheduleItemController = TextEditingController(text: widget.unitInfo?.nonScheduleItem?.toString() ?? "");
-    _scheduledH1ItemController = TextEditingController(text: widget.unitInfo?.scheduledH1Item?.toString() ?? "");
-    _narcoticItemController = TextEditingController(text: widget.unitInfo?.narcoticItem?.toString() ?? "");
-    _expiryDateFormatController = TextEditingController(text: widget.unitInfo?.expiryDateFormat ?? "");
-    _expiryDateRequiredController = TextEditingController(text: widget.unitInfo?.expiryDateRequired ?? "");
-    _subUnitCodeController = TextEditingController(text: widget.unitInfo?.subUnitCode?.toString() ?? "");
-    _subQtyController = TextEditingController(text: widget.unitInfo?.subQty?.toString() ?? "");
-    _batchNoRequiredController = TextEditingController(text: widget.unitInfo?.batchNoRequired?.toString() ?? "");
-    _minimumStockQtyController = TextEditingController(text: widget.unitInfo?.minimumStockQty?.toString() ?? "");
-    _maximumStockQtyController = TextEditingController(text: widget.unitInfo?.maximumStockQty?.toString() ?? "");
-    _reOrderLevelController = TextEditingController(text: widget.unitInfo?.reOrderLevel?.toString() ?? "");
-    _reOrderQtyController = TextEditingController(text: widget.unitInfo?.reOrderQty?.toString() ?? "");
-    _priceTakenFromController = TextEditingController(text: widget.unitInfo?.priceTakenFrom?.toString() ?? "");
-    _itemDiscountPercentageController = TextEditingController(text: widget.unitInfo?.itemDiscountPercentage?.toString() ?? "");
-    _itemDiscountRequiredController = TextEditingController(text: widget.unitInfo?.itemDiscountRequired?.toString() ?? "");
-    _itemDiscountValueController = TextEditingController(text: widget.unitInfo?.itemDiscountValue?.toString() ?? "");
-    _purchaseRateWTaxController = TextEditingController(text: widget.unitInfo?.purchaseRateWTax?.toString() ?? "");
-    _purchaseRateController = TextEditingController(text: widget.unitInfo?.purchaseRate?.toString() ?? "");
-    _salesRateController = TextEditingController(text: widget.unitInfo?.salesRate?.toString() ?? "");
-    _mRPRateController = TextEditingController(text: widget.unitInfo?.mRPRate?.toString() ?? "");
-    _gstPercentageController = TextEditingController(text: widget.unitInfo?.gstPercentage?.toString() ?? "");
+    Future.delayed(Duration(milliseconds: 300), () {
+      FocusScope.of(context).requestFocus(_itemNameFocus);
+    });
+    _loadList();
+    _itemIdController =
+        TextEditingController(text: widget.unitInfo?.itemID ?? "");
+    _itemNameController =
+        TextEditingController(text: widget.unitInfo?.itemName ?? "");
+    _itemTypeController = TextEditingController(
+        text: widget.unitInfo?.itemType?.toString() ?? "");
+    _itemGroupCodeController = TextEditingController(
+        text: widget.unitInfo?.itemGroupCode?.toString() ?? "");
+    _itemUnitCodeController = TextEditingController(
+        text: widget.unitInfo?.itemUnitCode?.toString() ?? "");
+    _itemMakeCodeController = TextEditingController(
+        text: widget.unitInfo?.itemMakeCode?.toString() ?? "");
+    _itemGenericCodeController = TextEditingController(
+        text: widget.unitInfo?.itemGenericCode?.toString() ?? "");
+    _nonScheduleItemController = TextEditingController(
+        text: widget.unitInfo?.nonScheduleItem?.toString() ?? "");
+    _scheduledH1ItemController = TextEditingController(
+        text: widget.unitInfo?.scheduledH1Item?.toString() ?? "");
+    _narcoticItemController = TextEditingController(
+        text: widget.unitInfo?.narcoticItem?.toString() ?? "");
+    _expiryDateFormatController =
+        TextEditingController(text: widget.unitInfo?.expiryDateFormat ?? "");
+    _expiryDateRequiredController =
+        TextEditingController(text: widget.unitInfo?.expiryDateRequired ?? "");
+    _subUnitCodeController = TextEditingController(
+        text: widget.unitInfo?.subUnitCode?.toString() ?? "");
+    _subQtyController =
+        TextEditingController(text: widget.unitInfo?.subQty?.toString() ?? "");
+    _batchNoRequiredController = TextEditingController(
+        text: widget.unitInfo?.batchNoRequired?.toString() ?? "");
+    _minimumStockQtyController = TextEditingController(
+        text: widget.unitInfo?.minimumStockQty?.toString() ?? "");
+    _maximumStockQtyController = TextEditingController(
+        text: widget.unitInfo?.maximumStockQty?.toString() ?? "");
+    _reOrderLevelController = TextEditingController(
+        text: widget.unitInfo?.reOrderLevel?.toString() ?? "");
+    _reOrderQtyController = TextEditingController(
+        text: widget.unitInfo?.reOrderQty?.toString() ?? "");
+    _priceTakenFromController = TextEditingController(
+        text: widget.unitInfo?.priceTakenFrom?.toString() ?? "");
+    _itemDiscountPercentageController = TextEditingController(
+        text: widget.unitInfo?.itemDiscountPercentage?.toString() ?? "");
+    _itemDiscountRequiredController = TextEditingController(
+        text: widget.unitInfo?.itemDiscountRequired?.toString() ?? "");
+    _itemDiscountValueController = TextEditingController(
+        text: widget.unitInfo?.itemDiscountValue?.toString() ?? "");
+    _purchaseRateWTaxController = TextEditingController(
+        text: widget.unitInfo?.purchaseRateWTax?.toString() ?? "");
+    _purchaseRateController = TextEditingController(
+        text: widget.unitInfo?.purchaseRate?.toString() ?? "");
+    _salesRateController = TextEditingController(
+        text: widget.unitInfo?.salesRate?.toString() ?? "");
+    _mRPRateController =
+        TextEditingController(text: widget.unitInfo?.mRPRate?.toString() ?? "");
+    _gstPercentageController = TextEditingController(
+        text: widget.unitInfo?.gstPercentage?.toString() ?? "");
     _createdUserController = TextEditingController(text: loadData.userCode);
 
     _activeStatus = (widget.unitInfo?.createdUserCode ?? 1) == 1;
   }
-Future<void> _loadList() async {
+
+  Future<void> _loadList() async {
     final response = await _getAllMasterService.getAllMasterService();
     if (response.isSuccess) {
       setState(() {
@@ -155,6 +196,7 @@ Future<void> _loadList() async {
       });
     }
   }
+
   @override
   void dispose() {
     _itemIdController.dispose();
@@ -230,65 +272,66 @@ Future<void> _loadList() async {
 
     if (widget.unitInfo == null) {
       // ADD mode
-  //       String? userId;
-  // String? userName;
-  // String? userPassword;
-  // int? userType;
-  // int? activeStatus;
-     final request = AddProductMasterModel(
-       itemID: _itemIdController.text.toString(),
-  itemName:_itemNameController .text.trim(),
-    itemType: int.tryParse(_itemTypeController.text.trim()),
-    itemGroupCode: _itemGroup,
-    itemUnitCode: _itemUnit,
-    itemMakeCode: _itemMake,
-    itemGenericCode: int.tryParse(_itemGenericCodeController.text.trim()),
-    nonScheduleItem: _nonScheduledItem?0:1,
-    scheduledH1Item: _nonScheduledItem?1:0,
-    narcoticItem: _isNarocotic?1:0,
-    expiryDateRequired: _expiryRequired?"1":"0",
-    expiryDateFormat: _expiryRequired?_expiryDateFormatController.text.trim():"0",
-    subUnitCode: int.tryParse(_subUnitCodeController.text.trim()),
-       subQty: int.tryParse(_subQtyController.text.trim()),
-    batchNoRequired: _isBatchNumbeRequired?1:0,
-    minimumStockQty: int.tryParse(_minimumStockQtyController.text.trim()),
-    maximumStockQty: int.tryParse(_maximumStockQtyController.text.trim()),
-    reOrderLevel: int.tryParse(_reOrderLevelController.text.trim()),
-    reOrderQty: int.tryParse(_reOrderQtyController.text.trim()),
-    priceTakenFrom: int.tryParse(_priceTakenFromController.text.trim()),
-    itemDiscountRequired: _isDiscountReq?1:0,
-    itemDiscountPercentage: _isDiscountReq?double.tryParse(_itemDiscountValueController.text.trim()):0.0,
-    itemDiscountValue: _isDiscountReq?double.tryParse(_itemDiscountValueController.text.trim()):0.0,
-    purchaseRate: int.tryParse(_purchaseRateController.text.trim()),
-    purchaseRateWTax: double.tryParse(_purchaseRateWTaxController.text.trim()),
-    salesRate: int.tryParse(_salesRateController.text.trim()),
-    mRPRate: int.tryParse(_mRPRateController.text.trim()),
-    gstPercentage: _taxCode,
-       createdDate: DateTime.now().toIso8601String(),
-       createdUserCode: 1,
-       updatedUserCode: 1
+      //       String? userId;
+      // String? userName;
+      // String? userPassword;
+      // int? userType;
+      // int? activeStatus;
+      final request = AddProductMasterModel(
+          itemID: _itemIdController.text.toString(),
+          itemName: _itemNameController.text.trim(),
+          itemType: int.tryParse(_itemTypeController.text.trim()),
+          itemGroupCode: _itemGroup,
+          itemUnitCode: _itemUnit,
+          itemMakeCode: _itemMake,
+          itemGenericCode: int.tryParse(_itemGenericCodeController.text.trim()),
+          nonScheduleItem: _nonScheduledItem ? 0 : 1,
+          scheduledH1Item: _nonScheduledItem ? 1 : 0,
+          narcoticItem: _isNarocotic ? 1 : 0,
+          expiryDateRequired: _expiryRequired ? "1" : "0",
+          expiryDateFormat:
+              _expiryRequired ? _expiryDateFormatController.text.trim() : "0",
+          subUnitCode: int.tryParse(_subUnitCodeController.text.trim()),
+          subQty: int.tryParse(_subQtyController.text.trim()),
+          batchNoRequired: _isBatchNumbeRequired ? 1 : 0,
+          minimumStockQty: int.tryParse(_minimumStockQtyController.text.trim()),
+          maximumStockQty: int.tryParse(_maximumStockQtyController.text.trim()),
+          reOrderLevel: int.tryParse(_reOrderLevelController.text.trim()),
+          reOrderQty: int.tryParse(_reOrderQtyController.text.trim()),
+          priceTakenFrom: int.tryParse(_priceTakenFromController.text.trim()),
+          itemDiscountRequired: _isDiscountReq ? 1 : 0,
+          itemDiscountPercentage: _isDiscountReq
+              ? double.tryParse(_itemDiscountValueController.text.trim())
+              : 0.0,
+          itemDiscountValue: _isDiscountReq
+              ? double.tryParse(_itemDiscountValueController.text.trim())
+              : 0.0,
+          purchaseRate: int.tryParse(_purchaseRateController.text.trim()),
+          purchaseRateWTax:
+              double.tryParse(_purchaseRateWTaxController.text.trim()),
+          salesRate: int.tryParse(_salesRateController.text.trim()),
+          mRPRate: int.tryParse(_mRPRateController.text.trim()),
+          gstPercentage: _taxCode,
+          createdDate: DateTime.now().toIso8601String(),
+          createdUserCode: 1,
+          updatedUserCode: 1
 
-
-
-
-
-
-       // current timestamp
- // custActiveStatus: _activeStatus ? 1 : 0,
-);
-print("request");
-print(request);
+          // current timestamp
+          // custActiveStatus: _activeStatus ? 1 : 0,
+          );
+      print("request");
+      print(request);
       final response = await _service.addProductService(request);
       _handleResponse(response.isSuccess, response.error);
     } else {
       // EDIT mode
- final updated = AddProductMasterModel(
-  itemName: _itemNameController.text.trim(),
-    // current timestamp
- // custActiveStatus: _activeStatus ? 1 : 0,
-);
-     print("updated");
-     print(updated);
+      final updated = AddProductMasterModel(
+        itemName: _itemNameController.text.trim(),
+        // current timestamp
+        // custActiveStatus: _activeStatus ? 1 : 0,
+      );
+      print("updated");
+      print(updated);
       final response = await _service.updateProductService(
         widget.unitInfo!.itemCode!,
         updated,
@@ -313,13 +356,19 @@ print(request);
       _itemNameController.text = widget.unitInfo?.itemName ?? "";
       // _createdUserController.text =
       //     widget.countryInfo?.createdUserCode?.toString() ?? "1001";
-     // _activeStatus = (widget.unitInfo?.custActiveStatus ?? 1) == 1;
+      // _activeStatus = (widget.unitInfo?.custActiveStatus ?? 1) == 1;
     }
+  }
+
+  void _fieldFocusChange(
+      BuildContext context, FocusNode current, FocusNode next) {
+    current.unfocus();
+    FocusScope.of(context).requestFocus(next);
   }
 
   @override
   Widget build(BuildContext context) {
-        if (_getAllLoading) return const Center(child: CircularProgressIndicator());
+    if (_getAllLoading) return const Center(child: CircularProgressIndicator());
     if (error != null) return Center(child: Text("Error: $error"));
 
     final isEdit = widget.unitInfo != null;
@@ -329,534 +378,710 @@ print(request);
         padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
-          child:
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              SearchDropdownField<Info>(
-                hintText: "Search Product",
-                prefixIcon: Icons.search,
-                fetchItems: (q) async {
-                  final response = await _service.getProductServiceSearch(q);
-                  if (response.isSuccess) {
-                    return (response.data?.info ?? [])
-                        .whereType<Info>()
-                        .toList();
-                  }
-                  return [];
-                },
-                displayString: (unit) => unit.itemName ?? "",
-                onSelected: (country) {
-                  setState(() {
-                 _itemIdController.text = country.itemCode.toString() ?? "";
-        _itemNameController.text = country.itemName ?? "";
-                    // _createdUserController.text =
-                    //     country.createdUserCode?.toString() ?? "1001";
-                   // _activeStatus = (country.custActiveStatus ?? 1) == 1;
-                  });
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              // Decide columns by screen width
+              int columns = 1; // default mobile
+              if (constraints.maxWidth > 1200) {
+                columns = 3;
+              } else if (constraints.maxWidth > 800) {
+                columns = 2;
+              }
 
-                  // ✅ Switch form into "Update mode"
-                  widget.onSaved(false);
-                },
-              ),
+              return Wrap(
+                spacing: 16,
+                runSpacing: 16,
+                children: [
+                  // Example fields (replace with all your CustomTextField/Dropdown etc.)
+                  SearchDropdownField<Info>(
+                    hintText: "Search Product",
+                    prefixIcon: Icons.search,
+                    fetchItems: (q) async {
+                      final response =
+                          await _service.getProductServiceSearch(q);
+                      if (response.isSuccess) {
+                        return (response.data?.info ?? [])
+                            .whereType<Info>()
+                            .toList();
+                      }
+                      return [];
+                    },
+                    displayString: (unit) => unit.itemName ?? "",
+                    onSelected: (country) {
+                      setState(() {
+                        _itemIdController.text =
+                            country.itemCode.toString() ?? "";
+                        _itemNameController.text = country.itemName ?? "";
+                        // _createdUserController.text =
+                        //     country.createdUserCode?.toString() ?? "1001";
+                        // _activeStatus = (country.custActiveStatus ?? 1) == 1;
+                      });
 
-              const SizedBox(height: 26),
-              // SwitchListTile(
-              //   value: _activeStatus,
-              //   title: const Text("Active Status"),
-              //   onChanged: (val) => setState(() => _activeStatus = val),
-              // ),
-              CustomSwitch(
-                value: _activeStatus,
-                title: "Active Status",
-                onChanged: (val) {
-                  setState(() {
-                    _activeStatus = val;
-                  });
-                },
-              ),
-              CustomTextField(
-                title: "Item Code",
-                hintText: "Enter Item Code",
-                controller: _itemIdController,
-                prefixIcon: Icons.flag_circle,
-                isValidate: true,
-                validator: (value) =>
-                    value == null || value.isEmpty ? "Enter unit ID" : null,
-                focusNode: _itemIdFocus,
-                textInputAction: TextInputAction.next,
-                onEditingComplete: () {
-                  FocusScope.of(context).requestFocus(_itemIdFocus);
-                },
-              ),
-              const SizedBox(height: 16),
-              CustomTextField(
-                title: "Product Name",
-                hintText: "Enter Product Name",
-                controller: _itemNameController,
-                prefixIcon: Icons.flag,
-                isValidate: true,
-                validator: (value) =>
-                    value == null || value.isEmpty ? "Enter Product name" : null,
-                focusNode: _itemNameFocus,
-                textInputAction: TextInputAction.next,
-                onEditingComplete: () {
-                  // FocusScope.of(context).requestFocus(_createdUserFocus);
-                },
-              ),
-              const SizedBox(height: 16),
-              CustomTextField(
-                title: "Item Type",
-                hintText: "Enter Item Type",
-                controller: _itemTypeController,
-                isValidate: true,
-                validator: (value) =>
-                value == null || value.isEmpty ? "Enter Item Type" : null,
-                focusNode: _itemTypeFocus,
-                textInputAction: TextInputAction.next,
-                onEditingComplete: () {
-                  FocusScope.of(context).requestFocus(_itemTypeFocus);
-                },
-              ),
-              const SizedBox(height: 16),
-              CustomDropdownField<int>(
-                title: "Select Item Group",
-                hintText: "Choose Item Group",
-                items: getAllMasterListModel!.info!.itemGroups!
-                    .map((e) => DropdownMenuItem<int>(
-                  value: e.itemGroupCode, // 🔹 use taxCode as value
-                  child: Text("${e.itemGroupName} "),
-                ))
-                    .toList(),
-                // initialValue: _taxCode, // int? taxCode
-                onChanged: (value) {
-                  setState(() {
-                        _itemGroup=value;
-                    //  _taxCode = value;
-                  });
-
-                  final selected = getAllMasterListModel!.info!.itemGroups!
-                      .firstWhere((c) => c.itemGroupCode == value, orElse: () => master.ItemGroups());
-
-                  print("Selected GST %: ${selected.itemGroupCode}");
-                  print("Selected TAX Code: ${selected.itemGroupCode}");
-                },
-                isValidate: true,
-                validator: (value) => value == null ? "Please select Item Group" : null,
-              ),
-              const SizedBox(height: 16),
-              CustomDropdownField<int>(
-                title: "Select  Unit",
-                hintText: "Choose  Unit",
-                items: getAllMasterListModel!.info!.units!
-                    .map((e) => DropdownMenuItem<int>(
-                  value: e.unitCode, // 🔹 use taxCode as value
-                  child: Text("${e.unitName} "),
-                ))
-                    .toList(),
-                // initialValue: _taxCode, // int? taxCode
-                onChanged: (value) {
-                  setState(() {
-                    _itemUnit=value;
-                    //  _taxCode = value;
-                  });
-
-                  final selected = getAllMasterListModel!.info!.units!
-                      .firstWhere((c) => c.unitCode == value, orElse: () => master.Units());
-
-                  print("Selected GST %: ${selected.unitCode}");
-                  print("Selected TAX Code: ${selected.unitCode}");
-                },
-                isValidate: true,
-                validator: (value) => value == null ? "Please select Unit" : null,
-              ),
-              const SizedBox(height: 16),
-              CustomDropdownField<int>(
-                title: "Select Item Make",
-                hintText: "Choose  Item Make",
-                items: getAllMasterListModel!.info!.itemMakes!
-                    .map((e) => DropdownMenuItem<int>(
-                  value: e.itemMakeCode, // 🔹 use taxCode as value
-                  child: Text("${e.itemMaketName} "),
-                ))
-                    .toList(),
-                // initialValue: _taxCode, // int? taxCode
-                onChanged: (value) {
-                  setState(() {
-                    _itemMake=value;
-                    //  _taxCode = value;
-                  });
-
-                  final selected = getAllMasterListModel!.info!.itemMakes!
-                      .firstWhere((c) => c.itemMakeCode == value, orElse: () => master.ItemMakes());
-
-                  print("Selected GST %: ${selected.itemMakeCode}");
-                  print("Selected TAX Code: ${selected.itemMakeCode}");
-                },
-                isValidate: true,
-                validator: (value) => value == null ? "Please select Item Make Code" : null,
-              ),
-              const SizedBox(height: 16),
-              CustomTextField(
-                title: "Item Generic",
-                hintText: "Enter Item Generic",
-                controller: _itemGenericCodeController,
-                isValidate: true,
-                validator: (value) =>
-                value == null || value.isEmpty ? "Enter Item Generic" : null,
-                focusNode: _itemGenericCodeFocus,
-                textInputAction: TextInputAction.next,
-                onEditingComplete: () {
-                  FocusScope.of(context).requestFocus(_itemGenericCodeFocus);
-                },
-              ),
-              const SizedBox(height: 16),
-              CustomSwitch(
-                value: _nonScheduledItem,
-                title: "Scheduled Item",
-                onChanged: (val) {
-                  setState(() {
-                    _nonScheduledItem = val;
-                  });
-                },
-              ),
-              const SizedBox(height: 16),
-              CustomSwitch(
-                value: _isNarocotic,
-                title: "Is  Narcotic Item",
-                onChanged: (val) {
-                  setState(() {
-                    _isNarocotic = val;
-                  });
-                },
-              ),
-              const SizedBox(height: 16),
-              CustomSwitch(
-                value: _expiryRequired,
-                title: "Is Expiry Required",
-                onChanged: (val) {
-                  setState(() {
-                    _expiryRequired = val;
-                  });
-                },
-              ),
-              const SizedBox(height: 16),
-              _expiryRequired?
-              CustomTextField(
-                title: "Expiry Date Format",
-                hintText: "Enter Expiry Date Format",
-                controller: _expiryDateFormatController,
-                isValidate: true,
-                validator: (value) =>
-                value == null || value.isEmpty ? "Expiry Date Format" : null,
-                focusNode: _expiryDateFormatFocus,
-                textInputAction: TextInputAction.next,
-                onEditingComplete: () {
-                  FocusScope.of(context).requestFocus(_expiryDateFormatFocus);
-                },
-              ):SizedBox(),
-              _expiryRequired? const SizedBox(height: 16):SizedBox(),
-              CustomTextField(
-                title: "SubUnit Code",
-                hintText: "Enter SubUnit Code",
-                controller: _subUnitCodeController,
-                isValidate: true,
-                validator: (value) =>
-                value == null || value.isEmpty ? "Enter SubUnit Code" : null,
-                focusNode: _subUnitCodeFocus,
-                textInputAction: TextInputAction.next,
-                onEditingComplete: () {
-                  FocusScope.of(context).requestFocus(_subUnitCodeFocus);
-                },
-              ),
-              SizedBox(height: 16),
-
-              CustomTextField(
-                title: "Sub Quantity",
-                hintText: "Enter Sub Quantity",
-                controller: _subQtyController,
-                isValidate: true,
-                validator: (value) =>
-                value == null || value.isEmpty ? "Enter Sub Quantity" : null,
-                focusNode: _subQtyFocus,
-                textInputAction: TextInputAction.next,
-                onEditingComplete: () {
-                  FocusScope.of(context).requestFocus(_subQtyFocus);
-                },
-              ),
-              SizedBox(height: 16),
-
-              CustomSwitch(
-                value: _isBatchNumbeRequired,
-                title: "Is Batch Number Required",
-                onChanged: (val) {
-                  setState(() {
-                    _isBatchNumbeRequired = val;
-                  });
-                },
-              ),
-              SizedBox(height: 16),
-
-              CustomTextField(
-                title: "Minimum Stock Quantity",
-                hintText: "Enter Minimum Stock Quantity",
-                controller: _minimumStockQtyController,
-                isValidate: true,
-                validator: (value) =>
-                value == null || value.isEmpty ? "Enter Minimum Stock Quantity" : null,
-                focusNode: _minimumStockQtyFocus,
-                isNumeric: true,
-                textInputAction: TextInputAction.next,
-                onEditingComplete: () {
-                  FocusScope.of(context).requestFocus(_minimumStockQtyFocus);
-                },
-              ),
-              SizedBox(height: 16),
-
-              CustomTextField(
-                title: "Maximum Stock Quantity",
-                hintText: "Enter Maximum Stock Quantity",
-                controller: _maximumStockQtyController,
-                isValidate: true,
-                validator: (value) =>
-                value == null || value.isEmpty ? "Enter Minimum Stock Quantity" : null,
-                focusNode: _maximumStockQtyFocus,
-                isNumeric: true,
-                textInputAction: TextInputAction.next,
-                onEditingComplete: () {
-                  FocusScope.of(context).requestFocus(_maximumStockQtyFocus);
-                },
-              ),
-              SizedBox(height: 16),
-              CustomTextField(
-                title: "Reorder Level",
-                hintText: "Enter Reorder Level",
-                controller: _reOrderLevelController,
-                isValidate: true,
-                validator: (value) =>
-                value == null || value.isEmpty ? "Enter Reorder Level" : null,
-                focusNode: _reOrderLevelFocus,
-                isNumeric: true,
-                textInputAction: TextInputAction.next,
-                onEditingComplete: () {
-                  FocusScope.of(context).requestFocus(_reOrderLevelFocus);
-                },
-              ),
-
-              SizedBox(height: 16),
-
-              CustomTextField(
-                title: "Reorder Quantity",
-                hintText: "Enter Reorder Quantity",
-                controller: _reOrderQtyController,
-                isValidate: true,
-                validator: (value) =>
-                value == null || value.isEmpty ? "Enter Minimum Stock Quantity" : null,
-                focusNode: _reOrderQtyFocus,
-                isNumeric: true,
-                textInputAction: TextInputAction.next,
-                onEditingComplete: () {
-                  FocusScope.of(context).requestFocus(_reOrderQtyFocus);
-                },
-              ),
-
-              SizedBox(height: 16),
-
-              CustomTextField(
-                title: "Price Taken From",
-                hintText: "Enter Price Taken From",
-                controller: _priceTakenFromController,
-                isValidate: true,
-                validator: (value) =>
-                value == null || value.isEmpty ? "Enter Price Taken From" : null,
-                focusNode: _priceTakenFromFocus,
-                isNumeric: true,
-                textInputAction: TextInputAction.next,
-                onEditingComplete: () {
-                  FocusScope.of(context).requestFocus(_priceTakenFromFocus);
-                },
-              ),
-
-              SizedBox(height: 16),
-
-              CustomSwitch(
-                value: _isDiscountReq,
-                title: "Is Discount Required",
-                onChanged: (val) {
-                  setState(() {
-                    _isDiscountReq = val;
-                  });
-                },
-              ),
-              SizedBox(height: 16),
-
-              _isDiscountReq?
-              CustomTextField(
-                title: "Discount Percentage",
-                hintText: "Enter Discount Percentage",
-                controller: _itemDiscountPercentageController,
-                isValidate: true,
-                validator: (value) =>
-                value == null || value.isEmpty ? "Enter Discount Percentage" : null,
-                focusNode: _itemDiscountPercentageFocus,
-                isNumeric: true,
-                textInputAction: TextInputAction.next,
-                onEditingComplete: () {
-                  FocusScope.of(context).requestFocus(_itemDiscountPercentageFocus);
-                },
-              )
-              :SizedBox(),
-
-              _isDiscountReq?SizedBox(height: 16):SizedBox(),
-
-              _isDiscountReq?
-              CustomTextField(
-                title: "Discount Value",
-                hintText: "Enter Discount value",
-                controller: _itemDiscountValueController,
-                isValidate: true,
-                validator: (value) =>
-                value == null || value.isEmpty ? "Enter Discount Value" : null,
-                focusNode: _itemDiscountValueFocus,
-                isNumeric: true,
-                textInputAction: TextInputAction.next,
-                onEditingComplete: () {
-                  FocusScope.of(context).requestFocus(_itemDiscountValueFocus);
-                },
-              )
-                  :SizedBox(),
-
-              _isDiscountReq?SizedBox(height: 16):SizedBox(),
-              CustomTextField(
-                title: "Purchase Rate",
-                hintText: "Enter Purchase Rate",
-                controller: _purchaseRateController,
-                isValidate: true,
-                validator: (value) =>
-                value == null || value.isEmpty ? "Enter Purchase Rate" : null,
-                focusNode: _purchaseRateFocus,
-                isNumeric: true,
-                textInputAction: TextInputAction.next,
-                onEditingComplete: () {
-                  FocusScope.of(context).requestFocus(_purchaseRateFocus);
-                },
-              ),
-
-              SizedBox(height: 16),
-
-              CustomTextField(
-                title: "Purchase Rate Tax",
-                hintText: "Enter Purchase Rate Tax",
-                controller: _purchaseRateWTaxController,
-                isValidate: true,
-                validator: (value) =>
-                value == null || value.isEmpty ? "Enter Purchase Rate Tax" : null,
-                focusNode: _purchaseRateWTaxFocus,
-                isNumeric: true,
-                textInputAction: TextInputAction.next,
-                onEditingComplete: () {
-                  FocusScope.of(context).requestFocus(_purchaseRateWTaxFocus);
-                },
-              ),
-
-              SizedBox(height: 16),
-
-              CustomTextField(
-                title: "Sales Rate",
-                hintText: "Enter Sales Rate",
-                controller: _salesRateController,
-                isValidate: true,
-                validator: (value) =>
-                value == null || value.isEmpty ? "Enter Sales Rate " : null,
-                focusNode: _salesRateFocus,
-                isNumeric: true,
-                textInputAction: TextInputAction.next,
-                onEditingComplete: () {
-                  FocusScope.of(context).requestFocus(_salesRateFocus);
-                },
-              ),
-
-              SizedBox(height: 16),
-
-              CustomTextField(
-                title: "MRP Rate",
-                hintText: "Enter MRP Rate",
-                controller: _mRPRateController,
-                isValidate: true,
-                validator: (value) =>
-                value == null || value.isEmpty ? "Enter MRP Rate" : null,
-                focusNode: _mRPRateFocus,
-                isNumeric: true,
-                textInputAction: TextInputAction.next,
-                onEditingComplete: () {
-                  FocusScope.of(context).requestFocus(_mRPRateFocus);
-                },
-              ),
-
-              SizedBox(height: 16),
-
-              CustomDropdownField<int>(
-        title: "Select GST",
-        hintText: "Choose a GST",
-        items: getAllMasterListModel!.info!.taxMasters!
-        .map((e) => DropdownMenuItem<int>(
-              value: e.taxCode, // 🔹 use taxCode as value
-              child: Text("${e.taxName} (${e.taxPercentage}%)"),
-            ))
-        .toList(),
-       // initialValue: _taxCode, // int? taxCode
-        onChanged: (value) {
-      setState(() {
-        _taxCode=value;
-      //  _taxCode = value;
-      });
-
-      final selected = getAllMasterListModel!.info!.taxMasters!
-          .firstWhere((c) => c.taxCode == value, orElse: () => master.TaxMasters());
-
-      print("Selected GST %: ${selected.taxPercentage}");
-      print("Selected TAX Code: ${selected.taxCode}");
-        },
-        isValidate: true,
-        validator: (value) => value == null ? "Please select a GST" : null,
-      ),
-       const SizedBox(height: 10),
-              CustomTextField(
-                title: "Create User",
-                controller: _createdUserController,
-                prefixIcon: Icons.person,
-                isEdit: true,
-                focusNode: _createUserFocus,
-                textInputAction: TextInputAction.done,
-                onEditingComplete: _submit,
-              ),
-              const SizedBox(height: 16),
-              // SwitchListTile(
-              //   value: _activeStatus,
-              //   title: const Text("Active Status"),
-              //   onChanged: (val) => setState(() => _activeStatus = val),
-              // ),
-              const SizedBox(height: 16),
-              if (_loading)
-                const CircularProgressIndicator()
-              else
-                GradientButton(
-                    text: isEdit ? "Update Product" : "Add Product",
-                    onPressed: _submit),
-              if (_message != null) ...[
-                const SizedBox(height: 16),
-                Text(
-                  _message!,
-                  style: TextStyle(
-                    color: _message!.contains("successfully")
-                        ? Colors.green
-                        : Colors.red,
+                      // ✅ Switch form into "Update mode"
+                      widget.onSaved(false);
+                    },
                   ),
-                ),
-              ]
-            ],
-          ),
+                  SizedBox(
+                    width: constraints.maxWidth,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text("Product Status"),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        CustomSwitch(
+                          value: _activeStatus,
+                          title: "Active Status",
+                          onChanged: (val) {
+                            setState(() {
+                              _activeStatus = val;
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(
+                    width: constraints.maxWidth / columns - 20,
+                    child: CustomTextField(
+                      title: "Item Code",
+                      hintText: "Enter Item Code",
+                      controller: _itemIdController,
+                      prefixIcon: Icons.flag_circle,
+                      isValidate: true,
+                      validator: (value) => value == null || value.isEmpty
+                          ? "Enter Item Code"
+                          : null,
+                      focusNode: _itemIdFocus,
+                      textInputAction: TextInputAction.next,
+                    ),
+                  ),
+                  SizedBox(
+                    width: constraints.maxWidth / columns - 20,
+                    child: CustomTextField(
+                      title: "Product Name",
+                      hintText: "Enter Product Name",
+                      controller: _itemNameController,
+                      prefixIcon: Icons.flag,
+                      isValidate: true,
+                      validator: (value) => value == null || value.isEmpty
+                          ? "Enter Product Name"
+                          : null,
+                      focusNode: _itemNameFocus,
+                      textInputAction: TextInputAction.next,
+                      onEditingComplete: () => _fieldFocusChange(
+                          context, _itemNameFocus, _itemTypeFocus),
+                      autoFocus: true,
+                    ),
+                  ),
+                  SizedBox(
+                    width: constraints.maxWidth / columns - 20,
+                    child: CustomTextField(
+                      title: "Item Type",
+                      hintText: "Enter Item Type",
+                      controller: _itemTypeController,
+                      isValidate: true,
+                      validator: (value) => value == null || value.isEmpty
+                          ? "Enter Item Type"
+                          : null,
+                      focusNode: _itemTypeFocus,
+                      prefixIcon: Icons.pageview,
+                      textInputAction: TextInputAction.next,
+                      onEditingComplete: () {
+                        _fieldFocusChange(
+                            context, _itemTypeFocus, _itemGroupFocus);
+                      },
+                    ),
+                  ),
+                  // 🔹 Continue wrapping all your fields the same way
+                  SizedBox(
+                    width: constraints.maxWidth / columns - 20,
+                    child: CustomDropdownField<int>(
+                      title: "Select Item Group",
+                      hintText: "Choose Item Group",
+                      items: getAllMasterListModel!.info!.itemGroups!
+                          .map((e) => DropdownMenuItem<int>(
+                                value:
+                                    e.itemGroupCode, // 🔹 use taxCode as value
+                                child: Text("${e.itemGroupName} "),
+                              ))
+                          .toList(),
+                      // initialValue: _taxCode, // int? taxCode
+                      onChanged: (value) {
+                        setState(() {
+                          _itemGroup = value;
+                          //  _taxCode = value;
+                        });
 
+                        final selected = getAllMasterListModel!
+                            .info!.itemGroups!
+                            .firstWhere((c) => c.itemGroupCode == value,
+                                orElse: () => master.ItemGroups());
+                      },
+                      isValidate: true,
+                      validator: (value) =>
+                          value == null ? "Please select Item Group" : null,
+                      focusNode: _itemGroupFocus,
+                      onEditingComplete: () => _fieldFocusChange(
+                        context,
+                        _itemGroupFocus,
+                        _itemUnitCodeFocus,
+                      ),
+                    ),
+                  ),
+
+                  SizedBox(
+                    width: constraints.maxWidth / columns - 20,
+                    child: CustomDropdownField<int>(
+                      title: "Select  Unit",
+                      hintText: "Choose  Unit",
+                      items: getAllMasterListModel!.info!.units!
+                          .map((e) => DropdownMenuItem<int>(
+                                value: e.unitCode, // 🔹 use taxCode as value
+                                child: Text("${e.unitName} "),
+                              ))
+                          .toList(),
+                      // initialValue: _taxCode, // int? taxCode
+                      onChanged: (value) {
+                        setState(() {
+                          _itemUnit = value;
+                          //  _taxCode = value;
+                        });
+
+                        final selected = getAllMasterListModel!.info!.units!
+                            .firstWhere((c) => c.unitCode == value,
+                                orElse: () => master.Units());
+                      },
+                      isValidate: true,
+                      validator: (value) =>
+                          value == null ? "Please select Unit" : null,
+                      focusNode: _itemUnitCodeFocus,
+                      onEditingComplete: () => _fieldFocusChange(
+                        context,
+                        _itemUnitCodeFocus,
+                        _itemMakeCodeFocus,
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    width: constraints.maxWidth / columns - 20,
+                    child: CustomDropdownField<int>(
+                      title: "Select Item Make",
+                      hintText: "Choose  Item Make",
+                      items: getAllMasterListModel!.info!.itemMakes!
+                          .map((e) => DropdownMenuItem<int>(
+                                value:
+                                    e.itemMakeCode, // 🔹 use taxCode as value
+                                child: Text("${e.itemMaketName} "),
+                              ))
+                          .toList(),
+                      // initialValue: _taxCode, // int? taxCode
+                      onChanged: (value) {
+                        setState(() {
+                          _itemMake = value;
+                          //  _taxCode = value;
+                        });
+
+                        final selected = getAllMasterListModel!.info!.itemMakes!
+                            .firstWhere((c) => c.itemMakeCode == value,
+                                orElse: () => master.ItemMakes());
+
+                        print("Selected GST %: ${selected.itemMakeCode}");
+                        print("Selected TAX Code: ${selected.itemMakeCode}");
+                      },
+                      isValidate: true,
+                      validator: (value) =>
+                          value == null ? "Please select Item Make Code" : null,
+                      focusNode: _itemMakeCodeFocus,
+                      onEditingComplete: () => _fieldFocusChange(
+                        context,
+                        _itemMakeCodeFocus,
+                        _itemGenericCodeFocus,
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    width: constraints.maxWidth / columns - 20,
+                    child: CustomDropdownField<int>(
+                      title: "Select Item Generic",
+                      hintText: "Choose  IItem Generic",
+                      items: getAllMasterListModel!.info!.generics!
+                          .map((e) => DropdownMenuItem<int>(
+                                value: e.genericCode, // 🔹 use taxCode as value
+                                child: Text("${e.genericName} "),
+                              ))
+                          .toList(),
+                      // initialValue: _taxCode, // int? taxCode
+                      onChanged: (value) {
+                        setState(() {
+                          _itemGeneric = value;
+                          //  _taxCode = value;
+                        });
+
+                        final selected = getAllMasterListModel!.info!.generics!
+                            .firstWhere((c) => c.genericCode == value,
+                                orElse: () => master.Generics());
+
+                        print("Selected GST %: ${selected.genericCode}");
+                        print("Selected TAX Code: ${selected.genericName}");
+                      },
+                      isValidate: true,
+                      validator: (value) =>
+                          value == null ? "Please select Item Make Code" : null,
+                      focusNode: _itemGenericCodeFocus,
+                      onEditingComplete: () => _fieldFocusChange(
+                        context,
+                        _itemGenericCodeFocus,
+                        _nonScheduleItemFocus,
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  const Divider(),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  SizedBox(
+                    width: constraints.maxWidth,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            const Text("Scheduled Item"),
+                            const SizedBox(
+                              width: 10,
+                            ),
+                            CustomSwitch(
+                              value: _nonScheduledItem,
+                              title: "Scheduled Item",
+                              onChanged: (val) {
+                                setState(() {
+                                  _nonScheduledItem = val;
+                                });
+                              },
+                            ),
+                          ],
+                        ),
+                        const SizedBox(width: 16),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            const Text(" Narcotic Item"),
+                            const SizedBox(
+                              width: 10,
+                            ),
+                            CustomSwitch(
+                              value: _isNarocotic,
+                              title: "Is  Narcotic Item",
+                              onChanged: (val) {
+                                setState(() {
+                                  _isNarocotic = val;
+                                });
+                              },
+                            ),
+                          ],
+                        ),
+                        const SizedBox(width: 16),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            const Text(" Expiry Required"),
+                            const SizedBox(
+                              width: 10,
+                            ),
+                            CustomSwitch(
+                              value: _expiryRequired,
+                              title: "Is Expiry Required",
+                              onChanged: (val) {
+                                setState(() {
+                                  _expiryRequired = val;
+                                });
+                              },
+                            ),
+                          ],
+                        ),
+                        const SizedBox(width: 16),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            const Text("Batch Number Required"),
+                            const SizedBox(
+                              width: 10,
+                            ),
+                            CustomSwitch(
+                              value: _isBatchNumbeRequired,
+                              title: "Is Batch Number Required",
+                              onChanged: (val) {
+                                setState(() {
+                                  _isBatchNumbeRequired = val;
+                                });
+                              },
+                            ),
+                          ],
+                        ),
+                        const SizedBox(width: 16),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            const Text("Discount"),
+                            const SizedBox(
+                              width: 10,
+                            ),
+                            CustomSwitch(
+                              value: _isDiscountReq,
+                              title: "Is Discount Required",
+                              onChanged: (val) {
+                                setState(() {
+                                  _isDiscountReq = val;
+                                });
+                              },
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  _expiryRequired
+                      ? SizedBox(
+                          width: constraints.maxWidth / columns - 20,
+                          child: CustomTextField(
+                            title: "Expiry Date Format",
+                            hintText: "Enter Expiry Date Format",
+                            controller: _expiryDateFormatController,
+                            isValidate: true,
+                            validator: (value) => value == null || value.isEmpty
+                                ? "Expiry Date Format"
+                                : null,
+                            focusNode: _expiryDateFormatFocus,
+                            textInputAction: TextInputAction.next,
+                            onEditingComplete: () {
+                              FocusScope.of(context)
+                                  .requestFocus(_expiryDateFormatFocus);
+                            },
+                          ))
+                      : SizedBox(
+                          width: 0,
+                        ),
+                  SizedBox(
+                    width: constraints.maxWidth / columns - 20,
+                    child: CustomTextField(
+                      title: "SubUnit Code",
+                      hintText: "Enter SubUnit Code",
+                      controller: _subUnitCodeController,
+                      isValidate: true,
+                      validator: (value) => value == null || value.isEmpty
+                          ? "Enter SubUnit Code"
+                          : null,
+                      focusNode: _subUnitCodeFocus,
+                      textInputAction: TextInputAction.next,
+                      onEditingComplete: () {
+                        FocusScope.of(context).requestFocus(_subUnitCodeFocus);
+                      },
+                    ),
+                  ),
+                  SizedBox(
+                    width: constraints.maxWidth / columns - 20,
+                    child: CustomTextField(
+                      title: "Sub Quantity",
+                      hintText: "Enter Sub Quantity",
+                      controller: _subQtyController,
+                      isValidate: true,
+                      validator: (value) => value == null || value.isEmpty
+                          ? "Enter Sub Quantity"
+                          : null,
+                      focusNode: _subQtyFocus,
+                      textInputAction: TextInputAction.next,
+                      onEditingComplete: () {
+                        FocusScope.of(context).requestFocus(_subQtyFocus);
+                      },
+                    ),
+                  ),
+
+                  SizedBox(
+                    width: constraints.maxWidth / columns - 20,
+                    child: CustomTextField(
+                      title: "Minimum Stock Quantity",
+                      hintText: "Enter Minimum Stock Quantity",
+                      controller: _minimumStockQtyController,
+                      isValidate: true,
+                      validator: (value) => value == null || value.isEmpty
+                          ? "Enter Minimum Stock Quantity"
+                          : null,
+                      focusNode: _minimumStockQtyFocus,
+                      isNumeric: true,
+                      textInputAction: TextInputAction.next,
+                      onEditingComplete: () {
+                        FocusScope.of(context)
+                            .requestFocus(_minimumStockQtyFocus);
+                      },
+                    ),
+                  ),
+                  SizedBox(
+                    width: constraints.maxWidth / columns - 20,
+                    child: CustomTextField(
+                      title: "Maximum Stock Quantity",
+                      hintText: "Enter Maximum Stock Quantity",
+                      controller: _maximumStockQtyController,
+                      isValidate: true,
+                      validator: (value) => value == null || value.isEmpty
+                          ? "Enter Minimum Stock Quantity"
+                          : null,
+                      focusNode: _maximumStockQtyFocus,
+                      isNumeric: true,
+                      textInputAction: TextInputAction.next,
+                      onEditingComplete: () {
+                        FocusScope.of(context)
+                            .requestFocus(_maximumStockQtyFocus);
+                      },
+                    ),
+                  ),
+                  SizedBox(
+                    width: constraints.maxWidth / columns - 20,
+                    child: CustomTextField(
+                      title: "Reorder Level",
+                      hintText: "Enter Reorder Level",
+                      controller: _reOrderLevelController,
+                      isValidate: true,
+                      validator: (value) => value == null || value.isEmpty
+                          ? "Enter Reorder Level"
+                          : null,
+                      focusNode: _reOrderLevelFocus,
+                      isNumeric: true,
+                      textInputAction: TextInputAction.next,
+                      onEditingComplete: () {
+                        FocusScope.of(context).requestFocus(_reOrderLevelFocus);
+                      },
+                    ),
+                  ),
+                  SizedBox(
+                    width: constraints.maxWidth / columns - 20,
+                    child: CustomTextField(
+                      title: "Reorder Quantity",
+                      hintText: "Enter Reorder Quantity",
+                      controller: _reOrderQtyController,
+                      isValidate: true,
+                      validator: (value) => value == null || value.isEmpty
+                          ? "Enter Minimum Stock Quantity"
+                          : null,
+                      focusNode: _reOrderQtyFocus,
+                      isNumeric: true,
+                      textInputAction: TextInputAction.next,
+                      onEditingComplete: () {
+                        FocusScope.of(context).requestFocus(_reOrderQtyFocus);
+                      },
+                    ),
+                  ),
+                  SizedBox(
+                    width: constraints.maxWidth / columns - 20,
+                    child: CustomTextField(
+                      title: "Price Taken From",
+                      hintText: "Enter Price Taken From",
+                      controller: _priceTakenFromController,
+                      isValidate: true,
+                      validator: (value) => value == null || value.isEmpty
+                          ? "Enter Price Taken From"
+                          : null,
+                      focusNode: _priceTakenFromFocus,
+                      isNumeric: true,
+                      textInputAction: TextInputAction.next,
+                      onEditingComplete: () {
+                        FocusScope.of(context)
+                            .requestFocus(_priceTakenFromFocus);
+                      },
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  const Divider(),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  _isDiscountReq
+                      ? SizedBox(
+                          width: constraints.maxWidth / columns - 20,
+                          child: CustomTextField(
+                            title: "Discount Percentage",
+                            hintText: "Enter Discount Percentage",
+                            controller: _itemDiscountPercentageController,
+                            isValidate: true,
+                            validator: (value) => value == null || value.isEmpty
+                                ? "Enter Discount Percentage"
+                                : null,
+                            focusNode: _itemDiscountPercentageFocus,
+                            isNumeric: true,
+                            textInputAction: TextInputAction.next,
+                            onEditingComplete: () {
+                              FocusScope.of(context)
+                                  .requestFocus(_itemDiscountPercentageFocus);
+                            },
+                          ))
+                      : SizedBox(),
+                  _isDiscountReq
+                      ? SizedBox(
+                          width: constraints.maxWidth / columns - 20,
+                          child: CustomTextField(
+                            title: "Discount Value",
+                            hintText: "Enter Discount value",
+                            controller: _itemDiscountValueController,
+                            isValidate: true,
+                            validator: (value) => value == null || value.isEmpty
+                                ? "Enter Discount Value"
+                                : null,
+                            focusNode: _itemDiscountValueFocus,
+                            isNumeric: true,
+                            textInputAction: TextInputAction.next,
+                            onEditingComplete: () {
+                              FocusScope.of(context)
+                                  .requestFocus(_itemDiscountValueFocus);
+                            },
+                          ))
+                      : SizedBox(),
+                  SizedBox(
+                    width: constraints.maxWidth / columns - 20,
+                    child: CustomTextField(
+                      title: "Purchase Rate",
+                      hintText: "Enter Purchase Rate",
+                      controller: _purchaseRateController,
+                      isValidate: true,
+                      validator: (value) => value == null || value.isEmpty
+                          ? "Enter Purchase Rate"
+                          : null,
+                      focusNode: _purchaseRateFocus,
+                      isNumeric: true,
+                      textInputAction: TextInputAction.next,
+                      onEditingComplete: () {
+                        FocusScope.of(context).requestFocus(_purchaseRateFocus);
+                      },
+                    ),
+                  ),
+                  SizedBox(
+                    width: constraints.maxWidth / columns - 20,
+                    child: CustomTextField(
+                      title: "Purchase Rate Tax",
+                      hintText: "Enter Purchase Rate Tax",
+                      controller: _purchaseRateWTaxController,
+                      isValidate: true,
+                      validator: (value) => value == null || value.isEmpty
+                          ? "Enter Purchase Rate Tax"
+                          : null,
+                      focusNode: _purchaseRateWTaxFocus,
+                      isNumeric: true,
+                      textInputAction: TextInputAction.next,
+                      onEditingComplete: () {
+                        FocusScope.of(context)
+                            .requestFocus(_purchaseRateWTaxFocus);
+                      },
+                    ),
+                  ),
+                  SizedBox(
+                    width: constraints.maxWidth / columns - 20,
+                    child: CustomTextField(
+                      title: "Sales Rate",
+                      hintText: "Enter Sales Rate",
+                      controller: _salesRateController,
+                      isValidate: true,
+                      validator: (value) => value == null || value.isEmpty
+                          ? "Enter Sales Rate "
+                          : null,
+                      focusNode: _salesRateFocus,
+                      isNumeric: true,
+                      textInputAction: TextInputAction.next,
+                      onEditingComplete: () {
+                        FocusScope.of(context).requestFocus(_salesRateFocus);
+                      },
+                    ),
+                  ),
+                  SizedBox(
+                    width: constraints.maxWidth / columns - 20,
+                    child: CustomTextField(
+                      title: "MRP Rate",
+                      hintText: "Enter MRP Rate",
+                      controller: _mRPRateController,
+                      isValidate: true,
+                      validator: (value) => value == null || value.isEmpty
+                          ? "Enter MRP Rate"
+                          : null,
+                      focusNode: _mRPRateFocus,
+                      isNumeric: true,
+                      textInputAction: TextInputAction.next,
+                      onEditingComplete: () {
+                        FocusScope.of(context).requestFocus(_mRPRateFocus);
+                      },
+                    ),
+                  ),
+                  SizedBox(
+                    width: constraints.maxWidth / columns - 20,
+                    child: CustomDropdownField<int>(
+                      title: "Select GST",
+                      hintText: "Choose a GST",
+                      items: getAllMasterListModel!.info!.taxMasters!
+                          .map((e) => DropdownMenuItem<int>(
+                                value: e.taxCode, // 🔹 use taxCode as value
+                                child:
+                                    Text("${e.taxName} (${e.taxPercentage}%)"),
+                              ))
+                          .toList(),
+                      // initialValue: _taxCode, // int? taxCode
+                      onChanged: (value) {
+                        setState(() {
+                          _taxCode = value;
+                          //  _taxCode = value;
+                        });
+
+                        final selected = getAllMasterListModel!
+                            .info!.taxMasters!
+                            .firstWhere((c) => c.taxCode == value,
+                                orElse: () => master.TaxMasters());
+
+                        print("Selected GST %: ${selected.taxPercentage}");
+                        print("Selected TAX Code: ${selected.taxCode}");
+                      },
+                      isValidate: true,
+                      validator: (value) =>
+                          value == null ? "Please select a GST" : null,
+                    ),
+                  ),
+                  SizedBox(
+                    width: constraints.maxWidth / columns - 20,
+                    child: CustomTextField(
+                      title: "Create User",
+                      controller: _createdUserController,
+                      prefixIcon: Icons.person,
+                      isEdit: true,
+                      focusNode: _createUserFocus,
+                      textInputAction: TextInputAction.done,
+                      onEditingComplete: _submit,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  if (_loading)
+                    const CircularProgressIndicator()
+                  else
+                    GradientButton(
+                        text: isEdit ? "Update Product" : "Add Product",
+                        onPressed: _submit),
+                  if (_message != null) ...[
+                    const SizedBox(height: 16),
+                    Text(
+                      _message!,
+                      style: TextStyle(
+                        color: _message!.contains("successfully")
+                            ? Colors.green
+                            : Colors.red,
+                      ),
+                    ),
+                  ]
+                ],
+              );
+            },
+          ),
         ),
       ),
     );
