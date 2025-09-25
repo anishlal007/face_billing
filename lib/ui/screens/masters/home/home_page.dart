@@ -10,6 +10,7 @@ import '../../pages/customer_group_master_page.dart';
 import '../../pages/customer_master_page.dart';
 import '../../pages/dashboard_page.dart';
 import '../../pages/finance_year_master.dart';
+import '../../pages/generics_master_page.dart';
 import '../../pages/hns_master_page.dart';
 import '../../pages/item_group_master.dart';
 import '../../pages/item_make_master.dart';
@@ -140,6 +141,11 @@ class _HomePageState extends State<HomePage> {
           title: "Purchase Master",
           icon: Icons.money,
           page: const PurchaseMasterPage(),
+        ),
+        MenuItemData(
+          title: "Generics Master",
+          icon: Icons.money,
+          page: const GenericsMasterPage(),
         ),
       ],
     ),

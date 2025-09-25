@@ -15,6 +15,8 @@ import '../../../widgets/custom_dropdown_text_field.dart';
 import '../../../widgets/custom_switch.dart';
 import '../../../widgets/custom_text_field.dart';
 import '../../../widgets/gradient_button.dart';
+import '../../../widgets/product_drop_down_field.dart';
+import '../../../widgets/product_search_field.dart';
 import '../../../widgets/search_dropdown_field.dart';
 import 'add_purchase_controller.dart';
 
@@ -47,6 +49,7 @@ class _AddPurchaseMasterPageState extends State<AddPurchaseMasterPage> {
 ///model
 
 master. GetAllMasterListModel?getAllMasterListModel;
+product. ProductMasterListModel?productMasterListModel;
 
  
   late TextEditingController _supplierNameController;
@@ -104,6 +107,7 @@ final TextEditingController itemNameController = TextEditingController();
    
   }
 Future<void> _loadList() async {
+
     final response = await _getAllMasterService.getAllMasterService();
     if (response.isSuccess) {
       setState(() {
@@ -117,7 +121,23 @@ Future<void> _loadList() async {
         _getAllLoading = false;
       });
     }
+    final productResponse = await _productService.getSProductService();
+    if (productResponse.isSuccess) {
+      setState(() {
+      productMasterListModel = productResponse.data!;
+      items=productMasterListModel!.info!;
+        _getAllLoading = false;
+        error = null;
+      });
+    } else {
+      setState(() {
+        error = response.error;
+        _getAllLoading = false;
+      });
+    }
+    
   }
+ 
  @override
   void dispose() {
     // 🔹 Dispose controllers
@@ -257,423 +277,534 @@ print(request);
 
     final isEdit = widget.unitInfo != null;
 
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: 
-          Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-          //  crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              
-             SearchDropdownField<product.Info>(
-  fetchItems: (q) async {
-    final response = await _productService.getProductServiceSearch(q);
-    if (response.isSuccess) {
-      return (response.data?.info ?? []).whereType<product.Info>().toList();
-    }
-    return [];
-  },
-  displayString: (unit) => unit.itemName ?? "",
-  onSelected: (country) {
-    setState(() {
-      //_supplierNameController.text = country.supName ?? "";
-    });
-    widget.onSaved(false);
-  },
-),
-              // const SizedBox(height: 26),
-        Wrap(
-                spacing: 12,
-                runSpacing: 12,
-                children: [
-                  CustomDropdownField<int>(
-  title: "Supplier Name",
-  hintText: "Choose a Supplier Name",
-  items: getAllMasterListModel!.info!.suppliers!
-      .map((e) => DropdownMenuItem<int>(
-            value: e.supCode!,
-            child: Text("${e.supName}"),
-          ))
-      .toList(),
- // initialValue: _taxCode, // ✅ use int value here
-  onChanged: (value) {
-    setState(() {
-      //_taxCode = value;  // uhttps://dart.dev/diagnostics/cast_to_non_typepdate dropdown selection
-      _supplierNameController.text = value.toString(); // update text controller if needed
-    });
-
-    final selected = getAllMasterListModel!.info!.suppliers!
-        ?.firstWhere((c) => c.supCode == value, orElse: () => master.Suppliers());
-
-    print("Selected: ${selected?.supCode}");
-    print("TAX Code: ${selected?.supName}");
-  },
-  isValidate: true,
-  validator: (value) => value == null ? "Please select a GST" : null,
-),
-     
-                 
-                 CustomTextField(
-                title: "Supplier Invoice No",
-                controller: _supplierInvoicNoController,
-                prefixIcon: Icons.person,
-                isEdit: false,
-                focusNode: _supNameFocus,
-                textInputAction: TextInputAction.done,
-                onEditingComplete: _submit,
-              ),
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Form(
+            key: _formKey,
+            child: 
+            Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+            //  crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
                 
-                 CustomTextField(
-                title: "Invoice Date",
-                controller: _invoiceDateController,
-                prefixIcon: Icons.person,
-                isEdit: true,
-                focusNode: _invoiceDateFocus,
-                textInputAction: TextInputAction.done,
-                onEditingComplete: _submit,
-              ),
-                 CustomTextField(
-                title: "GST Type",
-                controller: _gstTypeController,
-                prefixIcon: Icons.person,
-                isEdit: false,
-                focusNode: _gstTypeFocus,
-                textInputAction: TextInputAction.done,
-                onEditingComplete: _submit,
-              ),
-                 CustomTextField(
-                title: "Invoice Amount",
-                controller: _invoiceAmtController,
-                prefixIcon: Icons.person,
-                isEdit: false,
-                focusNode: _invoiceAmtFocus,
-                textInputAction: TextInputAction.done,
-                onEditingComplete: _submit,
-              ),
-                 CustomTextField(
-                title: "Purchase No",
-                controller: _purchaseNoController,
-                prefixIcon: Icons.person,
-                isEdit: false,
-                focusNode: _purchaseNoFocus,
-                textInputAction: TextInputAction.done,
-                onEditingComplete: _submit,
-              ),
-                 CustomTextField(
-                title: "Purchase Date",
-                controller: _purchaseDateController,
-                prefixIcon: Icons.person,
-                isEdit: true,
-                focusNode: _purchaseDateFocus,
-                textInputAction: TextInputAction.done,
-                onEditingComplete: _submit,
-              ),
-                 CustomTextField(
-                title: "Payment Mode",
-                controller: _paymentModeController,
-                prefixIcon: Icons.person,
-                isEdit: false,
-                focusNode: _paymentModeFocus,
-                textInputAction: TextInputAction.done,
-                onEditingComplete: _submit,
-              ),
-                 CustomTextField(
-                title: "Based On",
-                controller: _basedOnController,
-                prefixIcon: Icons.person,
-                isEdit: false,
-                focusNode: _basedOnFocus,
-                textInputAction: TextInputAction.done,
-                onEditingComplete: _submit,
-              ),
-                 CustomTextField(
-                title: "Amount Name",
-                controller: _accountNameController,
-                prefixIcon: Icons.person,
-                isEdit: false,
-                focusNode: _accountNameFocus,
-                textInputAction: TextInputAction.done,
-                onEditingComplete: _submit,
-              ),
-                
-                ],
-              ),
-              const SizedBox(height: 20,),
-      //  SingleChildScrollView(
-        
-      //         scrollDirection: Axis.horizontal,
-      //         child: DataTable(
-      //           border: TableBorder.all(color: Colors.grey.shade300),
-      //           headingRowColor:
-      //               MaterialStateProperty.all(Colors.blue.shade50),
-      //           columns: const [
-      //             DataColumn(label: Text("SL No")),
-      //             DataColumn(label: Text("Item Code")),
-      //             DataColumn(label: Text("Barcode No")),
-      //             DataColumn(label: Text("Item Name")),
-      //             DataColumn(label: Text("UOM")),
-      //             DataColumn(label: Text("QTY")),
-      //             DataColumn(label: Text("Rate")),
-      //             DataColumn(label: Text("Gross Amt")),
-      //             DataColumn(label: Text("VAT Amt")),
-      //             DataColumn(label: Text("Net Amt")),
-      //             DataColumn(label: Text("Action")),
-      //           ],
-      //           rows: [
-      //             DataRow(cells: [
-      //               const DataCell(Text("1")),
-      //               DataCell(TextFormField()),
-      //               DataCell(TextFormField()),
-      //               DataCell(TextFormField()),
-      //               DataCell(DropdownButton<String>(
-      //                 value: "PCS",
-      //                 items: const [
-      //                   DropdownMenuItem(value: "PCS", child: Text("PCS")),
-      //                   DropdownMenuItem(value: "KG", child: Text("KG")),
-      //                 ],
-      //                 onChanged: (_) {},
-      //               )),
-      //               DataCell(TextFormField()),
-      //               DataCell(TextFormField()),
-      //               DataCell(TextFormField()),
-      //               DataCell(TextFormField()),
-      //               DataCell(TextFormField()),
-      //               DataCell(IconButton(
-      //                 icon: const Icon(Icons.delete, color: Colors.red),
-      //                 onPressed: () {},
-      //               )),
-      //             ]),
-      //           ],
-      //         ),
-      //       ),
-   
-   SingleChildScrollView(
-  scrollDirection: Axis.horizontal,
-  child: DataTable(
-    border: TableBorder.all(color: Colors.grey.shade300),
-    headingRowColor: MaterialStateProperty.all(Colors.blue.shade50),
-    columns: const [
-      DataColumn(label: Text("SL No")),
-      DataColumn(label: Text("Item Code")),
-      DataColumn(label: Text("Item Name")),
-      DataColumn(label: Text("Batch No")),
-      DataColumn(label: Text("Expiry")),
-      DataColumn(label: Text("HSN Code")),
-      DataColumn(label: Text("Qty")),
-      DataColumn(label: Text("MRP/Rate")),
-      // DataColumn(label: Text("Net Rate")),
-      // DataColumn(label: Text("Net Value")),
-      DataColumn(label: Text("Sale Rate")),
-      DataColumn(label: Text("GST %")),
-      DataColumn(label: Text("GST Value")),
-      DataColumn(label: Text("Action")),
+               SearchDropdownField<product.Info>(
+        fetchItems: (q) async {
+      final response = await _productService.getProductServiceSearch(q);
+      if (response.isSuccess) {
+        return (response.data?.info ?? []).whereType<product.Info>().toList();
+      }
+      return [];
+        },
+        displayString: (unit) => unit.itemName ?? "",
+        onSelected: (country) {
+      setState(() {
+        //_supplierNameController.text = country.supName ?? "";
+      });
+      widget.onSaved(false);
+        },
+      ),
+                // const SizedBox(height: 26),
+          Wrap(
+                  spacing: 12,
+                  runSpacing: 12,
+                  children: [
+                    CustomDropdownField<int>(
+        title: "Supplier Name",
+        hintText: "Choose a Supplier Name",
+        items: getAllMasterListModel!.info!.suppliers!
+        .map((e) => DropdownMenuItem<int>(
+              value: e.supCode!,
+              child: Text("${e.supName}"),
+            ))
+        .toList(),
+       // initialValue: _taxCode, // ✅ use int value here
+        onChanged: (value) {
+      setState(() {
+        //_taxCode = value;  // uhttps://dart.dev/diagnostics/cast_to_non_typepdate dropdown selection
+        _supplierNameController.text = value.toString(); // update text controller if needed
+      });
+      
+      final selected = getAllMasterListModel!.info!.suppliers!
+          ?.firstWhere((c) => c.supCode == value, orElse: () => master.Suppliers());
+      
+      print("Selected: ${selected?.supCode}");
+      print("TAX Code: ${selected?.supName}");
+        },
+        isValidate: true,
+        validator: (value) => value == null ? "Please select a GST" : null,
+      ),
+       
+                   
+                   CustomTextField(
+                  title: "Supplier Invoice No",
+                  controller: _supplierInvoicNoController,
+                  prefixIcon: Icons.person,
+                  isEdit: false,
+                  focusNode: _supNameFocus,
+                  textInputAction: TextInputAction.done,
+                  onEditingComplete: _submit,
+                ),
+                  
+                   CustomTextField(
+                  title: "Invoice Date",
+                  controller: _invoiceDateController,
+                  prefixIcon: Icons.person,
+                  isEdit: true,
+                  focusNode: _invoiceDateFocus,
+                  textInputAction: TextInputAction.done,
+                  onEditingComplete: _submit,
+                ),
+                   CustomTextField(
+                  title: "GST Type",
+                  controller: _gstTypeController,
+                  prefixIcon: Icons.person,
+                  isEdit: false,
+                  focusNode: _gstTypeFocus,
+                  textInputAction: TextInputAction.done,
+                  onEditingComplete: _submit,
+                ),
+                   CustomTextField(
+                  title: "Invoice Amount",
+                  controller: _invoiceAmtController,
+                  prefixIcon: Icons.person,
+                  isEdit: false,
+                  focusNode: _invoiceAmtFocus,
+                  textInputAction: TextInputAction.done,
+                  onEditingComplete: _submit,
+                ),
+                   CustomTextField(
+                  title: "Purchase No",
+                  controller: _purchaseNoController,
+                  prefixIcon: Icons.person,
+                  isEdit: false,
+                  focusNode: _purchaseNoFocus,
+                  textInputAction: TextInputAction.done,
+                  onEditingComplete: _submit,
+                ),
+                   CustomTextField(
+                  title: "Purchase Date",
+                  controller: _purchaseDateController,
+                  prefixIcon: Icons.person,
+                  isEdit: true,
+                  focusNode: _purchaseDateFocus,
+                  textInputAction: TextInputAction.done,
+                  onEditingComplete: _submit,
+                ),
+                   CustomTextField(
+                  title: "Payment Mode",
+                  controller: _paymentModeController,
+                  prefixIcon: Icons.person,
+                  isEdit: false,
+                  focusNode: _paymentModeFocus,
+                  textInputAction: TextInputAction.done,
+                  onEditingComplete: _submit,
+                ),
+                   CustomTextField(
+                  title: "Based On",
+                  controller: _basedOnController,
+                  prefixIcon: Icons.person,
+                  isEdit: false,
+                  focusNode: _basedOnFocus,
+                  textInputAction: TextInputAction.done,
+                  onEditingComplete: _submit,
+                ),
+                   CustomTextField(
+                  title: "Amount Name",
+                  controller: _accountNameController,
+                  prefixIcon: Icons.person,
+                  isEdit: false,
+                  focusNode: _accountNameFocus,
+                  textInputAction: TextInputAction.done,
+                  onEditingComplete: _submit,
+                ),
+                  
+                  ],
+                ),
+                const SizedBox(height: 20,),
+        //  SingleChildScrollView(
+          
+        //         scrollDirection: Axis.horizontal,
+        //         child: DataTable(
+        //           border: TableBorder.all(color: Colors.grey.shade300),
+        //           headingRowColor:
+        //               MaterialStateProperty.all(Colors.blue.shade50),
+        //           columns: const [
+        //             DataColumn(label: Text("SL No")),
+        //             DataColumn(label: Text("Item Code")),
+        //             DataColumn(label: Text("Barcode No")),
+        //             DataColumn(label: Text("Item Name")),
+        //             DataColumn(label: Text("UOM")),
+        //             DataColumn(label: Text("QTY")),
+        //             DataColumn(label: Text("Rate")),
+        //             DataColumn(label: Text("Gross Amt")),
+        //             DataColumn(label: Text("VAT Amt")),
+        //             DataColumn(label: Text("Net Amt")),
+        //             DataColumn(label: Text("Action")),
+        //           ],
+        //           rows: [
+        //             DataRow(cells: [
+        //               const DataCell(Text("1")),
+        //               DataCell(TextFormField()),
+        //               DataCell(TextFormField()),
+        //               DataCell(TextFormField()),
+        //               DataCell(DropdownButton<String>(
+        //                 value: "PCS",
+        //                 items: const [
+        //                   DropdownMenuItem(value: "PCS", child: Text("PCS")),
+        //                   DropdownMenuItem(value: "KG", child: Text("KG")),
+        //                 ],
+        //                 onChanged: (_) {},
+        //               )),
+        //               DataCell(TextFormField()),
+        //               DataCell(TextFormField()),
+        //               DataCell(TextFormField()),
+        //               DataCell(TextFormField()),
+        //               DataCell(TextFormField()),
+        //               DataCell(IconButton(
+        //                 icon: const Icon(Icons.delete, color: Colors.red),
+        //                 onPressed: () {},
+        //               )),
+        //             ]),
+        //           ],
+        //         ),
+        //       ),
+         
+         SizedBox(
+      height: 500,
+       child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+         child: SingleChildScrollView(
+           scrollDirection: Axis.vertical,
+           child: 
+           DataTable(
+          border: TableBorder.all(color: Colors.grey.shade300),
+          headingRowColor: MaterialStateProperty.all(Colors.blue.shade50),
+          columns: const [
+            DataColumn(label: Text("SL No")),
+            DataColumn(label: Text("Item Code")),
+            DataColumn(label: Text("Item Name")),
+            DataColumn(label: Text("Back No")),
+            DataColumn(label: Text("Expiry")),
+            DataColumn(label: Text("HSN Code")),
+            DataColumn(label: Text("FreeQty")),
+            DataColumn(label: Text("MRP/Rate")),
+            // DataColumn(label: Text("Net Rate")),
+            // DataColumn(label: Text("Net Value")),
+            DataColumn(label: Text("Purchase Rate")),
+            DataColumn(label: Text("Sales Rate")),
+            DataColumn(label: Text("GST Value")),
+            DataColumn(label: Text("Action")),
+          ],
+          rows: List.generate(items.length, (index) {
+            final item = items[index];
+             final controller = controllers[index];
+            return DataRow(cells: [
+              DataCell(Text("${index + 1}")),
+         
+              // Item Code
+              DataCell(TextFormField(
+               // onTap: () => _showItemSelection(context),
+                initialValue: item.itemCode?.toString() ?? '',
+                keyboardType: TextInputType.number,
+                onChanged: (val) => item.itemCode = int.tryParse(val),
+              )),
+         DataCell(
+  ProductSearchField<product.Info>(
+    hintText: "Search Product",
+    fetchItems: (q) async {
+      final response = await _productService.getProductServiceSearch(q);
+      if (response.isSuccess) {
+        return List<product.Info>.from(response.data?.info ?? []);
+      }
+      return [];
+    },
+    columnHeaders: ["Code", "Barcode", "Name", "UOM", "Qty", "Rate"],
+    rowBuilder: (item) => <DataCell>[
+      DataCell(Text(item.itemCode.toString())),
+      DataCell(Text(item.batchNoRequired.toString())),
+      DataCell(Text(item.itemName ?? "")),
+      DataCell(Text(item.expiryDateFormat ?? "")),
+      DataCell(Text(item.maximumStockQty.toString())),
+      DataCell(Text(item.mRPRate.toString())),
     ],
-    rows: List.generate(items.length, (index) {
-      final item = items[index];
-       final controller = controllers[index];
-      return DataRow(cells: [
-        DataCell(Text("${index + 1}")),
+   onSelected: (selected) {
+  setState(() {
+    // 1️⃣ Update the current main table row
+    item.itemCode = selected.itemCode;
+    item.itemName = selected.itemName ?? '';
+    item.batchNoRequired = selected.batchNoRequired ?? 0;
+    item.expiryDateFormat = selected.expiryDateFormat ?? '';
+    item.hSNCode = selected.hSNCode ?? '';
+    item.maximumStockQty = selected.maximumStockQty ?? 0;
+    item.mRPRate = selected.mRPRate ?? 0;
+    item.salesRate = selected.salesRate ?? 0;
+    item.gstPercentage = selected.gstPercentage ?? 0;
 
-        // Item Code
-        DataCell(TextFormField(
-          initialValue: item.itemCode?.toString() ?? '',
-          keyboardType: TextInputType.number,
-          onChanged: (val) => item.itemCode = int.tryParse(val),
-        )),
+    // 2️⃣ Update controllers for this row
+    controller.itemCodeController.text = item.itemCode?.toString() ?? '';
+    controller.itemNameController.text = item.itemName ?? '';
+    controller.batchNoController.text = item.batchNoRequired.toString();
+    controller.expiryController.text = item.expiryDateFormat ?? '';
+    controller.hsnController.text = item.hSNCode ?? '';
+    controller.qtyController.text = item.maximumStockQty.toString();
+    controller.mrpController.text = item.mRPRate.toString();
+    controller.salesRateController.text = item.salesRate.toString();
+    controller.gstController.text = item.gstPercentage.toString();
 
-        // Item Name with API search
-        DataCell(SearchDropdownField<product.Info>(
-      hintText: "Search Item",
-      fetchItems: (q) async {
-        final response = await _productService.getProductServiceSearch(q);
-        if (response.isSuccess) return response.data?.info ?? [];
-        return [];
-      },
-      displayString: (unit) => unit.itemName ?? "",
-      onSelected: (selected) {
-        setState(() {
-          // Update the item
-          item.itemCode = selected.itemCode;
-          item.itemName = selected.itemName ?? '';
-          item.batchNoRequired = selected.batchNoRequired ?? 0;
-          item.expiryDateFormat = selected.expiryDateFormat ?? '';
-          item.hSNCode = selected.hSNCode ?? '';
-          item.maximumStockQty = selected.maximumStockQty ?? 0;
-          item.mRPRate = selected.mRPRate ?? 0;
-          item.salesRate = selected.salesRate ?? 0;
-          item.gstPercentage = selected.gstPercentage ?? 0;
+    // 3️⃣ Add a new empty row if this is the last row
+    if (index == items.length - 1) {
+      items.add(product.Info());
+      controllers.add(ItemRowControllers());
+    }
+  });
 
-          // Update controllers for this row only
-          controller.itemCodeController.text = item.itemCode?.toString() ?? '';
-          controller.itemNameController.text = item.itemName!;
-          controller.batchNoController.text = item.batchNoRequired.toString();
-          controller.expiryController.text = item.expiryDateFormat!;
-          controller.hsnController.text = item.hSNCode!;
-          controller.qtyController.text = item.maximumStockQty.toString();
-          controller.mrpController.text = item.mRPRate.toString();
-          controller.salesRateController.text = item.salesRate.toString();
-          controller.gstController.text = item.gstPercentage.toString();
-
-          // Add new empty row if last row is filled
-          if (index == items.length - 1) {
-            items.add(product.Info());
-            controllers.add(ItemRowControllers());
-          }
-        });
-      },
-    )),
-
-//         DataCell(SearchDropdownField<product.Info>(
-//           hintText: "Search Item",
-//           fetchItems: (q) async {
-//             final response = await _productService.getProductServiceSearch(q);
-//             if (response.isSuccess) {
-//               return response.data?.info ?? [];
-//             }
-//             return [];
-//           },
-//           displayString: (unit) => unit.itemName ?? "",
-//           onSelected: (selected) {
-//             setState(() {
-//   // Assign all values from the selected item to the current row
-//   item.itemCode     = selected.itemCode;
-//   item.itemName     = selected.itemName ?? '';
-//   item.batchNoRequired      = selected.batchNoRequired ??0;
-//   item.expiryDateFormat       = selected.expiryDateFormat ?? '';
-//   item.hSNCode      = selected.hSNCode ?? '';
-//   item.maximumStockQty          = selected.maximumStockQty ?? 0;
-//   item.mRPRate      = selected.mRPRate ?? 0;
-
-//   item.salesRate     = selected.salesRate ?? 0;
-//   item.gstPercentage   = selected.gstPercentage ?? 0;
-
-//   itemCodeController.text = item.itemCode?.toString() ?? '';
-//     itemNameController.text = item.itemName!;
-//   batchNoController.text = item.batchNoRequired.toString();
-//     expiryController.text = item.expiryDateFormat!;
-//  hsnController.text = item.hSNCode!;
-//     qtyController.text = item.maximumStockQty.toString();
-//    mrpController.text = item.mRPRate.toString();
-//    salesRateController.text = item.salesRate.toString();
-//    gstController.text = item.gstPercentage.toString();
-//   // Add a new empty row if last row is filled
-//   if (index == items.length - 1) {
-//     items.add(product.Info(
-//       itemCode: null,
-//       itemName: '',
-//       batchNoRequired: 0,
-//       expiryDateFormat: '',
-//       hSNCode: '',
-//       maximumStockQty: 0,
-//       mRPRate: 0,
-     
-//       salesRate: 0,
-//       gstPercentage: 0,
-  
-//     ));
-//   }
-// });
-//             // setState(() {
-//             //   item.itemCode = selected.itemCode;
-//             //   item.itemName = selected.itemName ?? "";
-
-//             //   // Add a new empty row if last row filled
-//             //   if (index == items.length - 1) items.add(product.Info());
-//             // });
-//           },
-//         )),
-
-        // Batch No
-        DataCell(TextFormField(
-          controller:controller.batchNoController ,
-         // initialValue: item.batchNoRequired.toString(),
-          onChanged: (val) => item.batchNoRequired = int.parse(val),
-        )),
-
-        // Expiry
-        DataCell(TextFormField(
-          controller:controller.expiryController ,
-          ///initialValue: item.expiryDateFormat,
-          onChanged: (val) => item.expiryDateFormat = val,
-        )),
-
-        // HSN Code
-        DataCell(TextFormField(
-         controller:controller.hsnController ,
-          onChanged: (val) => item.hSNCode = val,
-        )),
-
-        // Qty
-        DataCell(TextFormField(
-         controller:controller.qtyController ,
-          keyboardType: TextInputType.number,
-          onChanged: (val) => item.maximumStockQty = int.tryParse(val) ?? 0,
-        )),
-
-        // MRP/Rate
-        DataCell(TextFormField(
-       controller:controller.mrpController ,
-          keyboardType: TextInputType.number,
-          onChanged: (val) => item.mRPRate = int.tryParse(val) ?? 0,
-        )),
-
-        // Net Rate
-        // DataCell(TextFormField(
-        //   keyboardType: TextInputType.number,
-        //   onChanged: (val) => item.netRate = double.tryParse(val) ?? 0,
-        // )),
-
-        // // Net Value
-        // DataCell(Text(item.netValue.toStringAsFixed(2))),
-
-        // Sale Rate
-        DataCell(TextFormField(
-          controller:controller.salesRateController ,
-          keyboardType: TextInputType.number,
-          onChanged: (val) => item.salesRate = int.tryParse(val) ?? 0,
-        )),
-
-        // GST %
-        DataCell(TextFormField(
-         controller:controller.gstController ,
-          keyboardType: TextInputType.number,
-          onChanged: (val) => item.gstPercentage = int.tryParse(val) ?? 0,
-        )),
-
-        // GST Value
-        DataCell(TextFormField(
-         controller:controller.gstController ,
-          keyboardType: TextInputType.number,
-          onChanged: (val) => item.gstPercentage = int.tryParse(val) ?? 0,
-        )),
-
-        // Delete
-        DataCell(IconButton(
-          icon: const Icon(Icons.delete, color: Colors.red),
-          onPressed: () {
-            setState(() {
-              items.removeAt(index);
-              if (items.isEmpty) items.add(product.Info());
-            });
-          },
-        )),
-      ]);
-    }),
+  // 4️⃣ Clear the search field inside ProductSearchField
+  //    (so user sees a clean row after selection)
+  Future.delayed(Duration(milliseconds: 100), () {
+    //_controller.clear();
+    //setState(() => _results = []);
+  });
+},
   ),
 ),
-
-const SizedBox(height: 100,)
-            ],
-          ),
+              // Item Name with API search
+//               DataCell(
+//           ProductSearchDropdownField<product.Info>(
+//   hintText: "Search Product",
+//   prefixIcon: Icons.search,
+//   fetchItems: (q) async {
+//     final response = await _productService.getProductServiceSearch(q);
+//     if (response.isSuccess) {
+//       final infoList = response.data?.info;
+//       if (infoList != null) {
+//         // cast each element to product.Info
+//         return List<product.Info>.from(infoList);
+//       }
+//     }
+//     return <product.Info>[];
+//   },
+//   displayString: (item) => item.itemName ?? "",
+//   onSelected: (item) {
+//     print("Selected: ${item.itemName}");
+//   },
+//   columnHeaders: ["Code", "Barcode", "Name", "UOM", "Qty", "Rate"],
+//   rowBuilder: (product.Info item) => <DataCell>[
+//     DataCell(Text(item.itemCode.toString())),
+//     DataCell(Text(item.batchNoRequired.toString())),
+//     DataCell(Text(item.itemName ?? "")),
+//     DataCell(Text(item.expiryDateFormat ?? "")),
+//     DataCell(Text(item.maximumStockQty.toString())),
+//     DataCell(Text(item.mRPRate.toString())),
+//   ],
+// ),
+//           //       SearchDropdownField<product.Info>(
+//           //   hintText: "Search Item",
+//           //   fetchItems: (q) async {
+//           //     final response = await _productService.getProductServiceSearch(q);
+//           //     if (response.isSuccess) return response.data?.info ?? [];
+//           //     return [];
+//           //   },
+//           //   displayString: (unit) => unit.itemName ?? "",
+//           //   onSelected: (selected) {
+//           //     setState(() {
+//           //       // Update the item
+//           //       item.itemCode = selected.itemCode;
+//           //       item.itemName = selected.itemName ?? '';
+//           //       item.batchNoRequired = selected.batchNoRequired ?? 0;
+//           //       item.expiryDateFormat = selected.expiryDateFormat ?? '';
+//           //       item.hSNCode = selected.hSNCode ?? '';
+//           //       item.maximumStockQty = selected.maximumStockQty ?? 0;
+//           //       item.mRPRate = selected.mRPRate ?? 0;
+//           //       item.salesRate = selected.salesRate ?? 0;
+//           //       item.gstPercentage = selected.gstPercentage ?? 0;
+         
+//           //       // Update controllers for this row only
+//           //       controller.itemCodeController.text = item.itemCode?.toString() ?? '';
+//           //       controller.itemNameController.text = item.itemName!;
+//           //       controller.batchNoController.text = item.batchNoRequired.toString();
+//           //       controller.expiryController.text = item.expiryDateFormat!;
+//           //       controller.hsnController.text = item.hSNCode!;
+//           //       controller.qtyController.text = item.maximumStockQty.toString();
+//           //       controller.mrpController.text = item.mRPRate.toString();
+//           //       controller.salesRateController.text = item.salesRate.toString();
+//           //       controller.gstController.text = item.gstPercentage.toString();
+         
+//           //       // Add new empty row if last row is filled
+//           //       if (index == items.length - 1) {
+//           //         items.add(product.Info());
+//           //         controllers.add(ItemRowControllers());
+//           //       }
+//           //     });
+//           //   },
+//           // )
+         
+//           ),
+         
+         
+              // Batch No
+              DataCell(TextFormField(
+                controller:controller.batchNoController ,
+               // initialValue: item.batchNoRequired.toString(),
+                onChanged: (val) => item.batchNoRequired = int.parse(val),
+              )),
+         
+              // Expiry
+              DataCell(TextFormField(
+                controller:controller.expiryController ,
+                ///initialValue: item.expiryDateFormat,
+                onChanged: (val) => item.expiryDateFormat = val,
+              )),
+         
+              // HSN Code
+              DataCell(TextFormField(
+               controller:controller.hsnController ,
+                onChanged: (val) => item.hSNCode = val,
+              )),
+         
+              // Qty
+              DataCell(TextFormField(
+               controller:controller.qtyController ,
+                keyboardType: TextInputType.number,
+                onChanged: (val) => item.maximumStockQty = int.tryParse(val) ?? 0,
+              )),
+         
+              // MRP/Rate
+              DataCell(TextFormField(
+             controller:controller.mrpController ,
+                keyboardType: TextInputType.number,
+                onChanged: (val) => item.mRPRate = int.tryParse(val) ?? 0,
+              )),
+         
+              // Net Rate
+              // DataCell(TextFormField(
+              //   keyboardType: TextInputType.number,
+              //   onChanged: (val) => item.netRate = double.tryParse(val) ?? 0,
+              // )),
+         
+              // // Net Value
+              // DataCell(Text(item.netValue.toStringAsFixed(2))),
+         
+              // Sale Rate
+              DataCell(TextFormField(
+                controller:controller.salesRateController ,
+                keyboardType: TextInputType.number,
+                onChanged: (val) => item.salesRate = int.tryParse(val) ?? 0,
+              )),
+         
+              // GST %
+              DataCell(TextFormField(
+               controller:controller.gstController ,
+                keyboardType: TextInputType.number,
+                onChanged: (val) => item.gstPercentage = int.tryParse(val) ?? 0,
+              )),
+         
+              // GST Value
+              DataCell(TextFormField(
+               controller:controller.gstController ,
+                keyboardType: TextInputType.number,
+                onChanged: (val) => item.gstPercentage = int.tryParse(val) ?? 0,
+              )),
+         
+              // Delete
+              DataCell(IconButton(
+                icon: const Icon(Icons.delete, color: Colors.red),
+                onPressed: () {
+                  setState(() {
+                    items.removeAt(index);
+                    if (items.isEmpty) items.add(product.Info());
+                  });
+                },
+              )),
+            ]);
+          }),
+           ),
+         ),
+       ),
+         ),
       
+      const SizedBox(height: 100,)
+              ],
+            ),
+        
+          ),
         ),
       ),
     );
+  
   }
    
+
+
+
+void _showItemSelection(BuildContext context) async {
+  final selectedItem = await showModalBottomSheet<product.Info>(
+    context: context,
+    isScrollControlled: true,
+    builder: (context) {
+      return SizedBox(
+        height: MediaQuery.of(context).size.height * 0.7,
+        child: Column(
+          children: [
+            const Padding(
+              padding: EdgeInsets.all(12),
+              child: Text(
+                "Select Item",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+            ),
+            Expanded(
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: DataTable(
+                  columns: const [
+                    DataColumn(label: Text("SL No")),
+                    DataColumn(label: Text("Item Code")),
+                    DataColumn(label: Text("Barcode No")),
+                    DataColumn(label: Text("Item Name")),
+                    DataColumn(label: Text("UOM")),
+                    DataColumn(label: Text("Qty")),
+                    DataColumn(label: Text("Sales Rate")),
+                  ],
+                  rows: List.generate(items.length, (index) {
+                    final item = items[index];
+                    return DataRow(
+                      cells: [
+                        DataCell(Text("${index + 1}")),
+                        DataCell(Text(item.itemCode.toString())),
+                        DataCell(Text(item.batchNoRequired.toString())),
+                        DataCell(Text(item.itemName!)),
+                        DataCell(Text(item.maximumStockQty.toString())),
+                        DataCell(Text("${item.maximumStockQty.toString()}")),
+                        DataCell(Text("${item.mRPRate}")),
+                      ],
+                      onSelectChanged: (_) {
+                        Navigator.pop(context, item); // return item
+                      },
+                    );
+                  }),
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    },
+  );
+
+  if (selectedItem != null) {
+    setState(() {
+      itemCodeController.text = selectedItem.itemCode.toString();
+      batchNoController.text = selectedItem.batchNoRequired.toString();
+      itemNameController.text = selectedItem.itemName!;
+    //  uomController.text = selectedItem.uom;
+      qtyController.text = selectedItem.maximumStockQty.toString();
+      mrpController.text = selectedItem.mRPRate.toString();
+    });
+  }
+}
 
 
 }
