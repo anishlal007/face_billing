@@ -1,3 +1,3 @@
 class loadData{
-  static const userCode="1001";
+  static const dynamic userCode="1001";
 }

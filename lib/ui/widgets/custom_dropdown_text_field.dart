@@ -1,3 +1,4 @@
+import 'package:facebilling/core/colors.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter/material.dart';
@@ -18,6 +19,10 @@ class CustomDropdownField<T> extends StatefulWidget {
   final FocusNode? focusNode;
   final VoidCallback? onEditingComplete;
 
+  // ✅ New: Add button + popup widget
+  final Widget? addPage; // Pass "AddCountryScreen()", "AddStateScreen()" etc.
+  final String addTooltip;
+
   const CustomDropdownField({
     super.key,
     this.title,
@@ -31,6 +36,8 @@ class CustomDropdownField<T> extends StatefulWidget {
     this.isEdit = false,
     this.focusNode,
     this.onEditingComplete,
+    this.addPage,
+    this.addTooltip = "Add new",
   });
 
   @override
@@ -59,7 +66,31 @@ class _CustomDropdownFieldState<T> extends State<CustomDropdownField<T>> {
     }
 
     search(_dropdownKey.currentContext);
-    detector?.onTap?.call(); // 👈 simulate tap to open dropdown
+    detector?.onTap?.call();
+  }
+
+  // ✅ Open popup dialog
+  void _openPopup() {
+    if (widget.addPage != null) {
+      showDialog(
+        context: context,
+        builder: (context) => Dialog(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 500, maxHeight: 600),
+            child: widget.addPage!,
+          ),
+        ),
+      ).then((value) {
+        if (value == true) {
+          // ✅ You can trigger a reload of dropdown items here if needed
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Added successfully")),
+          );
+        }
+      });
+    }
   }
 
   @override
@@ -69,7 +100,7 @@ class _CustomDropdownFieldState<T> extends State<CustomDropdownField<T>> {
       onKeyEvent: (node, event) {
         if (event.logicalKey == LogicalKeyboardKey.enter &&
             event is KeyDownEvent) {
-          _openDropdown(); // open the dropdown
+          _openDropdown();
           return KeyEventResult.handled;
         }
         return KeyEventResult.ignored;
@@ -80,34 +111,56 @@ class _CustomDropdownFieldState<T> extends State<CustomDropdownField<T>> {
           if (widget.title != null)
             Padding(
               padding: const EdgeInsets.only(bottom: 6),
-              child: Text(widget.title!,
-                  style: const TextStyle(
-                      fontSize: 14, fontWeight: FontWeight.w500)),
+              child: Text(
+                widget.title!,
+                style:
+                    const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+              ),
             ),
-          DropdownButtonFormField<T>(
-            key: _dropdownKey,
-            value: _selectedValue,
-            hint: Text(widget.hintText ?? "Select"),
-            icon: const Icon(Icons.arrow_drop_down),
-            decoration: InputDecoration(
-              prefixIcon:
-                  widget.prefixIcon != null ? Icon(widget.prefixIcon) : null,
-              border:
-                  OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-            ),
-            items: widget.items,
-            validator: widget.isValidate ? widget.validator : null,
-            onChanged: widget.isEdit
-                ? null
-                : (value) {
-                    setState(() => _selectedValue = value);
-                    widget.onChanged?.call(value);
+          Row(
+            children: [
+              Expanded(
+                child: DropdownButtonFormField<T>(
+                  key: _dropdownKey,
+                  value: _selectedValue,
+                  hint: Text(widget.hintText ?? "Select"),
+                  icon: const Icon(Icons.arrow_drop_down),
+                  decoration: InputDecoration(
+                    prefixIcon: widget.prefixIcon != null
+                        ? Icon(widget.prefixIcon)
+                        : null,
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8)),
+                  ),
+                  items: widget.items,
+                  validator: widget.isValidate ? widget.validator : null,
+                  onChanged: widget.isEdit
+                      ? null
+                      : (value) {
+                          setState(() => _selectedValue = value);
+                          widget.onChanged?.call(value);
 
-                    // ✅ Move to next field after selection
-                    if (widget.onEditingComplete != null) {
-                      widget.onEditingComplete!();
-                    }
-                  },
+                          if (widget.onEditingComplete != null) {
+                            widget.onEditingComplete!();
+                          }
+                        },
+                ),
+              ),
+
+              // ✅ Add button (if addPage is provided)
+              if (widget.addPage != null) ...[
+                // const SizedBox(width: 8),
+                IconButton(
+                  tooltip: widget.addTooltip,
+                  icon: const Icon(
+                    Icons.add_circle,
+                    color: primary,
+                    size: 30,
+                  ),
+                  onPressed: _openPopup,
+                ),
+              ],
+            ],
           ),
         ],
       ),

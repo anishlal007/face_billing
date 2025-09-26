@@ -1,4 +1,6 @@
 import 'package:facebilling/core/const.dart';
+import 'package:facebilling/ui/screens/masters/unit/AddUnitScreen.dart';
+import 'package:facebilling/ui/screens/masters/user_master/add_user_master_page.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../data/models/get_all_master_list_model.dart' as master;
@@ -562,6 +564,15 @@ class _AddProductMasterPageState extends State<AddProductMasterPage> {
                         _itemUnitCodeFocus,
                         _itemMakeCodeFocus,
                       ),
+
+                      addPage: Addunitscreen(
+                        onSaved: (success) {
+                          if (success) {
+                            Navigator.pop(context, true);
+                          }
+                        },
+                      ),
+                      addTooltip: "Add Item Group",
                     ),
                   ),
                   SizedBox(

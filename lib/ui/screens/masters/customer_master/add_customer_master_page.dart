@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 
-
+import '../../../../data/models/get_all_master_list_model.dart' as master;
 import '../../../../data/models/customer_master/add_customer_master_model.dart';
 import '../../../../data/models/customer_master/customer_master_list_model.dart';
 import '../../../../data/services/customer_master_service.dart';
+import '../../../../data/services/get_all_master_service.dart';
+import '../../../widgets/custom_dropdown_text_field.dart';
 import '../../../widgets/custom_switch.dart';
 import '../../../widgets/custom_text_field.dart';
 import '../../../widgets/gradient_button.dart';
@@ -25,17 +27,69 @@ class AddCustomerMasterPage extends StatefulWidget {
 class _AddCustomerMasterPageState extends State<AddCustomerMasterPage> {
   final _formKey = GlobalKey<FormState>();
   final CustomerMasterService _service = CustomerMasterService();
+  final GetAllMasterService _getAllMasterService = GetAllMasterService();
 
-  bool _activeStatus = true;
   bool _loading = false;
   String? _message;
+  bool _getAllLoading = true;
+  int? _areaCode, _cityCode, _stateCode, _countryCode, _subGrpCode,_taxCode,_gender;
+  bool _activeStatus = true,_isTaxInclusive=true;
+  String? error,_genderValue;
+
+
 
   late TextEditingController _unitIdController;
   late TextEditingController _unitNameController;
-  // late TextEditingController _createdUserController;
 
+  master.GetAllMasterListModel? getAllMasterListModel;
+  late TextEditingController _suppIdController;
+  late TextEditingController _suppNameController;
+  late TextEditingController _suppAddress1Controller;
+  late TextEditingController _supppinCodeController;
+  late TextEditingController _suppMobileController;
+  late TextEditingController _suppMailIdController;
+  late TextEditingController _suppGstNoController;
+  late TextEditingController _suppPanNoController;
+  late TextEditingController _suppLicenseNoController;
+  late TextEditingController _customerDobController;
+  late TextEditingController _createdUserController;
+  // late TextEditingController _createdUserController;
+  final FocusNode _countryNameFocus = FocusNode();
   final FocusNode _unitIdFocus = FocusNode();
   final FocusNode _unitNameFocus = FocusNode();
+  final FocusNode _suppIdFocus = FocusNode();
+  final FocusNode _suppNameFocus = FocusNode();
+  final FocusNode _supDobFocus = FocusNode();
+  final FocusNode _createUserFocus = FocusNode();
+  final FocusNode _suppAddress1Focus = FocusNode();
+  final FocusNode _supppinCodeFocus = FocusNode();
+  final FocusNode _suppMobileFocus = FocusNode();
+  final FocusNode _suppMailIdFocus = FocusNode();
+  final FocusNode _suppGstNoFocus = FocusNode();
+  final FocusNode _suppPanNoFocus = FocusNode();
+  final FocusNode _suppLicenseNoFocus = FocusNode();
+  final FocusNode _createdUserFocus = FocusNode();
+  final FocusNode _suppGroupFocus = FocusNode();
+  final FocusNode _suppCountryFocus = FocusNode();
+  final FocusNode _suppStateFocus = FocusNode();
+  final FocusNode _suppAreaFocus = FocusNode();
+  final FocusNode _areaFocus = FocusNode();
+  final FocusNode _pinCodeFocus = FocusNode();
+  final FocusNode _compMobileFocus = FocusNode();
+  final FocusNode _compPhoneFocus = FocusNode();
+  final FocusNode _compMailIdFocus = FocusNode();
+  final FocusNode _compwebsiteFocus = FocusNode();
+  final FocusNode _compGstNoFocus = FocusNode();
+  final FocusNode _compPanNoFocus = FocusNode();
+  final FocusNode _compLicenseNoFocus = FocusNode();
+  final FocusNode _compfssaiFocus = FocusNode();
+  final FocusNode _compbankNameFocus = FocusNode();
+  final FocusNode _compAccountNoFocus = FocusNode();
+  final FocusNode _compIfscNoFocus = FocusNode();
+  final FocusNode _compBranchNameFocus = FocusNode();
+  final FocusNode _compBranchAddFocus = FocusNode();
+  final FocusNode _compLogoAddFocus = FocusNode();
+  late TextEditingController _countryNameController;
   // final FocusNode _createdUserFocus = FocusNode();
 
   @override
@@ -49,6 +103,41 @@ class _AddCustomerMasterPageState extends State<AddCustomerMasterPage> {
     // _createdUserController = TextEditingController(
     //     text: widget.countryInfo?.createdUserCode?.toString() ?? "1001");
     _activeStatus = (widget.unitInfo?.custActiveStatus ?? 1) == 1;
+
+    _loadList();
+    _suppIdController =
+        TextEditingController(text: widget.unitInfo?.custId ?? "");
+    _suppNameController =
+        TextEditingController(text: widget.unitInfo?.custName ?? "");
+    _suppAddress1Controller = TextEditingController(
+        text: widget.unitInfo?.custaddress1?.toString() ?? "");
+    _supppinCodeController  = TextEditingController(
+        text: widget.unitInfo?.custPinCode?.toString() ?? "");
+    _suppMobileController = TextEditingController(
+        text: widget.unitInfo?.custMobileNo?.toString() ?? "");
+    _suppMailIdController = TextEditingController(
+        text: widget.unitInfo?.custEmailId?.toString() ?? "");
+    _suppGstNoController = TextEditingController(
+        text: widget.unitInfo?.custGSTINNo?.toString() ?? "");
+    _customerDobController = TextEditingController(
+        text: widget.unitInfo?.custDOB?.toString() ?? "");
+        _createdUserController = TextEditingController(
+        text: widget.unitInfo?.createdUserCode?.toString() ?? "1001");
+  }
+  Future<void> _loadList() async {
+    final response = await _getAllMasterService.getAllMasterService();
+    if (response.isSuccess) {
+      setState(() {
+        getAllMasterListModel = response.data!;
+        _getAllLoading = false;
+        error = null;
+      });
+    } else {
+      setState(() {
+        error = response.error;
+        _getAllLoading = false;
+      });
+    }
   }
 
   @override
@@ -60,6 +149,12 @@ class _AddCustomerMasterPageState extends State<AddCustomerMasterPage> {
     _unitNameFocus.dispose();
     // _createdUserFocus.dispose();
     super.dispose();
+  }
+
+  void _fieldFocusChange(
+      BuildContext context, FocusNode current, FocusNode next) {
+    current.unfocus();
+    FocusScope.of(context).requestFocus(next);
   }
 
   Future<void> _submit() async {
@@ -78,7 +173,24 @@ class _AddCustomerMasterPageState extends State<AddCustomerMasterPage> {
   // int? userType;
   // int? activeStatus;
      final request = AddCustomerMasterModel(
-  custName: _unitNameController.text.trim(),
+       custId: _suppIdController.text.trim(),
+  custName: _suppNameController.text.trim(),
+    custDOB: _customerDobController.text.trim(),
+    gender: _gender,
+    custGroupCode: _subGrpCode,
+    custAreaCode: _areaCode,
+    custStateCode: _stateCode,
+    custCountryCode: _countryCode,
+    custAddress1: _suppAddress1Controller.text.trim(),
+    custPinCode: _supppinCodeController.text.trim(),
+    custMobileNo: _suppMobileController.text.trim(),
+    custEmailId: _suppMailIdController.text.trim(),
+    custGSTINNo: _suppGstNoController.text.trim(),
+    custGSTType: 2,
+    taxIsIncluded: _isTaxInclusive?1:0,
+       custCreatedDate: DateTime.now().toIso8601String(),
+    createdUserCode: 1,
+       updatedUserCode: 1,
     // current timestamp
   custActiveStatus: _activeStatus ? 1 : 0,
 );
@@ -89,10 +201,29 @@ print(request);
     } else {
       // EDIT mode
  final updated = AddCustomerMasterModel(
-  custName: _unitNameController.text.trim(),
-    // current timestamp
-  custActiveStatus: _activeStatus ? 1 : 0,
-);
+   custId: _suppIdController.text.trim(),
+   custName: _suppNameController.text.trim(),
+   custDOB: _customerDobController.text.trim(),
+   gender: _gender,
+   custGroupCode: _subGrpCode,
+   custAreaCode: _areaCode,
+   custStateCode: _stateCode,
+   custCountryCode: _countryCode,
+   custAddress1: _suppAddress1Controller.text.trim(),
+   custPinCode: _supppinCodeController.text.trim(),
+   custMobileNo: _suppMobileController.text.trim(),
+   custEmailId: _suppMailIdController.text.trim(),
+   custGSTINNo: _suppGstNoController.text.trim(),
+   custGSTType: 2,
+   taxIsIncluded: _isTaxInclusive?1:0,
+   custCreatedDate: DateTime.now().toIso8601String(),
+   createdUserCode: 1,
+   updatedUserCode: 1,
+
+
+   // current timestamp
+   custActiveStatus: _activeStatus ? 1 : 0,
+ );
      print("updated");
      print(updated);
       final response = await _service.updateCustomerMaster(
@@ -125,121 +256,530 @@ print(request);
 
   @override
   Widget build(BuildContext context) {
+    if (_getAllLoading) return const Center(child: CircularProgressIndicator());
+    if (error != null) return Center(child: Text("Error: $error"));
     final isEdit = widget.unitInfo != null;
 
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Form(
-        key: _formKey,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            SearchDropdownField<Info>(
-              hintText: "Search User",
-              prefixIcon: Icons.search,
-              fetchItems: (q) async {
-                final response = await _service.getCustomerMasterSearch(q);
-                if (response.isSuccess) {
-                  return (response.data?.info ?? [])
-                      .whereType<Info>()
-                      .toList();
-                }
-                return [];
-              },
-              displayString: (unit) => unit.custName ?? "",
-              onSelected: (country) {
-                setState(() {
-                  _unitIdController.text = country.custCode.toString() ?? "";
-                  _unitNameController.text = country.custName ?? "";
-                  // _createdUserController.text =
-                  //     country.createdUserCode?.toString() ?? "1001";
-                  _activeStatus = (country.custActiveStatus ?? 1) == 1;
-                });
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Form(
+          key: _formKey,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              // Decide columns by screen width
+              int columns = 1; // default mobile
+              if (constraints.maxWidth > 1200) {
+                columns = 3;
+              } else if (constraints.maxWidth > 800) {
+                columns = 2;
+              }
 
-                // ✅ Switch form into "Update mode"
-                widget.onSaved(false);
-              },
-            ),
+              return Wrap(
+                spacing: 16,
+                runSpacing: 16,
+                children: [
+                  // Example fields (replace with all your CustomTextField/Dropdown etc.)
+                  SearchDropdownField<Info>(
+                    hintText: "Search Customer",
+                    prefixIcon: Icons.search,
+                    fetchItems: (q) async {
+                      final response =
+                      await _service.getCustomerMasterSearch(q);
+                      if (response.isSuccess) {
+                        return (response.data?.info ?? [])
+                            .whereType<Info>()
+                            .toList();
+                      }
+                      return [];
+                    },
+                    displayString: (unit) => unit.custName?? "",
+                    onSelected: (country) {
+                      setState(() {
+                        /*  _itemIdController.text =
+                            country.itemCode.toString() ?? "";
+                        _itemNameController.text = country.itemName ?? "";*/
+                        // _createdUserController.text =
+                        //     country.createdUserCode?.toString() ?? "1001";
+                        // _activeStatus = (country.custActiveStatus ?? 1) == 1;
+                      });
 
-            const SizedBox(height: 26),
-            // SwitchListTile(
-            //   value: _activeStatus,
-            //   title: const Text("Active Status"),
-            //   onChanged: (val) => setState(() => _activeStatus = val),
-            // ),
-            CustomSwitch(
-              value: _activeStatus,
-              title: "Active Status",
-              onChanged: (val) {
-                setState(() {
-                  _activeStatus = val;
-                });
-              },
-            ),
-            // CustomTextField(
-            //   title: "Location Code",
-            //   hintText: "Enter Location Code",
-            //   controller: _unitIdController,
-            //   prefixIcon: Icons.flag_circle,
-            //   isValidate: true,
-            //   validator: (value) =>
-            //       value == null || value.isEmpty ? "Enter unit ID" : null,
-            //   focusNode: _unitIdFocus,
-            //   textInputAction: TextInputAction.next,
-            //   onEditingComplete: () {
-            //     FocusScope.of(context).requestFocus(_unitNameFocus);
-            //   },
-            // ),
-            const SizedBox(height: 16),
-            CustomTextField(
-              title: "User Name",
-              hintText: "Enter User Name",
-              controller: _unitNameController,
-              prefixIcon: Icons.flag,
-              isValidate: true,
-              validator: (value) =>
-                  value == null || value.isEmpty ? "Enter User name" : null,
-              focusNode: _unitNameFocus,
-              textInputAction: TextInputAction.next,
-              onEditingComplete: () {
-                // FocusScope.of(context).requestFocus(_createdUserFocus);
-              },
-            ),
-            const SizedBox(height: 16),
-            // CustomTextField(
-            //   title: "Create User",
-            //   controller: _createdUserController,
-            //   prefixIcon: Icons.person,
-            //   isEdit: true,
-            //   focusNode: _createdUserFocus,
-            //   textInputAction: TextInputAction.done,
-            //   onEditingComplete: _submit,
-            // ),
-            const SizedBox(height: 16),
-            // SwitchListTile(
-            //   value: _activeStatus,
-            //   title: const Text("Active Status"),
-            //   onChanged: (val) => setState(() => _activeStatus = val),
-            // ),
-            const SizedBox(height: 16),
-            if (_loading)
-              const CircularProgressIndicator()
-            else
-              GradientButton(
-                  text: isEdit ? "Update User" : "Add User",
-                  onPressed: _submit),
-            if (_message != null) ...[
-              const SizedBox(height: 16),
-              Text(
-                _message!,
+                      // ✅ Switch form into "Update mode"
+                      widget.onSaved(false);
+                    },
+                  ),
+                  SizedBox(
+                    width: constraints.maxWidth,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text("Customer Status"),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        CustomSwitch(
+                          value: _activeStatus,
+                          title: "Active Status",
+                          onChanged: (val) {
+                            setState(() {
+                              _activeStatus = val;
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(
+                    width: constraints.maxWidth / columns - 20,
+                    child: CustomTextField(
+                      title: "Customer ID",
+                      hintText: "Enter Customer ID",
+                      controller: _suppIdController,
+                      prefixIcon: Icons.flag_circle,
+                      isValidate: true,
+                      validator: (value) => value == null || value.isEmpty
+                          ? "Enter Customer ID"
+                          : null,
+                      focusNode: _suppIdFocus,
+                      textInputAction: TextInputAction.next,
+                      onEditingComplete: () => _fieldFocusChange(
+                          context, _suppIdFocus, _suppNameFocus),
+                    ),
+                  ),
+                  SizedBox(
+                    width: constraints.maxWidth / columns - 20,
+                    child: CustomTextField(
+                      title: "Customer Name",
+                      hintText: "Enter Customer Name",
+                      controller: _suppNameController,
+                      prefixIcon: Icons.flag,
+                      isValidate: true,
+                      validator: (value) => value == null || value.isEmpty
+                          ? "Enter Customer Name"
+                          : null,
+                      focusNode: _suppNameFocus,
+                      textInputAction: TextInputAction.next,
+                      onEditingComplete: () => _fieldFocusChange(
+                          context, _suppNameFocus, _supDobFocus),
+                    ),
+                  ),
+                  SizedBox(
+                    width: constraints.maxWidth / columns - 20,
+                    child: CustomTextField(
+                      title: "Customer Date Of Birth",
+                      hintText: "Enter Customer Date Of Birth",
+                      controller: _customerDobController,
+                      isValidate: true,
+                      validator: (value) => value == null || value.isEmpty
+                          ? "Enter Customer Date Of Birth"
+                          : null,
+                      focusNode: _supDobFocus,
+                      textInputAction: TextInputAction.next,
+                      onEditingComplete: () => _fieldFocusChange(
+                          context, _supDobFocus, _suppGroupFocus),
+                    ),
+                  ),
+
+              // Define a variable in your State
+               // will hold "Male" or "Female"
+
+// Inside your build() -> children[]
+              SizedBox(
+                width: constraints.maxWidth / columns - 20,
+                child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                const Padding(
+                padding: EdgeInsets.only(bottom: 6),
+                child: Text(
+                "Gender",
                 style: TextStyle(
-                  color: _message!.contains("successfully")
-                      ? Colors.green
-                      : Colors.red,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: Colors.black87,
+                ),
+                ),
+                ),
+                Row(
+                children: [
+                Expanded(
+                child: RadioListTile<String>(
+                title: const Text("Male"),
+                value: "Male",
+                groupValue: _genderValue,
+                onChanged: (value) {
+                setState(() {
+                _genderValue = value;
+                _gender=1;
+                });
+                },
+                ),
+                ),
+                Expanded(
+                child: RadioListTile<String>(
+                title: const Text("Female"),
+                value: "Female",
+                groupValue: _genderValue,
+                onChanged: (value) {
+                setState(() {
+                _genderValue = value;
+                _gender=2;
+                });
+                },
+                ),
+                ),
+                ],
+                ),
+                ],
                 ),
               ),
-            ]
-          ],
+
+              SizedBox(
+                    width: constraints.maxWidth / columns - 20,
+                    child: CustomDropdownField<int>(
+                      title: "Select Customer Group",
+                      hintText: "Choose Customer Group",
+                      items: getAllMasterListModel!.info!.customerGroups!
+                          .map((e) => DropdownMenuItem<int>(
+                        value:
+                        e.custGroupCode, // 🔹 use taxCode as value
+                        child: Text("${e.custGroupName} "),
+                      ))
+                          .toList(),
+                      // initialValue: _taxCode, // int? taxCode
+                      onChanged: (value) {
+                        setState(() {
+                          _subGrpCode = value;
+                          //  _taxCode = value;
+                        });
+
+                        final selected = getAllMasterListModel!.info!.supplierGroups!
+                            .firstWhere((c) => c.supGroupCode == value,
+                            orElse: () => master.SupplierGroups());
+
+                        print("Selected GST %: ${selected.supGroupCode}");
+                        print("Selected TAX Code: ${selected.supGroupCode}");
+                      },
+                      isValidate: true,
+                      validator: (value) =>
+                      value == null ? "Please select Country" : null,
+                      focusNode: _suppGroupFocus,
+                      onEditingComplete: () => _fieldFocusChange(
+                        context,
+                        _suppGroupFocus,
+                        _countryNameFocus,
+                      ),
+                    ),
+                  ),
+
+
+
+                  SizedBox(
+                    width: constraints.maxWidth / columns - 20,
+                    child: CustomDropdownField<int>(
+                      title: "Select Country",
+                      hintText: "Choose Country",
+                      items: getAllMasterListModel!.info!.countries!
+                          .map((e) => DropdownMenuItem<int>(
+                        value:
+                        e.countryCode, // 🔹 use taxCode as value
+                        child: Text("${e.countryName} "),
+                      ))
+                          .toList(),
+                      // initialValue: _taxCode, // int? taxCode
+                      onChanged: (value) {
+                        setState(() {
+                          _countryCode = value;
+                          //  _taxCode = value;
+                        });
+
+                        final selected = getAllMasterListModel!.info!.countries!
+                            .firstWhere((c) => c.countryCode == value,
+                            orElse: () => master.Countries());
+
+                        print("Selected GST %: ${selected.countryCode}");
+                        print("Selected TAX Code: ${selected.countryCode}");
+                      },
+                      isValidate: true,
+                      validator: (value) =>
+                      value == null ? "Please select Country" : null,
+                      focusNode: _suppCountryFocus,
+                      onEditingComplete: () => _fieldFocusChange(
+                        context,
+                        _suppCountryFocus,
+                        _suppStateFocus,
+                      ),
+                    ),
+                  ),
+
+                  SizedBox(
+                    width: constraints.maxWidth / columns - 20,
+                    child: CustomDropdownField<int>(
+                      title: "Select State",
+                      hintText: "Choose State",
+                      items: getAllMasterListModel!.info!.states!
+                          .map((e) => DropdownMenuItem<int>(
+                        value:
+                        e.stateCode, // 🔹 use taxCode as value
+                        child: Text("${e.stateName} "),
+                      ))
+                          .toList(),
+                      // initialValue: _taxCode, // int? taxCode
+                      onChanged: (value) {
+                        setState(() {
+                          _stateCode = value;
+                          //  _taxCode = value;
+                        });
+
+                        final selected = getAllMasterListModel!.info!.states!
+                            .firstWhere((c) => c.stateCode == value,
+                            orElse: () => master.States());
+
+                        print("Selected GST %: ${selected.stateCode}");
+                        print("Selected TAX Code: ${selected.stateCode}");
+                      },
+                      isValidate: true,
+                      validator: (value) =>
+                      value == null ? "Please select State" : null,
+                      focusNode: _suppStateFocus,
+                      onEditingComplete: () => _fieldFocusChange(
+                          context,
+                          _suppStateFocus,
+                          _suppAreaFocus
+                      ),
+                    ),
+                  ),
+
+                  SizedBox(
+                    width: constraints.maxWidth / columns - 20,
+                    child: CustomDropdownField<int>(
+                      title: "Select Areas",
+                      hintText: "Choose Areas",
+                      items: getAllMasterListModel!.info!.areas!
+                          .map((e) => DropdownMenuItem<int>(
+                        value:
+                        e.areaCode, // 🔹 use taxCode as value
+                        child: Text("${e.areaName} "),
+                      ))
+                          .toList(),
+                      // initialValue: _taxCode, // int? taxCode
+                      onChanged: (value) {
+                        setState(() {
+                          _areaCode = value;
+                          //  _taxCode = value;
+                        });
+
+                        final selected = getAllMasterListModel!.info!.areas!
+                            .firstWhere((c) => c.stateCode == value,
+                            orElse: () => master.Areas());
+
+                        print("Selected GST %: ${selected.areaCode}");
+                        print("Selected TAX Code: ${selected.areaCode}");
+                      },
+                      isValidate: true,
+                      validator: (value) =>
+                      value == null ? "Please select Area" : null,
+                      focusNode: _suppAreaFocus,
+                      onEditingComplete: () => _fieldFocusChange(
+                        context,
+                        _suppAreaFocus,
+                        _pinCodeFocus,
+                      ),
+                    ),
+                  ),
+
+                  const Divider(),
+                  SizedBox(
+                    width: constraints.maxWidth / columns - 20,
+                    child: CustomTextField(
+                      title: "Customer Address",
+                      hintText: "Enter Customer Address",
+                      controller: _suppAddress1Controller,
+                      isValidate: true,
+                      validator: (value) => value == null || value.isEmpty
+                          ? "Enter Customer Address"
+                          : null,
+                      focusNode: _suppAddress1Focus,
+                      textInputAction: TextInputAction.next,
+                      onEditingComplete: () => _fieldFocusChange(
+                          context, _suppAddress1Focus, _pinCodeFocus),
+                      autoFocus: true,
+                    ),
+                  ),
+
+
+                  SizedBox(
+                    width: constraints.maxWidth / columns - 20,
+                    child: CustomTextField(
+                      title: "Customer Pin Code",
+                      hintText: "Enter Customer Pin Code",
+                      controller: _supppinCodeController,
+                      isValidate: true,
+                      validator: (value) => value == null || value.isEmpty
+                          ? "Enter Customer Pin Code"
+                          : null,
+                      focusNode: _pinCodeFocus,
+                      textInputAction: TextInputAction.next,
+                      onEditingComplete: () => _fieldFocusChange(
+                          context, _pinCodeFocus, _compMobileFocus),
+                      autoFocus: true,
+                    ),
+                  ),
+
+                  SizedBox(
+                    width: constraints.maxWidth / columns - 20,
+                    child: CustomTextField(
+                      title: "Customer Mobile Number",
+                      hintText: "Enter Customer Mobile Number",
+                      controller: _suppMobileController,
+                      isValidate: true,
+                      validator: (value) => value == null || value.isEmpty
+                          ? "Enter Customer Mobile Number"
+                          : null,
+                      focusNode: _compMobileFocus,
+                      textInputAction: TextInputAction.next,
+                      onEditingComplete: () => _fieldFocusChange(
+                          context, _compMobileFocus, _compMailIdFocus),
+                      autoFocus: true,
+                    ),
+                  ),
+
+
+                  SizedBox(
+                    width: constraints.maxWidth / columns - 20,
+                    child: CustomTextField(
+                      title: "Customer Email ID",
+                      hintText: "Enter Customer Email ID",
+                      controller: _suppMailIdController,
+                      isValidate: true,
+                      validator: (value) => value == null || value.isEmpty
+                          ? "Enter Customer Email ID"
+                          : null,
+                      focusNode: _compMailIdFocus,
+                      textInputAction: TextInputAction.next,
+                      onEditingComplete: () => _fieldFocusChange(
+                          context, _compMailIdFocus, _compwebsiteFocus),
+                      autoFocus: true,
+                    ),
+                  ),
+
+                  SizedBox(
+                    width: constraints.maxWidth / columns - 20,
+                    child: CustomTextField(
+                      title: "Customer GST Number",
+                      hintText: "Enter Customer GST Number",
+                      controller: _suppGstNoController,
+                      isValidate: true,
+                      validator: (value) => value == null || value.isEmpty
+                          ? "Enter Customer GST Number"
+                          : null,
+                      focusNode: _compGstNoFocus,
+                      textInputAction: TextInputAction.next,
+                      onEditingComplete: () => _fieldFocusChange(
+                          context, _compGstNoFocus, _compLicenseNoFocus),
+                      autoFocus: true,
+                    ),
+                  ),
+
+
+
+                  const Divider(),
+
+
+
+                  SizedBox(
+                    width: constraints.maxWidth / columns - 20,
+                    child: CustomDropdownField<int>(
+                      title: "Select GST Type",
+                      hintText: "Choose the GST Type",
+                      items: getAllMasterListModel!.info!.taxMasters!
+                          .map((e) => DropdownMenuItem<int>(
+                        value: e.taxCode, // 🔹 use taxCode as value
+                        child:
+                        Text("${e.taxName} (${e.taxPercentage}%)"),
+                      ))
+                          .toList(),
+                      // initialValue: _taxCode, // int? taxCode
+                      onChanged: (value) {
+                        setState(() {
+                          _taxCode = value;
+                          //  _taxCode = value;
+                        });
+
+                        final selected = getAllMasterListModel!
+                            .info!.taxMasters!
+                            .firstWhere((c) => c.taxCode == value,
+                            orElse: () => master.TaxMasters());
+
+                        print("Selected GST %: ${selected.taxPercentage}");
+                        print("Selected TAX Code: ${selected.taxCode}");
+                      },
+                      isValidate: true,
+                      validator: (value) =>
+                      value == null ? "Please select a GST" : null,
+                    ),
+                  ),
+
+
+
+                  SizedBox(
+                    width: constraints.maxWidth / columns - 20,
+                    child: CustomTextField(
+                      title: "Create Customer",
+                      controller: _createdUserController,
+                      prefixIcon: Icons.person,
+                      isEdit: true,
+                      focusNode: _createUserFocus,
+                      textInputAction: TextInputAction.done,
+                      onEditingComplete: _submit,
+                    ),
+                  ),
+
+                  SizedBox(
+                    width: constraints.maxWidth,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text("Is Tax Inclusive"),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        CustomSwitch(
+                          value: _isTaxInclusive,
+                          title: "Active Status",
+                          onChanged: (val) {
+                            setState(() {
+                              _isTaxInclusive = val;
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+
+
+                  const SizedBox(height: 16),
+                  if (_loading)
+                    const CircularProgressIndicator()
+                  else
+                    GradientButton(
+                        text: isEdit ? "Update Customer" : "Add Customer",
+                        onPressed: _submit),
+                  if (_message != null) ...[
+                    const SizedBox(height: 16),
+                    Text(
+                      _message!,
+                      style: TextStyle(
+                        color: _message!.contains("successfully")
+                            ? Colors.green
+                            : Colors.red,
+                      ),
+                    ),
+                  ]
+                ],
+              );
+            },
+          ),
         ),
       ),
     );

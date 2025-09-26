@@ -15,8 +15,8 @@ import '../models/user_master/user_master_list_model.dart';
 
 class PurchaseMasterService {
   final Dio _dio = ApiClient.dio;
-  
- Future<ApiResponse<Country>> getCountries() async {
+
+  Future<ApiResponse<Country>> getCountries() async {
     try {
       final response = await _dio.get("countrymaster");
 
@@ -29,10 +29,12 @@ class PurchaseMasterService {
       return ApiResponse(error: e.toString());
     }
   }
-  Future<ApiResponse<bool>> addPurchaseMaster(AddPurchaseMasterModel request) async {
+
+  Future<ApiResponse<bool>> addPurchaseMaster(
+      AddPurchaseMasterModel request) async {
     try {
-      final response = await _dio.post("products", data: request.toJson());
-print("Sending JSON: ${jsonEncode(request.toJson())}");
+      final response = await _dio.post("purchase", data: request.toJson());
+      print("Sending JSON: ${jsonEncode(request.toJson())}");
       if (response.statusCode == 200 || response.statusCode == 201) {
         return ApiResponse(data: true);
       } else {
@@ -45,7 +47,7 @@ print("Sending JSON: ${jsonEncode(request.toJson())}");
 
   Future<ApiResponse<PurchaseMasterListModel>> getSPurchaseMaster() async {
     try {
-      final response = await _dio.get("products");
+      final response = await _dio.get("purchase");
 
       final responseData = response.data;
 
@@ -57,7 +59,8 @@ print("Sending JSON: ${jsonEncode(request.toJson())}");
     }
   }
 
-  Future<ApiResponse<PurchaseMasterListModel>> getPurchaseMasterSearch(String q) async {
+  Future<ApiResponse<PurchaseMasterListModel>> getPurchaseMasterSearch(
+      String q) async {
     try {
       final response = await _dio.get("item/search?q=$q");
 
@@ -72,7 +75,8 @@ print("Sending JSON: ${jsonEncode(request.toJson())}");
   }
 
   /// INFO Country (GET) -> /countrymaster/{id}
-  Future<ApiResponse<PurchaseMasterListModel>> getPurchaseMasterById(String id) async {
+  Future<ApiResponse<PurchaseMasterListModel>> getPurchaseMasterById(
+      String id) async {
     try {
       final response = await _dio.get("products/$id");
       return ApiResponse(data: PurchaseMasterListModel.fromJson(response.data));
@@ -82,7 +86,8 @@ print("Sending JSON: ${jsonEncode(request.toJson())}");
   }
 
   /// EDIT Country (PUT) -> /countrymaster
-  Future<ApiResponse<bool>> updatePurchaseMaster(dynamic id, AddPurchaseMasterModel request) async {
+  Future<ApiResponse<bool>> updatePurchaseMaster(
+      dynamic id, AddPurchaseMasterModel request) async {
     try {
       final response = await _dio.put("products/$id", data: request.toJson());
 
