@@ -1,24 +1,37 @@
-2025/09/26-00:56:58.004 398a3e Reusing MANIFEST /private/var/folders/13/qls48qw97vj5n2gk3ppy9gx00000gn/T/flutter_tools.Ut1coJ/flutter_tools_chrome_device.1Q300x/Default/shared_proto_db/MANIFEST-000001
-2025/09/26-00:56:58.004 398a3e Recovering log #39
-2025/09/26-00:56:58.009 398a3e Reusing old log /private/var/folders/13/qls48qw97vj5n2gk3ppy9gx00000gn/T/flutter_tools.Ut1coJ/flutter_tools_chrome_device.1Q300x/Default/shared_proto_db/000039.log 
-2025/09/26-00:56:58.009 398a3e Delete type=0 #13
-2025/09/26-00:56:58.010 398a3e Delete type=0 #7
-2025/09/26-00:56:58.010 398a3e Delete type=0 #4
-2025/09/26-00:56:58.010 398a3e Delete type=0 #10
-2025/09/26-00:56:58.010 398a3e Delete type=0 #29
-2025/09/26-00:56:58.010 398a3e Delete type=0 #16
-2025/09/26-00:56:58.010 398a3e Delete type=0 #3
-2025/09/26-00:56:58.010 398a3e Delete type=2 #14
-2025/09/26-00:56:58.010 398a3e Delete type=2 #17
-2025/09/26-00:56:58.010 398a3e Delete type=2 #11
-2025/09/26-00:56:58.010 398a3e Delete type=2 #8
-2025/09/26-00:56:58.010 398a3e Delete type=2 #21
-2025/09/26-00:56:58.010 398a3e Delete type=2 #27
-2025/09/26-00:56:58.010 398a3e Delete type=2 #24
-2025/09/26-00:56:58.010 398a3e Delete type=2 #30
-2025/09/26-00:56:58.010 398a3e Delete type=0 #32
-2025/09/26-00:56:58.010 398a3e Delete type=0 #26
-2025/09/26-00:56:58.010 398a3e Delete type=2 #40
-2025/09/26-00:56:58.010 398a3e Delete type=0 #19
-2025/09/26-00:56:58.010 398a3e Delete type=0 #23
-2025/09/26-00:56:58.010 398a3e Delete type=0 #36
+2025/09/26-18:08:39.632 119a2 Reusing MANIFEST /private/var/folders/h3/9hjzgwlj5txd9lwf4t0cl_nc0000gn/T/flutter_tools.Un8UuD/flutter_tools_chrome_device.ujOii2/Default/shared_proto_db/MANIFEST-000001
+2025/09/26-18:08:39.633 119a2 Recovering log #41
+2025/09/26-18:08:39.635 119a2 Reusing old log /private/var/folders/h3/9hjzgwlj5txd9lwf4t0cl_nc0000gn/T/flutter_tools.Un8UuD/flutter_tools_chrome_device.ujOii2/Default/shared_proto_db/000041.log 
+2025/09/26-18:08:39.635 119a2 Delete type=0 #13
+2025/09/26-18:08:39.635 119a2 Delete type=0 #7
+2025/09/26-18:08:39.636 119a2 Delete type=0 #4
+2025/09/26-18:08:39.636 119a2 Delete type=0 #10
+2025/09/26-18:08:39.636 119a2 Delete type=0 #39
+2025/09/26-18:08:39.636 119a2 Delete type=0 #29
+2025/09/26-18:08:39.636 119a2 Delete type=0 #16
+2025/09/26-18:08:39.636 119a2 Delete type=0 #3
+2025/09/26-18:08:39.636 119a2 Delete type=2 #14
+2025/09/26-18:08:39.636 119a2 Delete type=2 #17
+2025/09/26-18:08:39.636 119a2 Delete type=2 #11
+2025/09/26-18:08:39.636 119a2 Delete type=2 #8
+2025/09/26-18:08:39.636 119a2 Delete type=2 #21
+2025/09/26-18:08:39.636 119a2 Delete type=2 #27
+2025/09/26-18:08:39.636 119a2 Delete type=2 #24
+2025/09/26-18:08:39.636 119a2 Delete type=2 #30
+2025/09/26-18:08:39.636 119a2 Delete type=0 #32
+2025/09/26-18:08:39.636 119a2 Delete type=0 #26
+2025/09/26-18:08:39.636 119a2 Delete type=2 #40
+2025/09/26-18:08:39.636 119a2 Delete type=0 #19
+2025/09/26-18:08:39.636 119a2 Delete type=0 #23
+2025/09/26-18:08:39.636 119a2 Delete type=0 #36
+2025/09/26-18:21:56.173 119a2 Level-0 table #45: started
+2025/09/26-18:21:56.190 119a2 Level-0 table #45: 124815 bytes OK
+2025/09/26-18:21:56.200 119a2 Delete type=0 #41
+2025/09/26-18:21:56.206 119a2 Compacting 4@0 + 1@1 files
+2025/09/26-18:21:56.218 119a2 Generated table #46@0: 1700 keys, 334307 bytes
+2025/09/26-18:21:56.218 119a2 Compacted 4@0 + 1@1 files => 334307 bytes
+2025/09/26-18:21:56.221 119a2 compacted to: files[ 0 1 1 0 0 0 0 ]
+2025/09/26-18:21:56.221 119a2 Delete type=2 #39
+2025/09/26-18:21:56.221 119a2 Delete type=2 #34
+2025/09/26-18:21:56.221 119a2 Delete type=2 #37
+2025/09/26-18:21:56.221 119a2 Delete type=2 #42
+2025/09/26-18:21:56.221 119a2 Delete type=2 #45

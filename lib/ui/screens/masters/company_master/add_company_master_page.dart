@@ -1,12 +1,10 @@
+import 'package:facebilling/ui/screens/masters/country/AddCountryScreen.dart';
 import 'package:flutter/material.dart';
-
 
 import '../../../../data/models/company_master/add_company_master_model.dart';
 import '../../../../data/models/company_master/company_master_list_model.dart';
-import '../../../../data/models/customer_master/add_customer_master_model.dart';
 import '../../../../data/models/get_all_master_list_model.dart' as master;
 import '../../../../data/services/comapany_master_service.dart';
-import '../../../../data/services/customer_master_service.dart';
 import '../../../../data/services/get_all_master_service.dart';
 import '../../../widgets/custom_dropdown_text_field.dart';
 import '../../../widgets/custom_switch.dart';
@@ -67,7 +65,6 @@ class _AddCompanyMasterPageState extends State<AddCompanyMasterPage> {
   late TextEditingController _compBranchAddController;
   late TextEditingController _compLogoAddController;
 
-
   // 🔹 FocusNodes
   final FocusNode _compNameFocus = FocusNode();
   final FocusNode _compShortNameFocus = FocusNode();
@@ -114,7 +111,6 @@ class _AddCompanyMasterPageState extends State<AddCompanyMasterPage> {
     //     text: widget.countryInfo?.createdUserCode?.toString() ?? "1001");
     _activeStatus = (widget.unitInfo?.coActiveStatus ?? 1) == 1;
 
-
     _compNameController =
         TextEditingController(text: widget.unitInfo?.coName ?? "");
     _compShortNameController = TextEditingController(
@@ -143,8 +139,8 @@ class _AddCompanyMasterPageState extends State<AddCompanyMasterPage> {
         text: widget.unitInfo?.coWebsite?.toString() ?? "");
     _compGstNoController = TextEditingController(
         text: widget.unitInfo?.coGstinNo?.toString() ?? "");
-    _compPanNoController = TextEditingController(
-        text: widget.unitInfo?.coPanNo?.toString() ?? "");
+    _compPanNoController =
+        TextEditingController(text: widget.unitInfo?.coPanNo?.toString() ?? "");
     _compLicenseNoController = TextEditingController(
         text: widget.unitInfo?.coLicenseNo1?.toString() ?? "");
     _compfssaiController = TextEditingController(
@@ -153,18 +149,16 @@ class _AddCompanyMasterPageState extends State<AddCompanyMasterPage> {
         text: widget.unitInfo?.coBankName?.toString() ?? "");
     _compbankNameController = TextEditingController(
         text: widget.unitInfo?.coBankName?.toString() ?? "");
-    _compAccountNoController = TextEditingController(
-        text: widget.unitInfo?.coAccNo?.toString() ?? "");
+    _compAccountNoController =
+        TextEditingController(text: widget.unitInfo?.coAccNo?.toString() ?? "");
     _compIfscNoController = TextEditingController(
         text: widget.unitInfo?.coIFSCCode?.toString() ?? "");
     _compBranchNameController = TextEditingController(
         text: widget.unitInfo?.coBranchName?.toString() ?? "");
     _compBranchAddController = TextEditingController(
         text: widget.unitInfo?.coBankAdd1?.toString() ?? "");
-    _compLogoAddController = TextEditingController(
-        text: widget.unitInfo?.coLogo?.toString() ?? "");
-
-
+    _compLogoAddController =
+        TextEditingController(text: widget.unitInfo?.coLogo?.toString() ?? "");
   }
 
   @override
@@ -188,81 +182,81 @@ class _AddCompanyMasterPageState extends State<AddCompanyMasterPage> {
 
     if (widget.unitInfo == null) {
       // ADD mode
-  //       String? userId;
-  // String? userName;
-  // String? userPassword;
-  // int? userType;
-  // int? activeStatus;
-     final request = AddCompanyMasterModel(
-  coName: _compNameController.text.trim(),
-  coShortName: _compShortNameController.text.trim(),
-  coAddress1: _compAddress1Controller.text.trim(),
-  coAddress2: _compAddress2Controller.text.trim(),
-  coAddress3: _compAddress3Controller.text.trim(),
-  coAddress4: _compAddress4Controller.text.trim(),
-  coAddress5: _compAddress5Controller.text.trim(),
-  areaCode: _areaCode,
-  cityCode: int.parse(_cityController.text.trim()),
-  coPinCode: _pinCodeController.text.trim(),
-  stateCode: _stateCode,
-  countryCode: _countryCode,
-  coMobileNo1: _compMobileController.text.trim(),
-  coPhoneNo1: _compPhoneController.text.trim(),
-  coMailId: _compMailIdController.text.trim(),
-  coWebsite: _compwebsiteController.text.trim(),
-  coGstinNo: _compGstNoController.text.trim(),
-  coPanNo: _compPanNoController.text.trim(),
-  coLicenseNo1: _compLicenseNoController.text.trim(),
-  coFSSAINo: _compfssaiController.text.trim(),
-  coBankName: _compbankNameController.text.trim(),
-  coAccNo: _compAccountNoController.text.trim(),
-  coIFSCCode: _compIfscNoController.text.trim(),
-  coBranchName: _compBranchNameController.text.trim(),
-  coBankAdd1: _compBranchAddController.text.trim(),
-  coLogo: _compLogoAddController.text.trim(),
-  coActiveStatus: _activeStatus ? 1 : 0,
-  softwareVersion: "v1.0",
-  softwareInstalledDt: "2025-09-21 10:00:00",
-);
-print("request");
-print(request);
+      //       String? userId;
+      // String? userName;
+      // String? userPassword;
+      // int? userType;
+      // int? activeStatus;
+      final request = AddCompanyMasterModel(
+        coName: _compNameController.text.trim(),
+        coShortName: _compShortNameController.text.trim(),
+        coAddress1: _compAddress1Controller.text.trim(),
+        coAddress2: _compAddress2Controller.text.trim(),
+        coAddress3: _compAddress3Controller.text.trim(),
+        coAddress4: _compAddress4Controller.text.trim(),
+        coAddress5: _compAddress5Controller.text.trim(),
+        areaCode: _areaCode,
+        cityCode: int.parse(_cityController.text.trim()),
+        coPinCode: _pinCodeController.text.trim(),
+        stateCode: _stateCode,
+        countryCode: _countryCode,
+        coMobileNo1: _compMobileController.text.trim(),
+        coPhoneNo1: _compPhoneController.text.trim(),
+        coMailId: _compMailIdController.text.trim(),
+        coWebsite: _compwebsiteController.text.trim(),
+        coGstinNo: _compGstNoController.text.trim(),
+        coPanNo: _compPanNoController.text.trim(),
+        coLicenseNo1: _compLicenseNoController.text.trim(),
+        coFSSAINo: _compfssaiController.text.trim(),
+        coBankName: _compbankNameController.text.trim(),
+        coAccNo: _compAccountNoController.text.trim(),
+        coIFSCCode: _compIfscNoController.text.trim(),
+        coBranchName: _compBranchNameController.text.trim(),
+        coBankAdd1: _compBranchAddController.text.trim(),
+        coLogo: _compLogoAddController.text.trim(),
+        coActiveStatus: _activeStatus ? 1 : 0,
+        softwareVersion: "v1.0",
+        softwareInstalledDt: "2025-09-21 10:00:00",
+      );
+      print("request");
+      print(request);
       final response = await _service.addComapanyMaster(request);
       _handleResponse(response.isSuccess, response.error);
     } else {
       // EDIT mode
- final updated =AddCompanyMasterModel(
-   coName: _compNameController.text.trim(),
-   coShortName: _compShortNameController.text.trim(),
-   coAddress1: _compAddress1Controller.text.trim(),
-   coAddress2: _compAddress2Controller.text.trim(),
-   coAddress3: _compAddress3Controller.text.trim(),
-   coAddress4: _compAddress4Controller.text.trim(),
-   coAddress5: _compAddress5Controller.text.trim(),
-   areaCode: _areaCode,
-   cityCode: int.parse(_cityController.text.trim()),
-   coPinCode: _pinCodeController.text.trim(),
-   stateCode: _stateCode,
-   countryCode: _countryCode,
-   coMobileNo1: _compMobileController.text.trim(),
-   coPhoneNo1: _compPhoneController.text.trim(),
-   coMailId: _compMailIdController.text.trim(),
-   coWebsite: _compwebsiteController.text.trim(),
-   coGstinNo: _compGstNoController.text.trim(),
-   coPanNo: _compPanNoController.text.trim(),
-   coLicenseNo1: _compLicenseNoController.text.trim(),
-   coFSSAINo: _compfssaiController.text.trim(),
-   coBankName: _compbankNameController.text.trim(),
-   coAccNo: _compAccountNoController.text.trim(),
-   coIFSCCode: _compIfscNoController.text.trim(),
-   coBranchName: _compBranchNameController.text.trim(),
-   coBankAdd1: _compBranchAddController.text.trim(),
-   coLogo: _compLogoAddController.text.trim(),
-   coActiveStatus: _activeStatus ? 1 : 0,
-   softwareVersion: "v1.0",
-   softwareInstalledDt: "2025-09-21 10:00:00",
- );
-     print("updated");
-     print(updated);
+      final updated = AddCompanyMasterModel(
+        coName: _compNameController.text.trim(),
+        coShortName: _compShortNameController.text.trim(),
+        coAddress1: _compAddress1Controller.text.trim(),
+        coAddress2: _compAddress2Controller.text.trim(),
+        coAddress3: _compAddress3Controller.text.trim(),
+        coAddress4: _compAddress4Controller.text.trim(),
+        coAddress5: _compAddress5Controller.text.trim(),
+        areaCode: _areaCode,
+        cityCode: int.parse(_cityController.text.trim()),
+        coPinCode: _pinCodeController.text.trim(),
+        stateCode: _stateCode,
+        countryCode: _countryCode,
+        coMobileNo1: _compMobileController.text.trim(),
+        coPhoneNo1: _compPhoneController.text.trim(),
+        coMailId: _compMailIdController.text.trim(),
+        coWebsite: _compwebsiteController.text.trim(),
+        coGstinNo: _compGstNoController.text.trim(),
+        coPanNo: _compPanNoController.text.trim(),
+        coLicenseNo1: _compLicenseNoController.text.trim(),
+        coFSSAINo: _compfssaiController.text.trim(),
+        coBankName: _compbankNameController.text.trim(),
+        coAccNo: _compAccountNoController.text.trim(),
+        coIFSCCode: _compIfscNoController.text.trim(),
+        coBranchName: _compBranchNameController.text.trim(),
+        coBankAdd1: _compBranchAddController.text.trim(),
+        coLogo: _compLogoAddController.text.trim(),
+        coActiveStatus: _activeStatus ? 1 : 0,
+        softwareVersion: "v1.0",
+        softwareInstalledDt: "2025-09-21 10:00:00",
+      );
+      print("updated");
+      print(updated);
       final response = await _service.updateComapanyMaster(
         widget.unitInfo!.coCode!,
         updated,
@@ -344,7 +338,7 @@ print(request);
                     prefixIcon: Icons.search,
                     fetchItems: (q) async {
                       final response =
-                      await _service.getComapanyMasterSearch(q);
+                          await _service.getComapanyMasterSearch(q);
                       if (response.isSuccess) {
                         return (response.data?.info ?? [])
                             .whereType<Info>()
@@ -352,10 +346,10 @@ print(request);
                       }
                       return [];
                     },
-                    displayString: (unit) => unit. coName?? "",
+                    displayString: (unit) => unit.coName ?? "",
                     onSelected: (country) {
                       setState(() {
-                      /*  _itemIdController.text =
+                        /*  _itemIdController.text =
                             country.itemCode.toString() ?? "";
                         _itemNameController.text = country.itemName ?? "";*/
                         // _createdUserController.text =
@@ -411,7 +405,7 @@ print(request);
                       title: "Company Short Name",
                       hintText: "Enter Company Short Name",
                       controller: _compShortNameController,
-                                           isValidate: true,
+                      isValidate: true,
                       validator: (value) => value == null || value.isEmpty
                           ? "Enter Product Name"
                           : null,
@@ -519,10 +513,9 @@ print(request);
                       hintText: "Choose Country",
                       items: getAllMasterListModel!.info!.countries!
                           .map((e) => DropdownMenuItem<int>(
-                        value:
-                        e.countryCode, // 🔹 use taxCode as value
-                        child: Text("${e.countryName} "),
-                      ))
+                                value: e.countryCode, // 🔹 use taxCode as value
+                                child: Text("${e.countryName} "),
+                              ))
                           .toList(),
                       // initialValue: _taxCode, // int? taxCode
                       onChanged: (value) {
@@ -533,20 +526,28 @@ print(request);
 
                         final selected = getAllMasterListModel!.info!.countries!
                             .firstWhere((c) => c.countryCode == value,
-                            orElse: () => master.Countries());
+                                orElse: () => master.Countries());
 
                         print("Selected GST %: ${selected.countryCode}");
                         print("Selected TAX Code: ${selected.countryCode}");
                       },
                       isValidate: true,
                       validator: (value) =>
-                      value == null ? "Please select Country" : null,
+                          value == null ? "Please select Country" : null,
                       focusNode: _countryFocus,
                       onEditingComplete: () => _fieldFocusChange(
                         context,
                         _countryFocus,
                         _stateFocus,
                       ),
+                      addPage: AddCountryScreen(
+                        onSaved: (success) {
+                          if (success) {
+                            Navigator.pop(context, true);
+                          }
+                        },
+                      ),
+                      addTooltip: "Add Country",
                     ),
                   ),
 
@@ -557,10 +558,9 @@ print(request);
                       hintText: "Choose State",
                       items: getAllMasterListModel!.info!.states!
                           .map((e) => DropdownMenuItem<int>(
-                        value:
-                        e.stateCode, // 🔹 use taxCode as value
-                        child: Text("${e.stateName} "),
-                      ))
+                                value: e.stateCode, // 🔹 use taxCode as value
+                                child: Text("${e.stateName} "),
+                              ))
                           .toList(),
                       // initialValue: _taxCode, // int? taxCode
                       onChanged: (value) {
@@ -571,14 +571,14 @@ print(request);
 
                         final selected = getAllMasterListModel!.info!.states!
                             .firstWhere((c) => c.stateCode == value,
-                            orElse: () => master.States());
+                                orElse: () => master.States());
 
                         print("Selected GST %: ${selected.stateCode}");
                         print("Selected TAX Code: ${selected.stateCode}");
                       },
                       isValidate: true,
                       validator: (value) =>
-                      value == null ? "Please select State" : null,
+                          value == null ? "Please select State" : null,
                       focusNode: _countryFocus,
                       onEditingComplete: () => _fieldFocusChange(
                         context,
@@ -601,8 +601,8 @@ print(request);
                           : null,
                       focusNode: _cityFocus,
                       textInputAction: TextInputAction.next,
-                      onEditingComplete: () => _fieldFocusChange(
-                          context, _cityFocus, _areaFocus),
+                      onEditingComplete: () =>
+                          _fieldFocusChange(context, _cityFocus, _areaFocus),
                       autoFocus: true,
                     ),
                   ),
@@ -613,10 +613,9 @@ print(request);
                       hintText: "Choose Areas",
                       items: getAllMasterListModel!.info!.areas!
                           .map((e) => DropdownMenuItem<int>(
-                        value:
-                        e.areaCode, // 🔹 use taxCode as value
-                        child: Text("${e.areaName} "),
-                      ))
+                                value: e.areaCode, // 🔹 use taxCode as value
+                                child: Text("${e.areaName} "),
+                              ))
                           .toList(),
                       // initialValue: _taxCode, // int? taxCode
                       onChanged: (value) {
@@ -627,14 +626,14 @@ print(request);
 
                         final selected = getAllMasterListModel!.info!.areas!
                             .firstWhere((c) => c.stateCode == value,
-                            orElse: () => master.Areas());
+                                orElse: () => master.Areas());
 
                         print("Selected GST %: ${selected.areaCode}");
                         print("Selected TAX Code: ${selected.areaCode}");
                       },
                       isValidate: true,
                       validator: (value) =>
-                      value == null ? "Please select Area" : null,
+                          value == null ? "Please select Area" : null,
                       focusNode: _countryFocus,
                       onEditingComplete: () => _fieldFocusChange(
                         context,
@@ -864,7 +863,7 @@ print(request);
                     child: CustomTextField(
                       title: "Company Branch Name",
                       hintText: "Enter Company Branch Name",
-                      controller:_compBranchNameController,
+                      controller: _compBranchNameController,
                       isValidate: true,
                       validator: (value) => value == null || value.isEmpty
                           ? "Enter Company Branch Name"
@@ -882,7 +881,7 @@ print(request);
                     child: CustomTextField(
                       title: "Company Bank Address",
                       hintText: "Enter Company Bank Address",
-                      controller:_compBranchAddController,
+                      controller: _compBranchAddController,
                       isValidate: true,
                       validator: (value) => value == null || value.isEmpty
                           ? "Enter Company Bank Address"
@@ -900,7 +899,7 @@ print(request);
                     child: CustomTextField(
                       title: "Company Logo",
                       hintText: "Enter Company Logo",
-                      controller:_compLogoAddController,
+                      controller: _compLogoAddController,
                       isValidate: true,
                       validator: (value) => value == null || value.isEmpty
                           ? "Enter Company Logo"

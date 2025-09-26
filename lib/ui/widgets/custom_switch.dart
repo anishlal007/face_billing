@@ -39,8 +39,8 @@ class _CustomSwitchState extends State<CustomSwitch>
       onTap: _toggleSwitch,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 300),
-        width: 60,
-        height: 30,
+        width: 40,
+        height: 20,
         padding: const EdgeInsets.all(4),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(30),

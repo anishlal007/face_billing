@@ -1,3 +1,5 @@
+import 'package:facebilling/ui/screens/masters/company_master/add_company_master_page.dart';
+import 'package:facebilling/ui/screens/masters/country/AddCountryScreen.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../data/models/country/country_response.dart';
@@ -41,19 +43,18 @@ class _AddStateMasterPageState extends State<AddStateMasterPage> {
   final FocusNode _unitNameFocus = FocusNode();
   final FocusNode _countryNameFocus = FocusNode();
   // final FocusNode _createdUserFocus = FocusNode();
-Country? country;
- bool loading = true;
+  Country? country;
+  bool loading = true;
   String? error;
   @override
   void initState() {
     super.initState();
-_loadCountries();
-    _unitIdController =
-        TextEditingController(text: widget.unitInfo?.stateCode.toString() ?? "");
+    _loadCountries();
+    _unitIdController = TextEditingController(
+        text: widget.unitInfo?.stateCode.toString() ?? "");
     _unitNameController =
         TextEditingController(text: widget.unitInfo?.stateName ?? "");
-    _countryNameController = TextEditingController(
-        text: "");
+    _countryNameController = TextEditingController(text: "");
     _activeStatus = (widget.unitInfo?.activeStatus ?? 1) == 1;
   }
 
@@ -72,6 +73,7 @@ _loadCountries();
       });
     }
   }
+
   @override
   void dispose() {
     _unitIdController.dispose();
@@ -94,32 +96,32 @@ _loadCountries();
     if (widget.unitInfo == null) {
       // ADD mode
 
-     final request = AddStateModel(
-  stateName: _unitNameController.text.trim(),
-  stateId:"0",
-  countryCode:0,
-     // required by API
-  createdUserCode: 1001,                             // hardcoded or from logged-in user
-    // current timestamp
-  activeStatus: _activeStatus ? 1 : 0,
-);
-print("request");
-print(request);
+      final request = AddStateModel(
+        stateName: _unitNameController.text.trim(),
+        stateId: "0",
+        countryCode: 0,
+        // required by API
+        createdUserCode: 1001, // hardcoded or from logged-in user
+        // current timestamp
+        activeStatus: _activeStatus ? 1 : 0,
+      );
+      print("request");
+      print(request);
       final response = await _service.addStateMaster(request);
       _handleResponse(response.isSuccess, response.error);
     } else {
       // EDIT mode
- final updated = AddStateModel(
-  stateName: _unitNameController.text.trim(),
-  stateId:"0",
-  countryCode:0,
-     // required by API
-  createdUserCode: 1001,                             // hardcoded or from logged-in user
-    // current timestamp
-  activeStatus: _activeStatus ? 1 : 0,
-);
-     print("updated");
-     print(updated);
+      final updated = AddStateModel(
+        stateName: _unitNameController.text.trim(),
+        stateId: "0",
+        countryCode: 0,
+        // required by API
+        createdUserCode: 1001, // hardcoded or from logged-in user
+        // current timestamp
+        activeStatus: _activeStatus ? 1 : 0,
+      );
+      print("updated");
+      print(updated);
       final response = await _service.updateStateMasterr(
         widget.unitInfo!.stateId!,
         updated,
@@ -165,9 +167,7 @@ print(request);
               fetchItems: (q) async {
                 final response = await _service.getStateMasterSearch(q);
                 if (response.isSuccess) {
-                  return (response.data?.info ?? [])
-                      .whereType<Info>()
-                      .toList();
+                  return (response.data?.info ?? []).whereType<Info>().toList();
                 }
                 return [];
               },
@@ -222,8 +222,9 @@ print(request);
               controller: _unitNameController,
               prefixIcon: Icons.flag,
               isValidate: true,
-              validator: (value) =>
-                  value == null || value.isEmpty ? "Enter Location State" : null,
+              validator: (value) => value == null || value.isEmpty
+                  ? "Enter Location State"
+                  : null,
               focusNode: _unitNameFocus,
               textInputAction: TextInputAction.next,
               onEditingComplete: () {
@@ -231,34 +232,44 @@ print(request);
               },
             ),
             const SizedBox(height: 16),
-CustomDropdownField<String>(
-  title: "Select Country",
-  hintText: "Choose a country",
-  items: country!.info
-          ?.map((e) => DropdownMenuItem<String>(
-                value: e?.countryName ?? "", // 🔹 value = country name
-                child: Text(e?.countryName ?? ""), // 🔹 UI label
-              ))
-          .toList() ?? [],
-  initialValue: null, // 🔹 empty initially
-  onChanged: (value) {
-    print("Selected: $value");
+            CustomDropdownField<String>(
+              title: "Select Country",
+              hintText: "Choose a country",
+              items: country!.info
+                      ?.map((e) => DropdownMenuItem<String>(
+                            value:
+                                e?.countryName ?? "", // 🔹 value = country name
+                            child: Text(e?.countryName ?? ""), // 🔹 UI label
+                          ))
+                      .toList() ??
+                  [],
+              initialValue: null, // 🔹 empty initially
+              onChanged: (value) {
+                print("Selected: $value");
 
-    final selected = country!.info?.firstWhere(
-      (c) => c?.countryName == value,
-      orElse: () => null,
-    );
+                final selected = country!.info?.firstWhere(
+                  (c) => c?.countryName == value,
+                  orElse: () => null,
+                );
 
-    print("Country Code: ${selected?.countryCode}");
-  },
-  isValidate: true,
-  validator: (value) {
-    if (value == null || value.isEmpty) {
-      return "Please select a country";
-    }
-    return null;
-  },
-),
+                print("Country Code: ${selected?.countryCode}");
+              },
+              isValidate: true,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return "Please select a country";
+                }
+                return null;
+              },
+              addPage: AddCountryScreen(
+                onSaved: (success) {
+                  if (success) {
+                    Navigator.pop(context, true);
+                  }
+                },
+              ),
+              addTooltip: "Add Country",
+            ),
             // CustomTextField(
             //   title: "Country Name",
             //   hintText: "Enter Country Name",

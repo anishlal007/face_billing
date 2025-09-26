@@ -127,7 +127,7 @@ class _AddunitscreenState extends State<Addunitscreen> {
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             SearchDropdownField<UnitInfo>(
-              hintText: "Search Country",
+              hintText: "Search Unit",
               prefixIcon: Icons.search,
               fetchItems: (q) async {
                 final response = await _service.getUnitSearch(q);

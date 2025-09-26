@@ -41,7 +41,9 @@ class _AddCountryScreenState extends State<AddCountryScreen> {
   @override
   void initState() {
     super.initState();
-
+    Future.delayed(Duration(milliseconds: 300), () {
+      FocusScope.of(context).requestFocus(_countryNameFocus);
+    });
     _countryIdController =
         TextEditingController(text: widget.countryInfo?.countryId ?? "");
     _countryNameController =
@@ -49,6 +51,12 @@ class _AddCountryScreenState extends State<AddCountryScreen> {
     _createdUserController = TextEditingController(
         text: widget.countryInfo?.createdUserCode?.toString() ?? "1001");
     _activeStatus = (widget.countryInfo?.activeStatus ?? 1) == 1;
+  }
+
+  void _fieldFocusChange(
+      BuildContext context, FocusNode current, FocusNode next) {
+    current.unfocus();
+    FocusScope.of(context).requestFocus(next);
   }
 
   @override
@@ -160,30 +168,25 @@ class _AddCountryScreenState extends State<AddCountryScreen> {
             //   title: const Text("Active Status"),
             //   onChanged: (val) => setState(() => _activeStatus = val),
             // ),
-            CustomSwitch(
-              value: _activeStatus,
-              title: "Active Status",
-              onChanged: (val) {
-                setState(() {
-                  _activeStatus = val;
-                });
-              },
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                const Text("Country Status"),
+                const SizedBox(
+                  width: 10,
+                ),
+                CustomSwitch(
+                  value: _activeStatus,
+                  title: "Is Discount Required",
+                  onChanged: (val) {
+                    setState(() {
+                      _activeStatus = val;
+                    });
+                  },
+                ),
+              ],
             ),
-            CustomTextField(
-              title: "Country Code",
-              hintText: "Enter Country Code",
-              controller: _countryIdController,
-              prefixIcon: Icons.flag_circle,
-              isValidate: true,
-              validator: (value) =>
-                  value == null || value.isEmpty ? "Enter country ID" : null,
-              focusNode: _countryIdFocus,
-              textInputAction: TextInputAction.next,
-              onEditingComplete: () {
-                FocusScope.of(context).requestFocus(_countryNameFocus);
-              },
-            ),
-            const SizedBox(height: 16),
             CustomTextField(
               title: "Country Name",
               hintText: "Enter Country Name",
@@ -194,9 +197,25 @@ class _AddCountryScreenState extends State<AddCountryScreen> {
                   value == null || value.isEmpty ? "Enter country name" : null,
               focusNode: _countryNameFocus,
               textInputAction: TextInputAction.next,
-              onEditingComplete: () {
-                FocusScope.of(context).requestFocus(_createdUserFocus);
-              },
+              // onEditingComplete: () {
+              //   FocusScope.of(context).requestFocus(_createdUserFocus);
+              // },
+              onEditingComplete: () => _fieldFocusChange(
+                  context, _countryNameFocus, _countryIdFocus),
+              autoFocus: true,
+            ),
+            const SizedBox(height: 16),
+            CustomTextField(
+              title: "Country Code",
+              hintText: "Enter Country Code",
+              controller: _countryIdController,
+              prefixIcon: Icons.flag_circle,
+              isValidate: true,
+              validator: (value) =>
+                  value == null || value.isEmpty ? "Enter country ID" : null,
+              focusNode: _countryIdFocus,
+              textInputAction: TextInputAction.next,
+              onEditingComplete: _submit,
             ),
             const SizedBox(height: 16),
             CustomTextField(

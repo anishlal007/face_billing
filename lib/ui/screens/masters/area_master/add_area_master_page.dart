@@ -1,14 +1,18 @@
 import 'package:facebilling/data/models/area_master/area_master_list_model.dart';
+import 'package:facebilling/ui/screens/masters/state_master/add_state_master_page.dart';
 import 'package:flutter/material.dart';
-
 
 import '../../../../data/models/area_master/add_area_master_model.dart';
 import '../../../../data/services/area_master_service.dart';
+import '../../../../data/services/get_all_master_service.dart';
 import '../../../../data/services/user_master_service.dart';
+import '../../../widgets/custom_dropdown_text_field.dart';
 import '../../../widgets/custom_switch.dart';
 import '../../../widgets/custom_text_field.dart';
 import '../../../widgets/gradient_button.dart';
 import '../../../widgets/search_dropdown_field.dart';
+
+import '../../../../data/models/get_all_master_list_model.dart' as master;
 
 class AddAreaMasterPage extends StatefulWidget {
   final Info? unitInfo;
@@ -27,22 +31,27 @@ class _AddAreaMasterPageState extends State<AddAreaMasterPage> {
   final _formKey = GlobalKey<FormState>();
   final AreaMasterService _service = AreaMasterService();
 
+  master.GetAllMasterListModel? getAllMasterListModel;
+
+  final GetAllMasterService _getAllMasterService = GetAllMasterService();
   bool _activeStatus = true;
   bool _loading = false;
   String? _message;
+  int? _stateCode;
 
   late TextEditingController _unitIdController;
   late TextEditingController _unitNameController;
-  // late TextEditingController _createdUserController;
-
+  late TextEditingController _createdUserController;
+  bool _getAllLoading = true;
   final FocusNode _unitIdFocus = FocusNode();
   final FocusNode _unitNameFocus = FocusNode();
+  String? error;
   // final FocusNode _createdUserFocus = FocusNode();
 
   @override
   void initState() {
     super.initState();
-
+    _loadList();
     _unitIdController =
         TextEditingController(text: widget.unitInfo?.areaId ?? "");
     _unitNameController =
@@ -50,6 +59,22 @@ class _AddAreaMasterPageState extends State<AddAreaMasterPage> {
     // _createdUserController = TextEditingController(
     //     text: widget.countryInfo?.createdUserCode?.toString() ?? "1001");
     _activeStatus = (widget.unitInfo?.activeStatus ?? 1) == 1;
+  }
+
+  Future<void> _loadList() async {
+    final response = await _getAllMasterService.getAllMasterService();
+    if (response.isSuccess) {
+      setState(() {
+        getAllMasterListModel = response.data!;
+        _getAllLoading = false;
+        error = null;
+      });
+    } else {
+      setState(() {
+        error = response.error;
+        _getAllLoading = false;
+      });
+    }
   }
 
   @override
@@ -73,33 +98,33 @@ class _AddAreaMasterPageState extends State<AddAreaMasterPage> {
 
     if (widget.unitInfo == null) {
       // ADD mode
-  String? areaId;
-  String? areaName;
-  int? stateCode;
-  int? createdUserCode;
-  int? activeStatus;
-     final request = AddAreaMasterModel(
-  areaName: _unitNameController.text.trim(),
-  areaId: _unitIdController.text.trim(),
-  
-    // current timestamp
-  activeStatus: _activeStatus ? 1 : 0,
-);
-print("request");
-print(request);
+      String? areaId;
+      String? areaName;
+      int? stateCode;
+      int? createdUserCode;
+      int? activeStatus;
+      final request = AddAreaMasterModel(
+        areaName: _unitNameController.text.trim(),
+        areaId: _unitIdController.text.trim(),
+
+        // current timestamp
+        activeStatus: _activeStatus ? 1 : 0,
+      );
+      print("request");
+      print(request);
       final response = await _service.addAreaMaster(request);
       _handleResponse(response.isSuccess, response.error);
     } else {
       // EDIT mode
- final updated = AddAreaMasterModel(
-  areaName: _unitNameController.text.trim(),
-  areaId: _unitIdController.text.trim(),
-  
-    // current timestamp
-  activeStatus: _activeStatus ? 1 : 0,
-);
-     print("updated");
-     print(updated);
+      final updated = AddAreaMasterModel(
+        areaName: _unitNameController.text.trim(),
+        areaId: _unitIdController.text.trim(),
+
+        // current timestamp
+        activeStatus: _activeStatus ? 1 : 0,
+      );
+      print("updated");
+      print(updated);
       final response = await _service.updateAreaMaster(
         widget.unitInfo!.areaCode!,
         updated,
@@ -145,9 +170,7 @@ print(request);
               fetchItems: (q) async {
                 final response = await _service.getAreaMasterSearch(q);
                 if (response.isSuccess) {
-                  return (response.data?.info ?? [])
-                      .whereType<Info>()
-                      .toList();
+                  return (response.data?.info ?? []).whereType<Info>().toList();
                 }
                 return [];
               },
@@ -211,12 +234,47 @@ print(request);
               },
             ),
             const SizedBox(height: 16),
+            CustomDropdownField<int>(
+              title: "Select State",
+              hintText: "Choose State",
+              items: getAllMasterListModel!.info!.states!
+                  .map((e) => DropdownMenuItem<int>(
+                        value: e.stateCode, // 🔹 use taxCode as value
+                        child: Text("${e.stateName} "),
+                      ))
+                  .toList(),
+              // initialValue: _taxCode, // int? taxCode
+              onChanged: (value) {
+                setState(() {
+                  _stateCode = value;
+                  //  _taxCode = value;
+                });
+
+                final selected = getAllMasterListModel!.info!.states!
+                    .firstWhere((c) => c.stateCode == value,
+                        orElse: () => master.States());
+
+                print("Selected GST %: ${selected.stateCode}");
+                print("Selected TAX Code: ${selected.stateCode}");
+              },
+              isValidate: true,
+              validator: (value) =>
+                  value == null ? "Please select State" : null,
+              addPage: AddStateMasterPage(
+                onSaved: (success) {
+                  if (success) {
+                    Navigator.pop(context, true);
+                  }
+                },
+              ),
+              addTooltip: "Add State",
+            ),
             // CustomTextField(
             //   title: "Create User",
             //   controller: _createdUserController,
             //   prefixIcon: Icons.person,
             //   isEdit: true,
-            //   focusNode: _createdUserFocus,
+            //   // focusNode: _createdUserFocus,
             //   textInputAction: TextInputAction.done,
             //   onEditingComplete: _submit,
             // ),

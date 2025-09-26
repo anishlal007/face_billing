@@ -1,4 +1,7 @@
 import 'package:facebilling/core/const.dart';
+import 'package:facebilling/ui/screens/masters/generics_master/add_generics_master_page.dart';
+import 'package:facebilling/ui/screens/masters/item_group/AddGroupScreen.dart';
+import 'package:facebilling/ui/screens/masters/item_make_master/add_item_make_master.dart';
 import 'package:facebilling/ui/screens/masters/unit/AddUnitScreen.dart';
 import 'package:facebilling/ui/screens/masters/user_master/add_user_master_page.dart';
 import 'package:flutter/material.dart';
@@ -42,7 +45,7 @@ class _AddProductMasterPageState extends State<AddProductMasterPage> {
   bool _nonScheduledItem = true,
       _scheduledItem = true,
       _expiryRequired = true,
-      _isNarocotic = true,
+      _isNarocotic = false,
       _isBatchNumbeRequired = true,
       _isDiscountReq = true;
   String? _message;
@@ -385,9 +388,9 @@ class _AddProductMasterPageState extends State<AddProductMasterPage> {
               // Decide columns by screen width
               int columns = 1; // default mobile
               if (constraints.maxWidth > 1200) {
-                columns = 3;
+                columns = 4;
               } else if (constraints.maxWidth > 800) {
-                columns = 2;
+                columns = 3;
               }
 
               return Wrap(
@@ -460,7 +463,7 @@ class _AddProductMasterPageState extends State<AddProductMasterPage> {
                     ),
                   ),
                   SizedBox(
-                    width: constraints.maxWidth / columns - 20,
+                    width: constraints.maxWidth / columns - 30,
                     child: CustomTextField(
                       title: "Product Name",
                       hintText: "Enter Product Name",
@@ -478,7 +481,7 @@ class _AddProductMasterPageState extends State<AddProductMasterPage> {
                     ),
                   ),
                   SizedBox(
-                    width: constraints.maxWidth / columns - 20,
+                    width: constraints.maxWidth / columns - 30,
                     child: CustomTextField(
                       title: "Item Type",
                       hintText: "Enter Item Type",
@@ -530,6 +533,14 @@ class _AddProductMasterPageState extends State<AddProductMasterPage> {
                         _itemGroupFocus,
                         _itemUnitCodeFocus,
                       ),
+                      addPage: Addgroupscreen(
+                        onSaved: (success) {
+                          if (success) {
+                            Navigator.pop(context, true);
+                          }
+                        },
+                      ),
+                      addTooltip: "Add Item Group",
                     ),
                   ),
 
@@ -572,7 +583,7 @@ class _AddProductMasterPageState extends State<AddProductMasterPage> {
                           }
                         },
                       ),
-                      addTooltip: "Add Item Group",
+                      addTooltip: "Add Unit",
                     ),
                   ),
                   SizedBox(
@@ -610,6 +621,14 @@ class _AddProductMasterPageState extends State<AddProductMasterPage> {
                         _itemMakeCodeFocus,
                         _itemGenericCodeFocus,
                       ),
+                      addPage: AddItemMakeMaster(
+                        onSaved: (success) {
+                          if (success) {
+                            Navigator.pop(context, true);
+                          }
+                        },
+                      ),
+                      addTooltip: "Add Item Make",
                     ),
                   ),
                   SizedBox(
@@ -646,6 +665,14 @@ class _AddProductMasterPageState extends State<AddProductMasterPage> {
                         _itemGenericCodeFocus,
                         _nonScheduleItemFocus,
                       ),
+                      addPage: AddGenericsMasterPage(
+                        onSaved: (success) {
+                          if (success) {
+                            Navigator.pop(context, true);
+                          }
+                        },
+                      ),
+                      addTooltip: "Add Item Generic",
                     ),
                   ),
 
@@ -658,104 +685,107 @@ class _AddProductMasterPageState extends State<AddProductMasterPage> {
                   ),
                   SizedBox(
                     width: constraints.maxWidth,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            const Text("Scheduled Item"),
-                            const SizedBox(
-                              width: 10,
-                            ),
-                            CustomSwitch(
-                              value: _nonScheduledItem,
-                              title: "Scheduled Item",
-                              onChanged: (val) {
-                                setState(() {
-                                  _nonScheduledItem = val;
-                                });
-                              },
-                            ),
-                          ],
-                        ),
-                        const SizedBox(width: 16),
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            const Text(" Narcotic Item"),
-                            const SizedBox(
-                              width: 10,
-                            ),
-                            CustomSwitch(
-                              value: _isNarocotic,
-                              title: "Is  Narcotic Item",
-                              onChanged: (val) {
-                                setState(() {
-                                  _isNarocotic = val;
-                                });
-                              },
-                            ),
-                          ],
-                        ),
-                        const SizedBox(width: 16),
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            const Text(" Expiry Required"),
-                            const SizedBox(
-                              width: 10,
-                            ),
-                            CustomSwitch(
-                              value: _expiryRequired,
-                              title: "Is Expiry Required",
-                              onChanged: (val) {
-                                setState(() {
-                                  _expiryRequired = val;
-                                });
-                              },
-                            ),
-                          ],
-                        ),
-                        const SizedBox(width: 16),
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            const Text("Batch Number Required"),
-                            const SizedBox(
-                              width: 10,
-                            ),
-                            CustomSwitch(
-                              value: _isBatchNumbeRequired,
-                              title: "Is Batch Number Required",
-                              onChanged: (val) {
-                                setState(() {
-                                  _isBatchNumbeRequired = val;
-                                });
-                              },
-                            ),
-                          ],
-                        ),
-                        const SizedBox(width: 16),
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            const Text("Discount"),
-                            const SizedBox(
-                              width: 10,
-                            ),
-                            CustomSwitch(
-                              value: _isDiscountReq,
-                              title: "Is Discount Required",
-                              onChanged: (val) {
-                                setState(() {
-                                  _isDiscountReq = val;
-                                });
-                              },
-                            ),
-                          ],
-                        ),
-                      ],
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              const Text("Scheduled Item"),
+                              const SizedBox(
+                                width: 10,
+                              ),
+                              CustomSwitch(
+                                value: _nonScheduledItem,
+                                title: "Scheduled Item",
+                                onChanged: (val) {
+                                  setState(() {
+                                    _nonScheduledItem = val;
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
+                          const SizedBox(width: 20),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              const Text(" Narcotic Item"),
+                              const SizedBox(
+                                width: 10,
+                              ),
+                              CustomSwitch(
+                                value: _isNarocotic,
+                                title: "Is  Narcotic Item",
+                                onChanged: (val) {
+                                  setState(() {
+                                    _isNarocotic = val;
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
+                          const SizedBox(width: 20),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              const Text(" Expiry Required"),
+                              const SizedBox(
+                                width: 10,
+                              ),
+                              CustomSwitch(
+                                value: _expiryRequired,
+                                title: "Is Expiry Required",
+                                onChanged: (val) {
+                                  setState(() {
+                                    _expiryRequired = val;
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
+                          const SizedBox(width: 20),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              const Text("Batch Number Required"),
+                              const SizedBox(
+                                width: 10,
+                              ),
+                              CustomSwitch(
+                                value: _isBatchNumbeRequired,
+                                title: "Is Batch Number Required",
+                                onChanged: (val) {
+                                  setState(() {
+                                    _isBatchNumbeRequired = val;
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
+                          const SizedBox(width: 20),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              const Text("Discount"),
+                              const SizedBox(
+                                width: 10,
+                              ),
+                              CustomSwitch(
+                                value: _isDiscountReq,
+                                title: "Is Discount Required",
+                                onChanged: (val) {
+                                  setState(() {
+                                    _isDiscountReq = val;
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                   _expiryRequired
