@@ -1,7 +1,11 @@
+import 'dart:io';
+
 import 'package:facebilling/core/const.dart';
 import 'package:facebilling/ui/screens/masters/generics_master/add_generics_master_page.dart';
+import 'package:facebilling/ui/screens/masters/hns_master/add_hns_master_page.dart';
 import 'package:facebilling/ui/screens/masters/item_group/AddGroupScreen.dart';
 import 'package:facebilling/ui/screens/masters/item_make_master/add_item_make_master.dart';
+import 'package:facebilling/ui/screens/masters/tax_master/add_tax_master_page.dart';
 import 'package:facebilling/ui/screens/masters/unit/AddUnitScreen.dart';
 import 'package:facebilling/ui/screens/masters/user_master/add_user_master_page.dart';
 import 'package:flutter/material.dart';
@@ -14,10 +18,12 @@ import '../../../../data/services/get_all_master_service.dart';
 import '../../../../data/services/product_service.dart';
 import '../../../../data/services/tax_master_service.dart'
     show TaxMasterService;
+import '../../../widgets/custom_checkbox.dart';
 import '../../../widgets/custom_dropdown_text_field.dart';
 import '../../../widgets/custom_switch.dart';
 import '../../../widgets/custom_text_field.dart';
 import '../../../widgets/gradient_button.dart';
+import '../../../widgets/image_pickerField.dart';
 import '../../../widgets/search_dropdown_field.dart';
 
 class AddProductMasterPage extends StatefulWidget {
@@ -39,8 +45,9 @@ class _AddProductMasterPageState extends State<AddProductMasterPage> {
   ///services
   final ProductService _service = ProductService();
   final GetAllMasterService _getAllMasterService = GetAllMasterService();
-  int? _taxCode, _itemGroup, _itemUnit, _itemMake, _itemGeneric;
+  int? _taxCode, _itemGroup, _itemUnit, _itemMake, _itemGeneric, _unitCode;
   bool _activeStatus = true;
+  bool _ismfgreatured = true;
   bool _loading = false;
   bool _nonScheduledItem = true,
       _scheduledItem = true,
@@ -51,6 +58,10 @@ class _AddProductMasterPageState extends State<AddProductMasterPage> {
   String? _message;
   bool _getAllLoading = true;
 
+  File? _image;
+  int? selectedPaymentType;
+  int? priceTakenFrom;
+  int? selectedExpiryType;
   String? error;
 
   ///model
@@ -70,6 +81,8 @@ class _AddProductMasterPageState extends State<AddProductMasterPage> {
   late TextEditingController _expiryDateRequiredController;
   late TextEditingController _subUnitCodeController;
   late TextEditingController _subQtyController;
+  late TextEditingController _subUnitsController;
+  late TextEditingController _subQtyFormatController;
   late TextEditingController _batchNoRequiredController;
   late TextEditingController _minimumStockQtyController;
   late TextEditingController _maximumStockQtyController;
@@ -102,6 +115,8 @@ class _AddProductMasterPageState extends State<AddProductMasterPage> {
   final FocusNode _expiryDateRequiredFocus = FocusNode();
   final FocusNode _subUnitCodeFocus = FocusNode();
   final FocusNode _subQtyFocus = FocusNode();
+  final FocusNode _subUnitsFocus = FocusNode();
+  final FocusNode _subQtyFormat = FocusNode();
   final FocusNode _batchNoRequiredFocus = FocusNode();
   final FocusNode _minimumStockQtyFocus = FocusNode();
   final FocusNode _maximumStockQtyFocus = FocusNode();
@@ -151,8 +166,12 @@ class _AddProductMasterPageState extends State<AddProductMasterPage> {
         TextEditingController(text: widget.unitInfo?.expiryDateRequired ?? "");
     _subUnitCodeController = TextEditingController(
         text: widget.unitInfo?.subUnitCode?.toString() ?? "");
+    _subQtyFormatController = TextEditingController(
+        text: widget.unitInfo?.subQtyFormalDigits?.toString() ?? "");
     _subQtyController =
         TextEditingController(text: widget.unitInfo?.subQty?.toString() ?? "");
+    _subUnitsController = TextEditingController(
+        text: widget.unitInfo?.subUnitCode?.toString() ?? "");
     _batchNoRequiredController = TextEditingController(
         text: widget.unitInfo?.batchNoRequired?.toString() ?? "");
     _minimumStockQtyController = TextEditingController(
@@ -218,6 +237,8 @@ class _AddProductMasterPageState extends State<AddProductMasterPage> {
     _expiryDateRequiredController.dispose();
     _subUnitCodeController.dispose();
     _subQtyController.dispose();
+    _subQtyController.dispose();
+    _subQtyFormatController.dispose();
     _batchNoRequiredController.dispose();
     _minimumStockQtyController.dispose();
     _maximumStockQtyController.dispose();
@@ -249,6 +270,8 @@ class _AddProductMasterPageState extends State<AddProductMasterPage> {
     _expiryDateRequiredFocus.dispose();
     _subUnitCodeFocus.dispose();
     _subQtyFocus.dispose();
+    _subUnitsFocus.dispose();
+    _subQtyFormat.dispose();
     _batchNoRequiredFocus.dispose();
     _minimumStockQtyFocus.dispose();
     _maximumStockQtyFocus.dispose();
@@ -303,7 +326,7 @@ class _AddProductMasterPageState extends State<AddProductMasterPage> {
           maximumStockQty: int.tryParse(_maximumStockQtyController.text.trim()),
           reOrderLevel: int.tryParse(_reOrderLevelController.text.trim()),
           reOrderQty: int.tryParse(_reOrderQtyController.text.trim()),
-          priceTakenFrom: int.tryParse(_priceTakenFromController.text.trim()),
+          priceTakenFrom: priceTakenFrom,
           itemDiscountRequired: _isDiscountReq ? 1 : 0,
           itemDiscountPercentage: _isDiscountReq
               ? double.tryParse(_itemDiscountValueController.text.trim())
@@ -388,9 +411,9 @@ class _AddProductMasterPageState extends State<AddProductMasterPage> {
               // Decide columns by screen width
               int columns = 1; // default mobile
               if (constraints.maxWidth > 1200) {
-                columns = 4;
+                columns = 5;
               } else if (constraints.maxWidth > 800) {
-                columns = 3;
+                columns = 4;
               }
 
               return Wrap(
@@ -400,7 +423,7 @@ class _AddProductMasterPageState extends State<AddProductMasterPage> {
                   // Example fields (replace with all your CustomTextField/Dropdown etc.)
                   SearchDropdownField<Info>(
                     hintText: "Search Product",
-                    prefixIcon: Icons.search,
+                    // prefixIcon: Icons.search,
                     fetchItems: (q) async {
                       final response =
                           await _service.getProductServiceSearch(q);
@@ -430,19 +453,28 @@ class _AddProductMasterPageState extends State<AddProductMasterPage> {
                     width: constraints.maxWidth,
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        Text("Product Status"),
-                        SizedBox(
-                          width: 10,
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text("Product Status"),
+                            SizedBox(
+                              width: 10,
+                            ),
+                            CustomSwitch(
+                              value: _activeStatus,
+                              title: "Active Status",
+                              onChanged: (val) {
+                                setState(() {
+                                  _activeStatus = val;
+                                });
+                              },
+                            ),
+                          ],
                         ),
-                        CustomSwitch(
-                          value: _activeStatus,
-                          title: "Active Status",
-                          onChanged: (val) {
-                            setState(() {
-                              _activeStatus = val;
-                            });
-                          },
+                        const SizedBox(
+                          width: 20,
                         ),
                       ],
                     ),
@@ -450,10 +482,10 @@ class _AddProductMasterPageState extends State<AddProductMasterPage> {
                   SizedBox(
                     width: constraints.maxWidth / columns - 20,
                     child: CustomTextField(
-                      title: "Item Code",
-                      hintText: "Enter Item Code",
+                      title: "Item ID",
+                      hintText: "Enter Item ID",
                       controller: _itemIdController,
-                      prefixIcon: Icons.flag_circle,
+                      // prefixIcon: Icons.flag_circle,
                       isValidate: true,
                       validator: (value) => value == null || value.isEmpty
                           ? "Enter Item Code"
@@ -468,7 +500,7 @@ class _AddProductMasterPageState extends State<AddProductMasterPage> {
                       title: "Product Name",
                       hintText: "Enter Product Name",
                       controller: _itemNameController,
-                      prefixIcon: Icons.flag,
+                      // prefixIcon: Icons.flag,
                       isValidate: true,
                       validator: (value) => value == null || value.isEmpty
                           ? "Enter Product Name"
@@ -477,28 +509,50 @@ class _AddProductMasterPageState extends State<AddProductMasterPage> {
                       textInputAction: TextInputAction.next,
                       onEditingComplete: () => _fieldFocusChange(
                           context, _itemNameFocus, _itemTypeFocus),
-                      autoFocus: true,
+                      // autoFocus: true,
                     ),
                   ),
                   SizedBox(
                     width: constraints.maxWidth / columns - 30,
-                    child: CustomTextField(
-                      title: "Item Type",
-                      hintText: "Enter Item Type",
-                      controller: _itemTypeController,
-                      isValidate: true,
-                      validator: (value) => value == null || value.isEmpty
-                          ? "Enter Item Type"
-                          : null,
+                    child: CustomDropdownField<int>(
+                      title: "Product Type",
+                      hintText: "Select Product Type",
+                      items: const [
+                        DropdownMenuItem(value: 0, child: Text("Pharma")),
+                        DropdownMenuItem(value: 1, child: Text("Optical")),
+                        DropdownMenuItem(value: 2, child: Text("Service")),
+                      ],
+                      initialValue: selectedPaymentType,
+                      onChanged: (val) {
+                        setState(() => selectedPaymentType = val);
+                        print("Selected PaymentType: $val");
+                      },
                       focusNode: _itemTypeFocus,
-                      prefixIcon: Icons.pageview,
-                      textInputAction: TextInputAction.next,
                       onEditingComplete: () {
                         _fieldFocusChange(
                             context, _itemTypeFocus, _itemGroupFocus);
                       },
                     ),
                   ),
+                  // SizedBox(
+                  //   width: constraints.maxWidth / columns - 30,
+                  //   child: CustomTextField(
+                  //     title: "Item Type",
+                  //     hintText: "Enter Item Type",
+                  //     controller: _itemTypeController,
+                  //     isValidate: true,
+                  //     validator: (value) => value == null || value.isEmpty
+                  //         ? "Enter Item Type"
+                  //         : null,
+                  //     focusNode: _itemTypeFocus,
+                  //     prefixIcon: Icons.pageview,
+                  //     textInputAction: TextInputAction.next,
+                  //     onEditingComplete: () {
+                  //       _fieldFocusChange(
+                  //           context, _itemTypeFocus, _itemGroupFocus);
+                  //     },
+                  //   ),
+                  // ),
                   // 🔹 Continue wrapping all your fields the same way
                   SizedBox(
                     width: constraints.maxWidth / columns - 20,
@@ -541,49 +595,6 @@ class _AddProductMasterPageState extends State<AddProductMasterPage> {
                         },
                       ),
                       addTooltip: "Add Item Group",
-                    ),
-                  ),
-
-                  SizedBox(
-                    width: constraints.maxWidth / columns - 20,
-                    child: CustomDropdownField<int>(
-                      title: "Select  Unit",
-                      hintText: "Choose  Unit",
-                      items: getAllMasterListModel!.info!.units!
-                          .map((e) => DropdownMenuItem<int>(
-                                value: e.unitCode, // 🔹 use taxCode as value
-                                child: Text("${e.unitName} "),
-                              ))
-                          .toList(),
-                      // initialValue: _taxCode, // int? taxCode
-                      onChanged: (value) {
-                        setState(() {
-                          _itemUnit = value;
-                          //  _taxCode = value;
-                        });
-
-                        final selected = getAllMasterListModel!.info!.units!
-                            .firstWhere((c) => c.unitCode == value,
-                                orElse: () => master.Units());
-                      },
-                      isValidate: true,
-                      validator: (value) =>
-                          value == null ? "Please select Unit" : null,
-                      focusNode: _itemUnitCodeFocus,
-                      onEditingComplete: () => _fieldFocusChange(
-                        context,
-                        _itemUnitCodeFocus,
-                        _itemMakeCodeFocus,
-                      ),
-
-                      addPage: Addunitscreen(
-                        onSaved: (success) {
-                          if (success) {
-                            Navigator.pop(context, true);
-                          }
-                        },
-                      ),
-                      addTooltip: "Add Unit",
                     ),
                   ),
                   SizedBox(
@@ -631,207 +642,112 @@ class _AddProductMasterPageState extends State<AddProductMasterPage> {
                       addTooltip: "Add Item Make",
                     ),
                   ),
-                  SizedBox(
-                    width: constraints.maxWidth / columns - 20,
-                    child: CustomDropdownField<int>(
-                      title: "Select Item Generic",
-                      hintText: "Choose  IItem Generic",
-                      items: getAllMasterListModel!.info!.generics!
-                          .map((e) => DropdownMenuItem<int>(
-                                value: e.genericCode, // 🔹 use taxCode as value
-                                child: Text("${e.genericName} "),
-                              ))
-                          .toList(),
-                      // initialValue: _taxCode, // int? taxCode
-                      onChanged: (value) {
-                        setState(() {
-                          _itemGeneric = value;
-                          //  _taxCode = value;
-                        });
+                  selectedPaymentType == 0
+                      ? SizedBox(
+                          width: constraints.maxWidth / columns - 20,
+                          child: CustomDropdownField<int>(
+                            title: "Select Item Generic",
+                            hintText: "Choose  IItem Generic",
+                            items: getAllMasterListModel!.info!.generics!
+                                .map((e) => DropdownMenuItem<int>(
+                                      value: e
+                                          .genericCode, // 🔹 use taxCode as value
+                                      child: Text("${e.genericName} "),
+                                    ))
+                                .toList(),
+                            // initialValue: _taxCode, // int? taxCode
+                            onChanged: (value) {
+                              setState(() {
+                                _itemGeneric = value;
+                                //  _taxCode = value;
+                              });
 
-                        final selected = getAllMasterListModel!.info!.generics!
-                            .firstWhere((c) => c.genericCode == value,
-                                orElse: () => master.Generics());
+                              final selected = getAllMasterListModel!
+                                  .info!.generics!
+                                  .firstWhere((c) => c.genericCode == value,
+                                      orElse: () => master.Generics());
 
-                        print("Selected GST %: ${selected.genericCode}");
-                        print("Selected TAX Code: ${selected.genericName}");
-                      },
-                      isValidate: true,
-                      validator: (value) =>
-                          value == null ? "Please select Item Make Code" : null,
-                      focusNode: _itemGenericCodeFocus,
-                      onEditingComplete: () => _fieldFocusChange(
-                        context,
-                        _itemGenericCodeFocus,
-                        _nonScheduleItemFocus,
-                      ),
-                      addPage: AddGenericsMasterPage(
-                        onSaved: (success) {
-                          if (success) {
-                            Navigator.pop(context, true);
-                          }
-                        },
-                      ),
-                      addTooltip: "Add Item Generic",
-                    ),
-                  ),
+                              print("Selected GST %: ${selected.genericCode}");
+                              print(
+                                  "Selected TAX Code: ${selected.genericName}");
+                            },
+                            isValidate: true,
+                            validator: (value) => value == null
+                                ? "Please select Item Make Code"
+                                : null,
+                            focusNode: _itemGenericCodeFocus,
+                            onEditingComplete: () => _fieldFocusChange(
+                              context,
+                              _itemGenericCodeFocus,
+                              _nonScheduleItemFocus,
+                            ),
+                            addPage: AddGenericsMasterPage(
+                              onSaved: (success) {
+                                if (success) {
+                                  Navigator.pop(context, true);
+                                }
+                              },
+                            ),
+                            addTooltip: "Add Item Generic",
+                          ),
+                        )
+                      : SizedBox(),
 
                   const SizedBox(
                     height: 10,
                   ),
                   const Divider(),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  SizedBox(
-                    width: constraints.maxWidth,
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              const Text("Scheduled Item"),
-                              const SizedBox(
-                                width: 10,
-                              ),
-                              CustomSwitch(
-                                value: _nonScheduledItem,
-                                title: "Scheduled Item",
-                                onChanged: (val) {
-                                  setState(() {
-                                    _nonScheduledItem = val;
-                                  });
-                                },
-                              ),
-                            ],
-                          ),
-                          const SizedBox(width: 20),
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              const Text(" Narcotic Item"),
-                              const SizedBox(
-                                width: 10,
-                              ),
-                              CustomSwitch(
-                                value: _isNarocotic,
-                                title: "Is  Narcotic Item",
-                                onChanged: (val) {
-                                  setState(() {
-                                    _isNarocotic = val;
-                                  });
-                                },
-                              ),
-                            ],
-                          ),
-                          const SizedBox(width: 20),
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              const Text(" Expiry Required"),
-                              const SizedBox(
-                                width: 10,
-                              ),
-                              CustomSwitch(
-                                value: _expiryRequired,
-                                title: "Is Expiry Required",
-                                onChanged: (val) {
-                                  setState(() {
-                                    _expiryRequired = val;
-                                  });
-                                },
-                              ),
-                            ],
-                          ),
-                          const SizedBox(width: 20),
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              const Text("Batch Number Required"),
-                              const SizedBox(
-                                width: 10,
-                              ),
-                              CustomSwitch(
-                                value: _isBatchNumbeRequired,
-                                title: "Is Batch Number Required",
-                                onChanged: (val) {
-                                  setState(() {
-                                    _isBatchNumbeRequired = val;
-                                  });
-                                },
-                              ),
-                            ],
-                          ),
-                          const SizedBox(width: 20),
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              const Text("Discount"),
-                              const SizedBox(
-                                width: 10,
-                              ),
-                              CustomSwitch(
-                                value: _isDiscountReq,
-                                title: "Is Discount Required",
-                                onChanged: (val) {
-                                  setState(() {
-                                    _isDiscountReq = val;
-                                  });
-                                },
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  _expiryRequired
-                      ? SizedBox(
-                          width: constraints.maxWidth / columns - 20,
-                          child: CustomTextField(
-                            title: "Expiry Date Format",
-                            hintText: "Enter Expiry Date Format",
-                            controller: _expiryDateFormatController,
-                            isValidate: true,
-                            validator: (value) => value == null || value.isEmpty
-                                ? "Expiry Date Format"
-                                : null,
-                            focusNode: _expiryDateFormatFocus,
-                            textInputAction: TextInputAction.next,
-                            onEditingComplete: () {
-                              FocusScope.of(context)
-                                  .requestFocus(_expiryDateFormatFocus);
-                            },
-                          ))
-                      : SizedBox(
-                          width: 0,
-                        ),
+
                   SizedBox(
                     width: constraints.maxWidth / columns - 20,
-                    child: CustomTextField(
-                      title: "SubUnit Code",
-                      hintText: "Enter SubUnit Code",
-                      controller: _subUnitCodeController,
-                      isValidate: true,
-                      validator: (value) => value == null || value.isEmpty
-                          ? "Enter SubUnit Code"
-                          : null,
-                      focusNode: _subUnitCodeFocus,
-                      textInputAction: TextInputAction.next,
-                      onEditingComplete: () {
-                        FocusScope.of(context).requestFocus(_subUnitCodeFocus);
+                    child: CustomDropdownField<int>(
+                      title: "Select Unit",
+                      hintText: "Choose  Unit",
+                      items: getAllMasterListModel!.info!.units!
+                          .map((e) => DropdownMenuItem<int>(
+                                value: e.unitCode, // 🔹 use taxCode as value
+                                child: Text("${e.unitName} "),
+                              ))
+                          .toList(),
+                      // initialValue: _taxCode, // int? taxCode
+                      onChanged: (value) {
+                        setState(() {
+                          _itemUnit = value;
+                          //  _taxCode = value;
+                        });
+
+                        final selected = getAllMasterListModel!.info!.units!
+                            .firstWhere((c) => c.unitCode == value,
+                                orElse: () => master.Units());
                       },
+                      isValidate: true,
+                      validator: (value) =>
+                          value == null ? "Please select Unit" : null,
+                      focusNode: _itemUnitCodeFocus,
+                      onEditingComplete: () => _fieldFocusChange(
+                        context,
+                        _itemUnitCodeFocus,
+                        _itemMakeCodeFocus,
+                      ),
+
+                      addPage: Addunitscreen(
+                        onSaved: (success) {
+                          if (success) {
+                            _loadList();
+                            Navigator.pop(context, true);
+                          }
+                        },
+                      ),
+                      addTooltip: "Add Unit",
                     ),
                   ),
                   SizedBox(
                     width: constraints.maxWidth / columns - 20,
                     child: CustomTextField(
-                      title: "Sub Quantity",
+                      title: "Con Quantity",
                       hintText: "Enter Sub Quantity",
                       controller: _subQtyController,
+                      // isNumeric: true,
                       isValidate: true,
                       validator: (value) => value == null || value.isEmpty
                           ? "Enter Sub Quantity"
@@ -843,6 +759,169 @@ class _AddProductMasterPageState extends State<AddProductMasterPage> {
                       },
                     ),
                   ),
+                  SizedBox(
+                    width: constraints.maxWidth / columns - 20,
+                    child: CustomTextField(
+                      title: "Format Digit",
+                      hintText: "Format Digit",
+                      // isNumeric: true,
+                      controller: _subQtyFormatController,
+                      isValidate: true,
+                      validator: (value) =>
+                          value == null || value.isEmpty ? "Format Qty" : null,
+                      focusNode: _subQtyFormat,
+                      textInputAction: TextInputAction.next,
+                      onEditingComplete: () {
+                        FocusScope.of(context).requestFocus(_subQtyFormat);
+                      },
+                    ),
+                  ),
+                  SizedBox(
+                    width: constraints.maxWidth / columns - 20,
+                    child: CustomTextField(
+                      title: "Sub Units",
+                      hintText: "Enter Sub Units",
+                      // isNumeric: true,
+                      controller: _subUnitCodeController,
+                      isValidate: true,
+                      validator: (value) => value == null || value.isEmpty
+                          ? "Enter Sub Units"
+                          : null,
+                      focusNode: _subUnitsFocus,
+                      textInputAction: TextInputAction.next,
+                      onEditingComplete: () {
+                        FocusScope.of(context).requestFocus(_subUnitsFocus);
+                      },
+                    ),
+                  ),
+
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  const Divider(),
+
+                  SizedBox(
+                    width: constraints.maxWidth,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        selectedPaymentType == 0
+                            ? Flexible(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    CustomCheckbox(
+                                      label: "Is Batch Number Required",
+                                      value: _isBatchNumbeRequired,
+                                      onChanged: (val) {
+                                        setState(() {
+                                          _isBatchNumbeRequired = val ?? false;
+                                        });
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              )
+                            : const SizedBox(),
+                        const SizedBox(width: 20),
+                        Flexible(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              CustomCheckbox(
+                                label: "Is  Narcotic Item",
+                                value: _isNarocotic,
+                                onChanged: (val) {
+                                  setState(() {
+                                    _isNarocotic = val ?? false;
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 20),
+                        Flexible(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              CustomCheckbox(
+                                label: "Scheduled Item",
+                                value: _nonScheduledItem,
+                                onChanged: (val) {
+                                  setState(() {
+                                    _nonScheduledItem = val ?? false;
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 20),
+                        Flexible(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              CustomCheckbox(
+                                label: "Expiry Required",
+                                value: _expiryRequired,
+                                onChanged: (val) {
+                                  setState(() {
+                                    _expiryRequired = val ?? false;
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                        Flexible(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              CustomCheckbox(
+                                label: "MFGDateRequired",
+                                value: _ismfgreatured,
+                                onChanged: (val) {
+                                  setState(() {
+                                    _ismfgreatured = val ?? false;
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  _expiryRequired
+                      ? SizedBox(
+                          width: constraints.maxWidth / columns - 30,
+                          child: CustomDropdownField<int>(
+                            title: "Expiry Date Format",
+                            hintText: "Expiry Date Format",
+                            items: const [
+                              DropdownMenuItem(value: 0, child: Text("DD/YY")),
+                              DropdownMenuItem(
+                                  value: 1, child: Text("DD/MM/YY")),
+                              DropdownMenuItem(
+                                  value: 2, child: Text("DD/MM/YYYY")),
+                            ],
+                            initialValue: selectedExpiryType,
+                            onChanged: (val) {
+                              setState(() => selectedExpiryType = val);
+                              print("Selected PaymentType: $val");
+                            },
+                            focusNode: _itemTypeFocus,
+                            onEditingComplete: () {
+                              _fieldFocusChange(
+                                  context, _itemTypeFocus, _itemGroupFocus);
+                            },
+                          ),
+                        )
+                      : SizedBox(
+                          width: 0,
+                        ),
 
                   SizedBox(
                     width: constraints.maxWidth / columns - 20,
@@ -885,7 +964,7 @@ class _AddProductMasterPageState extends State<AddProductMasterPage> {
                   SizedBox(
                     width: constraints.maxWidth / columns - 20,
                     child: CustomTextField(
-                      title: "Reorder Level",
+                      title: "Re order Level",
                       hintText: "Enter Reorder Level",
                       controller: _reOrderLevelController,
                       isValidate: true,
@@ -903,7 +982,7 @@ class _AddProductMasterPageState extends State<AddProductMasterPage> {
                   SizedBox(
                     width: constraints.maxWidth / columns - 20,
                     child: CustomTextField(
-                      title: "Reorder Quantity",
+                      title: "Re order Quantity",
                       hintText: "Enter Reorder Quantity",
                       controller: _reOrderQtyController,
                       isValidate: true,
@@ -920,70 +999,103 @@ class _AddProductMasterPageState extends State<AddProductMasterPage> {
                   ),
                   SizedBox(
                     width: constraints.maxWidth / columns - 20,
-                    child: CustomTextField(
-                      title: "Price Taken From",
-                      hintText: "Enter Price Taken From",
-                      controller: _priceTakenFromController,
+                    child: CustomDropdownField<int>(
+                      title: "HSN Code",
+                      hintText: "HSN Code",
+                      items: getAllMasterListModel!.info!.hsnMasters!
+                          .map((e) => DropdownMenuItem<int>(
+                                value: e.hsnCode, // 🔹 use taxCode as value
+                                child: Text("${e.hsnName}"),
+                              ))
+                          .toList(),
+                      // initialValue: _taxCode, // int? taxCode
+                      onChanged: (value) {
+                        setState(() {
+                          _taxCode = value;
+                          //  _taxCode = value;
+                        });
+
+                        final selected = getAllMasterListModel!
+                            .info!.hsnMasters!
+                            .firstWhere((c) => c.hsnCode == value,
+                                orElse: () => master.HsnMasters());
+                      },
                       isValidate: true,
-                      validator: (value) => value == null || value.isEmpty
-                          ? "Enter Price Taken From"
-                          : null,
+                      validator: (value) =>
+                          value == null ? "Please select a GST" : null,
+
+                      addPage: AddHnsMasterPage(
+                        onSaved: (success) {
+                          if (success) {
+                            Navigator.pop(context, true);
+                          }
+                        },
+                      ),
+                      addTooltip: "Add HSN",
+                    ),
+                  ),
+                  SizedBox(
+                    width: constraints.maxWidth / columns - 20,
+                    child: CustomDropdownField<int>(
+                      title: "Select GST",
+                      hintText: "Choose a GST",
+                      items: getAllMasterListModel!.info!.taxMasters!
+                          .map((e) => DropdownMenuItem<int>(
+                                value: e.taxCode, // 🔹 use taxCode as value
+                                child:
+                                    Text("${e.taxName} (${e.taxPercentage}%)"),
+                              ))
+                          .toList(),
+                      // initialValue: _taxCode, // int? taxCode
+                      onChanged: (value) {
+                        setState(() {
+                          _taxCode = value;
+                          //  _taxCode = value;
+                        });
+
+                        final selected = getAllMasterListModel!
+                            .info!.taxMasters!
+                            .firstWhere((c) => c.taxCode == value,
+                                orElse: () => master.TaxMasters());
+
+                        print("Selected GST %: ${selected.taxPercentage}");
+                        print("Selected TAX Code: ${selected.taxCode}");
+                      },
+                      isValidate: true,
+                      validator: (value) =>
+                          value == null ? "Please select a GST" : null,
+
+                      // addPage: AddTaxMasterPage(
+                      //   onSaved: (success) {
+                      //     if (success) {
+                      //       Navigator.pop(context, true);
+                      //     }
+                      //   },
+                      // ),
+                      // addTooltip: "Add Tax",
+                    ),
+                  ),
+                  SizedBox(
+                    width: constraints.maxWidth / columns - 30,
+                    child: CustomDropdownField<int>(
+                      title: "Price Taken From",
+                      hintText: "Price Taken From",
+                      items: const [
+                        DropdownMenuItem(value: 0, child: Text("Purchase")),
+                        DropdownMenuItem(value: 1, child: Text("Master")),
+                      ],
+                      initialValue: priceTakenFrom,
+                      onChanged: (val) {
+                        setState(() => priceTakenFrom = val);
+                        print("Price Taken From: $val");
+                      },
                       focusNode: _priceTakenFromFocus,
-                      isNumeric: true,
-                      textInputAction: TextInputAction.next,
                       onEditingComplete: () {
-                        FocusScope.of(context)
-                            .requestFocus(_priceTakenFromFocus);
+                        _fieldFocusChange(
+                            context, _priceTakenFromFocus, _itemGroupFocus);
                       },
                     ),
                   ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  const Divider(),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  _isDiscountReq
-                      ? SizedBox(
-                          width: constraints.maxWidth / columns - 20,
-                          child: CustomTextField(
-                            title: "Discount Percentage",
-                            hintText: "Enter Discount Percentage",
-                            controller: _itemDiscountPercentageController,
-                            isValidate: true,
-                            validator: (value) => value == null || value.isEmpty
-                                ? "Enter Discount Percentage"
-                                : null,
-                            focusNode: _itemDiscountPercentageFocus,
-                            isNumeric: true,
-                            textInputAction: TextInputAction.next,
-                            onEditingComplete: () {
-                              FocusScope.of(context)
-                                  .requestFocus(_itemDiscountPercentageFocus);
-                            },
-                          ))
-                      : SizedBox(),
-                  _isDiscountReq
-                      ? SizedBox(
-                          width: constraints.maxWidth / columns - 20,
-                          child: CustomTextField(
-                            title: "Discount Value",
-                            hintText: "Enter Discount value",
-                            controller: _itemDiscountValueController,
-                            isValidate: true,
-                            validator: (value) => value == null || value.isEmpty
-                                ? "Enter Discount Value"
-                                : null,
-                            focusNode: _itemDiscountValueFocus,
-                            isNumeric: true,
-                            textInputAction: TextInputAction.next,
-                            onEditingComplete: () {
-                              FocusScope.of(context)
-                                  .requestFocus(_itemDiscountValueFocus);
-                            },
-                          ))
-                      : SizedBox(),
                   SizedBox(
                     width: constraints.maxWidth / columns - 20,
                     child: CustomTextField(
@@ -1005,12 +1117,12 @@ class _AddProductMasterPageState extends State<AddProductMasterPage> {
                   SizedBox(
                     width: constraints.maxWidth / columns - 20,
                     child: CustomTextField(
-                      title: "Purchase Rate Tax",
-                      hintText: "Enter Purchase Rate Tax",
+                      title: "Purchase Rate With Tax",
+                      hintText: "Enter Purchase Rate WithTax",
                       controller: _purchaseRateWTaxController,
                       isValidate: true,
                       validator: (value) => value == null || value.isEmpty
-                          ? "Enter Purchase Rate Tax"
+                          ? "Enter Purchase Rate With Tax"
                           : null,
                       focusNode: _purchaseRateWTaxFocus,
                       isNumeric: true,
@@ -1021,6 +1133,10 @@ class _AddProductMasterPageState extends State<AddProductMasterPage> {
                       },
                     ),
                   ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  const Divider(),
                   SizedBox(
                     width: constraints.maxWidth / columns - 20,
                     child: CustomTextField(
@@ -1057,44 +1173,93 @@ class _AddProductMasterPageState extends State<AddProductMasterPage> {
                       },
                     ),
                   ),
-                  SizedBox(
-                    width: constraints.maxWidth / columns - 20,
-                    child: CustomDropdownField<int>(
-                      title: "Select GST",
-                      hintText: "Choose a GST",
-                      items: getAllMasterListModel!.info!.taxMasters!
-                          .map((e) => DropdownMenuItem<int>(
-                                value: e.taxCode, // 🔹 use taxCode as value
-                                child:
-                                    Text("${e.taxName} (${e.taxPercentage}%)"),
-                              ))
-                          .toList(),
-                      // initialValue: _taxCode, // int? taxCode
-                      onChanged: (value) {
-                        setState(() {
-                          _taxCode = value;
-                          //  _taxCode = value;
-                        });
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  const Divider(),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Flexible(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            CustomCheckbox(
+                              label: "Discount",
+                              value: _isDiscountReq,
+                              onChanged: (val) {
+                                setState(() {
+                                  _isDiscountReq = val ?? false;
+                                });
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 20),
+                    ],
+                  ),
 
-                        final selected = getAllMasterListModel!
-                            .info!.taxMasters!
-                            .firstWhere((c) => c.taxCode == value,
-                                orElse: () => master.TaxMasters());
-
-                        print("Selected GST %: ${selected.taxPercentage}");
-                        print("Selected TAX Code: ${selected.taxCode}");
-                      },
-                      isValidate: true,
-                      validator: (value) =>
-                          value == null ? "Please select a GST" : null,
-                    ),
+                  _isDiscountReq
+                      ? SizedBox(
+                          width: constraints.maxWidth / columns - 20,
+                          child: CustomTextField(
+                            title: "Discount %",
+                            hintText: "Enter Discount Percentage",
+                            controller: _itemDiscountPercentageController,
+                            isValidate: true,
+                            validator: (value) => value == null || value.isEmpty
+                                ? "Enter Discount Percentage"
+                                : null,
+                            focusNode: _itemDiscountPercentageFocus,
+                            isNumeric: true,
+                            textInputAction: TextInputAction.next,
+                            onEditingComplete: () {
+                              FocusScope.of(context)
+                                  .requestFocus(_itemDiscountPercentageFocus);
+                            },
+                          ))
+                      : SizedBox(),
+                  _isDiscountReq
+                      ? SizedBox(
+                          width: constraints.maxWidth / columns - 20,
+                          child: CustomTextField(
+                            title: "Discount Value",
+                            hintText: "Enter Discount value",
+                            controller: _itemDiscountValueController,
+                            isValidate: true,
+                            validator: (value) => value == null || value.isEmpty
+                                ? "Enter Discount Value"
+                                : null,
+                            focusNode: _itemDiscountValueFocus,
+                            isNumeric: true,
+                            textInputAction: TextInputAction.next,
+                            onEditingComplete: () {
+                              FocusScope.of(context)
+                                  .requestFocus(_itemDiscountValueFocus);
+                            },
+                          ))
+                      : SizedBox(),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ImagePickerField(
+                        title: "Choose Image",
+                        onImageSelected: (file) {
+                          setState(() {
+                            _image = file;
+                          });
+                        },
+                      ),
+                    ],
                   ),
                   SizedBox(
                     width: constraints.maxWidth / columns - 20,
                     child: CustomTextField(
                       title: "Create User",
                       controller: _createdUserController,
-                      prefixIcon: Icons.person,
+                      // prefixIcon: Icons.person,
                       isEdit: true,
                       focusNode: _createUserFocus,
                       textInputAction: TextInputAction.done,

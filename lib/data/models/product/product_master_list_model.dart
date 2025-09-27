@@ -45,7 +45,7 @@ class Info {
   int? itemUnitCode;
   int? subUnitCode;
   int? subQty;
-  Null? subQtyFormalDigits;
+  int? subQtyFormalDigits;
   int? stockRequired;
   int? minimumStockQty;
   int? maximumStockQty;

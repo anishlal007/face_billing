@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class CustomTextField extends StatefulWidget {
   final String? title;
@@ -6,9 +8,9 @@ class CustomTextField extends StatefulWidget {
   final IconData? prefixIcon;
   final IconData? suffixIcon;
   final TextEditingController controller;
-  final FocusNode? focusNode; // NEW
-  final TextInputAction textInputAction; // NEW
-  final VoidCallback? onEditingComplete; // NEW
+  final FocusNode? focusNode;
+  final TextInputAction textInputAction;
+  final VoidCallback? onEditingComplete;
   final bool isPassword;
   final bool isNumeric;
   final bool isValidate;
@@ -62,11 +64,14 @@ class _CustomTextFieldState extends State<CustomTextField> {
         if (widget.title != null)
           Padding(
             padding: const EdgeInsets.only(bottom: 6),
-            child: Text(widget.title!,
-                style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.black87)),
+            child: Text(
+              widget.title!,
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: Colors.black87,
+              ),
+            ),
           ),
         TextField(
           controller: widget.controller,
@@ -79,6 +84,11 @@ class _CustomTextFieldState extends State<CustomTextField> {
           enabled: !widget.isEdit,
           onChanged: widget.isEdit ? null : _validate,
           autofocus: widget.autoFocus,
+
+          // ✅ Only allow numbers if isNumeric = true
+          inputFormatters:
+              widget.isNumeric ? [FilteringTextInputFormatter.digitsOnly] : [],
+
           decoration: InputDecoration(
             hintText: widget.hintText,
             prefixIcon:

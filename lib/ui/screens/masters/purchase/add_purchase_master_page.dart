@@ -23,6 +23,7 @@ import '../../../widgets/label_textfield.dart';
 import '../../../widgets/product_drop_down_field.dart';
 import '../../../widgets/product_search_field.dart';
 import '../../../widgets/search_dropdown_field.dart';
+import '../product_master/add_product_master_page.dart';
 import 'add_purchase_controller.dart';
 
 class AddPurchaseMasterPage extends StatefulWidget {
@@ -45,12 +46,14 @@ class _AddPurchaseMasterPageState extends State<AddPurchaseMasterPage> {
   final PurchaseMasterService _service = PurchaseMasterService();
   final GetAllMasterService _getAllMasterService = GetAllMasterService();
   final ProductService _productService = ProductService();
-
+  product.Info? editingUnit;
+  bool refreshList = false;
   bool _activeStatus = true;
   bool _loading = false;
   String? _message;
   bool _getAllLoading = true;
-
+  int? _highlightedIndex; // null = nothing highlighted
+  final FocusNode _subTableFocus = FocusNode(); // focus for keyboard
   ///sales rate calculation
   double _totalSalesRate = 0.0;
   int? selectedPaymentType;
@@ -169,8 +172,8 @@ class _AddPurchaseMasterPageState extends State<AddPurchaseMasterPage> {
   late TextEditingController _totalGstAmtController;
   late TextEditingController _qtyTotalController;
 
-  final TextEditingController itemCodeController = TextEditingController();
-  final TextEditingController itemNameController = TextEditingController();
+  // final TextEditingController itemCodeController = TextEditingController();
+  // final TextEditingController itemNameController = TextEditingController();
 
   final TextEditingController batchNoController = TextEditingController();
   final TextEditingController expiryController = TextEditingController();
@@ -235,6 +238,9 @@ class _AddPurchaseMasterPageState extends State<AddPurchaseMasterPage> {
   @override
   void initState() {
     super.initState();
+    Future.delayed(Duration(milliseconds: 300), () {
+      FocusScope.of(context).requestFocus(_spurchaseNoFocus);
+    });
     _loadList();
     //_itemIdController = TextEditingController(text: widget.unitInfo?.purchaseAccCode.toString() ?? "");
 
@@ -335,6 +341,15 @@ class _AddPurchaseMasterPageState extends State<AddPurchaseMasterPage> {
       setState(() {
         error = response.error;
         _getAllLoading = false;
+      });
+    }
+  }
+
+  void _onSaved(bool success) {
+    if (success) {
+      setState(() {
+        editingUnit = null; // reset after save
+        refreshList = true; // trigger reload
       });
     }
   }
@@ -608,7 +623,7 @@ class _AddPurchaseMasterPageState extends State<AddPurchaseMasterPage> {
                 if (constraints.maxWidth > 1200) {
                   columns = 5;
                 } else if (constraints.maxWidth > 800) {
-                  columns = 4;
+                  columns = 5;
                 }
                 return Wrap(
                   spacing: 16,
@@ -636,19 +651,6 @@ class _AddPurchaseMasterPageState extends State<AddPurchaseMasterPage> {
                     SizedBox(
                       width: constraints.maxWidth / columns - 20,
                       child: CustomTextField(
-                        title: "Supplier Invoice No",
-                        controller: _supplierInvoicNoController,
-                        // prefixIcon: Icons.person,
-                        isEdit: false,
-                        focusNode: _supNameFocus,
-                        textInputAction: TextInputAction.done,
-                        onEditingComplete: () => _fieldFocusChange(
-                            context, _supNameFocus, _invoiceDateFocus),
-                      ),
-                    ),
-                    SizedBox(
-                      width: constraints.maxWidth / columns - 20,
-                      child: CustomTextField(
                         title: "Purches No",
                         controller: _purchaseNoController,
                         // prefixIcon: Icons.person,
@@ -659,6 +661,20 @@ class _AddPurchaseMasterPageState extends State<AddPurchaseMasterPage> {
                             context, _supNameFocus, _invoiceDateFocus),
                       ),
                     ),
+                    SizedBox(
+                      width: constraints.maxWidth / columns - 20,
+                      child: CustomTextField(
+                        title: "Supplier Invoice No",
+                        controller: _supplierInvoicNoController,
+                        // prefixIcon: Icons.person,
+                        isEdit: false,
+                        focusNode: _supNameFocus,
+                        textInputAction: TextInputAction.done,
+                        onEditingComplete: () => _fieldFocusChange(
+                            context, _supNameFocus, _invoiceDateFocus),
+                      ),
+                    ),
+
                     SizedBox(
                       width: constraints.maxWidth / columns - 20,
                       child: CustomDropdownField<int>(
@@ -890,66 +906,80 @@ class _AddPurchaseMasterPageState extends State<AddPurchaseMasterPage> {
                         border: TableBorder.all(color: primary),
                         columnSpacing: 30,
                         headingRowColor: MaterialStateProperty.all(primary),
-                        columns: const [
-                          DataColumn(
+                        columns: [
+                          const DataColumn(
                               label: Text(
                             "SL No",
                             style: TextStyle(color: white),
                           )),
-                          DataColumn(
+                          const DataColumn(
                               label: Text(
                             "Item Id",
                             style: TextStyle(color: white),
                           )),
                           DataColumn(
-                              label: Text(
-                            "Item Name",
-                            style: TextStyle(color: white),
-                          )),
-                          DataColumn(
+                            label: Row(
+                              children: [
+                                const Text("Item Name",
+                                    style: TextStyle(color: white)),
+                                const SizedBox(width: 4),
+                                IconButton(
+                                  icon: Icon(Icons.add_circle_outline_rounded,
+                                      color: white, size: 20),
+                                  onPressed: () {
+                                    _showAddEditBottomSheet(editingUnit);
+
+                                    //_showAddProductPopup(context);
+                                  },
+                                ), // NON-INTERACTIVE
+                              ],
+                            ),
+                          ),
+
+                          const DataColumn(
                               label: Text(
                             "Back No",
                             style: TextStyle(color: white),
                           )),
-                          DataColumn(
+                          const DataColumn(
                               label: Text(
                             "Expiry",
                             style: TextStyle(color: white),
                           )),
-                          DataColumn(
+                          const DataColumn(
                               label: Text(
                             "VOM",
                             style: TextStyle(color: white),
                           )),
-                          DataColumn(
+                          const DataColumn(
                               label: Text(
                             "HSN Code",
                             style: TextStyle(color: white),
                           )),
-                          DataColumn(
+                          const DataColumn(
                               label: Text(
                             "FreeQty",
                             style: TextStyle(color: white),
                           )),
-                          DataColumn(
+                          const DataColumn(
                               label: Text(
                             "MRP/Rate",
                             style: TextStyle(color: white),
                           )),
                           // DataColumn(label: Text("Net Rate")),
                           // DataColumn(label: Text("Net Value")),
-                          DataColumn(
+                          const DataColumn(
                               label: Text(
                             "Purchase Rate",
                             style: TextStyle(color: white),
                           )),
-                          DataColumn(
+                          const DataColumn(
                               label: Text(
                             "Sales Rate",
                             style: TextStyle(color: white),
                           )),
                           //DataColumn(label: Text("GST Value")),
-                          DataColumn(
+                          const DataColumn(
                               label: Text(
                             "Action",
                             style: TextStyle(color: white),
@@ -963,19 +993,29 @@ class _AddPurchaseMasterPageState extends State<AddPurchaseMasterPage> {
 
                             // Item Code
                             DataCell(TextFormField(
-                              // onTap: () => _showItemSelection(context),
-                              initialValue: item.itemCode?.toString() ?? '',
+                              controller: controller.itemCodeController,
+                              focusNode: controller.itemCodeFocus,
                               keyboardType: TextInputType.number,
                               decoration: const InputDecoration(
-                                  hintText: "", border: InputBorder.none),
-                              onChanged: (val) =>
-                                  item.itemCode = int.tryParse(val),
+                                  border: InputBorder.none),
+                              onChanged: (val) => item.itemID = val,
+                              textInputAction: TextInputAction.next,
+                              onEditingComplete: () => FocusScope.of(context)
+                                  .requestFocus(controller.itemNameFocus),
                             )),
                             DataCell(
                               TextFormField(
+                                focusNode: controller.itemNameFocus,
                                 controller: controller.itemNameController,
                                 decoration: const InputDecoration(
-                                    hintText: "", border: InputBorder.none),
+                                  hintText: "",
+                                  border: InputBorder.none,
+                                ),
+                                textInputAction: TextInputAction
+                                    .next, // ✅ show "Next" on keyboard
+                                onEditingComplete: () => FocusScope.of(context)
+                                    .requestFocus(controller
+                                        .batchNoFocus), // ✅ jump to batch
                                 onChanged: (val) async {
                                   if (val.isNotEmpty) {
                                     final response = await _productService
@@ -993,7 +1033,6 @@ class _AddPurchaseMasterPageState extends State<AddPurchaseMasterPage> {
                                   } else {
                                     setState(() {
                                       _searchResults.clear();
-                                      _showSubTable = false;
                                       _activeRowIndex = null;
                                     });
                                   }
@@ -1010,93 +1049,123 @@ class _AddPurchaseMasterPageState extends State<AddPurchaseMasterPage> {
                             // Batch No
                             DataCell(TextFormField(
                               controller: controller.batchNoController,
-
+                              focusNode: controller.batchNoFocus,
                               decoration: const InputDecoration(
-                                  hintText: "", border: InputBorder.none),
-                              // initialValue: item.batchNoRequired.toString(),
+                                  border: InputBorder.none),
                               onChanged: (val) =>
-                                  item.batchNoRequired = int.parse(val),
+                                  item.batchNoRequired = int.tryParse(val) ?? 0,
+                              textInputAction: TextInputAction.next,
+                              onEditingComplete: () => FocusScope.of(context)
+                                  .requestFocus(controller.expiryFocus),
                             )),
 
                             // Expiry
                             DataCell(TextFormField(
                               controller: controller.expiryController,
+                              focusNode: controller.expiryFocus,
                               decoration: const InputDecoration(
-                                  hintText: "", border: InputBorder.none),
-
-                              ///initialValue: item.expiryDateFormat,
+                                  border: InputBorder.none),
                               onChanged: (val) => item.expiryDateFormat = val,
+                              textInputAction: TextInputAction.next,
+                              onEditingComplete: () => FocusScope.of(context)
+                                  .requestFocus(controller.hsnFocus),
                             )),
 
                             // HSN Code
                             DataCell(TextFormField(
                               controller: controller.hsnController,
+                              focusNode: controller.hsnFocus,
                               decoration: const InputDecoration(
-                                  hintText: "", border: InputBorder.none),
+                                  border: InputBorder.none),
                               onChanged: (val) => item.hSNCode = val,
+                              textInputAction: TextInputAction.next,
+                              onEditingComplete: () => FocusScope.of(context)
+                                  .requestFocus(controller.qtyFocus),
                             )),
 
                             // Qty
                             DataCell(TextFormField(
                               controller: controller.qtyController,
-                              decoration: const InputDecoration(
-                                  hintText: "", border: InputBorder.none),
+                              focusNode: controller.qtyFocus,
                               keyboardType: TextInputType.number,
+                              decoration: const InputDecoration(
+                                  border: InputBorder.none),
                               onChanged: (val) =>
                                   item.maximumStockQty = int.tryParse(val) ?? 0,
+                              textInputAction: TextInputAction.next,
+                              onEditingComplete: () => FocusScope.of(context)
+                                  .requestFocus(controller.mrpFocus),
                             )),
 
                             // MRP/Rate
                             DataCell(TextFormField(
                               controller: controller.mrpController,
-                              decoration: const InputDecoration(
-                                  hintText: "", border: InputBorder.none),
+                              focusNode: controller.mrpFocus,
                               keyboardType: TextInputType.number,
+                              decoration: const InputDecoration(
+                                  border: InputBorder.none),
                               onChanged: (val) =>
                                   item.mRPRate = int.tryParse(val) ?? 0,
+                              textInputAction: TextInputAction.next,
+                              onEditingComplete: () => FocusScope.of(context)
+                                  .requestFocus(controller.salesRateFocus),
                             )),
 
-                            // Net Rate
-                            // DataCell(TextFormField(
-                            //   keyboardType: TextInputType.number,
-                            //   onChanged: (val) => item.netRate = double.tryParse(val) ?? 0,
-                            // )),
-
-                            // // Net Value
-                            // DataCell(Text(item.netValue.toStringAsFixed(2))),
-
-                            // Sale Rate
-                            DataCell(
-                              TextFormField(
-                                controller: controller.salesRateController,
-                                decoration: const InputDecoration(
-                                    hintText: "", border: InputBorder.none),
-                                keyboardType: TextInputType.number,
-                                onChanged: (val) {
-                                  item.salesRate = int.tryParse(val) ?? 0;
-                                  _calculateTotalSalesRate(); // ✅ recalc after change
-                                },
-                              ),
-                            ),
+                            // Sales Rate
+                            DataCell(TextFormField(
+                              controller: controller.salesRateController,
+                              focusNode: controller.salesRateFocus,
+                              keyboardType: TextInputType.number,
+                              decoration: const InputDecoration(
+                                  border: InputBorder.none),
+                              onChanged: (val) {
+                                item.salesRate = int.tryParse(val) ?? 0;
+                                _calculateTotalSalesRate();
+                              },
+                              textInputAction: TextInputAction.next,
+                              onEditingComplete: () => FocusScope.of(context)
+                                  .requestFocus(controller.gstFocus),
+                            )),
 
                             // GST %
                             DataCell(TextFormField(
                               controller: controller.gstController,
-                              decoration: const InputDecoration(
-                                  hintText: "", border: InputBorder.none),
+                              focusNode: controller.gstFocus,
                               keyboardType: TextInputType.number,
+                              decoration: const InputDecoration(
+                                  border: InputBorder.none),
                               onChanged: (val) =>
                                   item.gstPercentage = int.tryParse(val) ?? 0,
+                              textInputAction: TextInputAction.done,
+                              onEditingComplete: () => FocusScope.of(context)
+                                  .requestFocus(controller.salesRateFocus),
                             )),
-
                             // GST Value
                             DataCell(TextFormField(
+                              focusNode: controller.salesRateFocus,
                               controller: controller.salesRateController,
                               decoration: const InputDecoration(
-                                  hintText: "", border: InputBorder.none),
+                                hintText: "",
+                                border: InputBorder.none,
+                              ),
                               keyboardType: TextInputType.number,
                               onChanged: (val) =>
                                   item.gstPercentage = int.tryParse(val) ?? 0,
+
+                              // 🔹 Jump to next row's itemCode when Enter pressed
+                              onEditingComplete: () {
+                                final currentIndex =
+                                    index; // ✅ use index from List.generate
+                                if (currentIndex < controllers.length - 1) {
+                                  // go to next row's itemCode
+                                  FocusScope.of(context).requestFocus(
+                                    controllers[currentIndex + 1].itemCodeFocus,
+                                  );
+                                } else {
+                                  // last row → just unfocus
+                                  FocusScope.of(context).unfocus();
+                                }
+                              },
                             )),
 
                             // Delete
@@ -1110,8 +1179,7 @@ class _AddPurchaseMasterPageState extends State<AddPurchaseMasterPage> {
                                           icon: const Icon(Icons.edit,
                                               color: primary),
                                           onPressed: () {
-                                            _showEditPopup(
-                                                context, items[index], index);
+                                            _showEditPopup(context, index);
                                             // 👉 Your edit logic here
                                             print("Edit row $index");
                                           },
@@ -1152,213 +1220,250 @@ class _AddPurchaseMasterPageState extends State<AddPurchaseMasterPage> {
                           scrollDirection: Axis.horizontal,
                           child: SingleChildScrollView(
                             scrollDirection: Axis.vertical,
-                            child: DataTable(
-                              showCheckboxColumn: false,
-                              border: TableBorder.all(color: lightgray),
-                              headingRowColor:
-                                  MaterialStateProperty.all(primary),
-                              columns: const [
-                                DataColumn(
-                                    label: Text(
-                                  "SL No",
-                                  style: TextStyle(color: white),
-                                )),
-                                DataColumn(
-                                    label: Text(
-                                  "Item Id",
-                                  style: TextStyle(color: white),
-                                )),
-                                DataColumn(
-                                    label: Text(
-                                  "Item Name",
-                                  style: TextStyle(color: white),
-                                )),
-                                DataColumn(
-                                    label: Text(
-                                  "Back No",
-                                  style: TextStyle(color: white),
-                                )),
-                                DataColumn(
-                                    label: Text(
-                                  "Expiry",
-                                  style: TextStyle(color: white),
-                                )),
-                                DataColumn(
-                                    label: Text(
-                                  "VOM",
-                                  style: TextStyle(color: white),
-                                )),
-                                DataColumn(
-                                    label: Text(
-                                  "HSN Code",
-                                  style: TextStyle(color: white),
-                                )),
-                                DataColumn(
-                                    label: Text(
-                                  "FreeQty",
-                                  style: TextStyle(color: white),
-                                )),
-                                DataColumn(
-                                    label: Text(
-                                  "MRP/Rate",
-                                  style: TextStyle(color: white),
-                                )),
-                                // DataColumn(label: Text("Net Rate")),
-                                // DataColumn(label: Text("Net Value")),
-                                DataColumn(
-                                    label: Text(
-                                  "Purchase Rate",
-                                  style: TextStyle(color: white),
-                                )),
-                                DataColumn(
-                                    label: Text(
-                                  "Sales Rate",
-                                  style: TextStyle(color: white),
-                                )),
-                              ],
-                              rows: _searchResults.asMap().entries.map((entry) {
-                                final index =
-                                    entry.key; // <-- gives you the index
-                                final p =
-                                    entry.value; // <-- this is your Info object
+                            child: _searchResults.isNotEmpty
+                                ? DataTable(
+                                    showCheckboxColumn: false,
+                                    border: TableBorder.all(color: lightgray),
+                                    headingRowColor:
+                                        MaterialStateProperty.all(primary),
+                                    columns: const [
+                                      DataColumn(
+                                          label: Text(
+                                        "SL No",
+                                        style: TextStyle(color: white),
+                                      )),
+                                      DataColumn(
+                                          label: Text(
+                                        "Item Id",
+                                        style: TextStyle(color: white),
+                                      )),
+                                      DataColumn(
+                                          label: Text(
+                                        "Item Name",
+                                        style: TextStyle(color: white),
+                                      )),
+                                      DataColumn(
+                                          label: Text(
+                                        "Batch No",
+                                        style: TextStyle(color: white),
+                                      )),
+                                      DataColumn(
+                                          label: Text(
+                                        "Expiry",
+                                        style: TextStyle(color: white),
+                                      )),
+                                      DataColumn(
+                                          label: Text(
+                                        "VOM",
+                                        style: TextStyle(color: white),
+                                      )),
+                                      DataColumn(
+                                          label: Text(
+                                        "HSN Code",
+                                        style: TextStyle(color: white),
+                                      )),
+                                      DataColumn(
+                                          label: Text(
+                                        "FreeQty",
+                                        style: TextStyle(color: white),
+                                      )),
+                                      DataColumn(
+                                          label: Text(
+                                        "MRP/Rate",
+                                        style: TextStyle(color: white),
+                                      )),
+                                      // DataColumn(label: Text("Net Rate")),
+                                      // DataColumn(label: Text("Net Value")),
+                                      DataColumn(
+                                          label: Text(
+                                        "Purchase Rate",
+                                        style: TextStyle(color: white),
+                                      )),
+                                      DataColumn(
+                                          label: Text(
+                                        "Sales Rate",
+                                        style: TextStyle(color: white),
+                                      )),
+                                    ],
+                                    rows: _searchResults
+                                        .asMap()
+                                        .entries
+                                        .map((entry) {
+                                      final index =
+                                          entry.key; // <-- gives you the index
+                                      final p = entry
+                                          .value; // <-- this is your Info object
 
-                                return DataRow(
-                                  onSelectChanged: (_) {
-                                    setState(() {
-                                      if (_activeRowIndex != null) {
-                                        // final p = _searchResults[_activeRowIndex!];
-                                        final item = items[_activeRowIndex!];
-                                        final controller =
-                                            controllers[_activeRowIndex!];
-                                        item.itemCode = p.itemCode;
-                                        item.itemName = p.itemName ?? '';
-                                        item.batchNoRequired =
-                                            p.batchNoRequired ?? 0;
-                                        item.expiryDateFormat =
-                                            p.expiryDateFormat ?? '';
-                                        item.hSNCode = p.hSNCode ?? '';
-                                        item.maximumStockQty =
-                                            p.maximumStockQty ?? 0;
-                                        item.mRPRate = p.mRPRate ?? 0;
-                                        item.salesRate = p.salesRate ?? 0;
-                                        item.gstPercentage =
-                                            p.gstPercentage ?? 0;
+                                      return DataRow(
+                                        onSelectChanged: (_) {
+                                          setState(() {
+                                            if (_activeRowIndex != null) {
+                                              // final p = _searchResults[_activeRowIndex!];
+                                              final item =
+                                                  items[_activeRowIndex!];
+                                              final controller =
+                                                  controllers[_activeRowIndex!];
+                                              item.itemID = p.itemID;
+                                              item.itemName = p.itemName ?? '';
+                                              item.batchNoRequired =
+                                                  p.batchNoRequired ?? 0;
+                                              item.expiryDateFormat =
+                                                  p.expiryDateFormat ?? '';
+                                              item.hSNCode = p.hSNCode ?? '';
+                                              item.maximumStockQty =
+                                                  p.maximumStockQty ?? 0;
+                                              item.mRPRate = p.mRPRate ?? 0;
+                                              item.salesRate = p.salesRate ?? 0;
+                                              item.gstPercentage =
+                                                  p.gstPercentage ?? 0;
 
-                                        // Update controllers
-                                        controller.itemCodeController.text =
-                                            item.itemCode?.toString() ?? '';
-                                        controller.itemNameController.text =
-                                            item.itemName ?? '';
-                                        controller.batchNoController.text =
-                                            item.batchNoRequired.toString();
-                                        controller.expiryController.text =
-                                            item.expiryDateFormat ?? '';
-                                        controller.hsnController.text =
-                                            item.hSNCode ?? '';
-                                        controller.qtyController.text =
-                                            item.maximumStockQty.toString();
-                                        controller.mrpController.text =
-                                            item.mRPRate.toString();
-                                        controller.salesRateController.text =
-                                            item.salesRate.toString();
-                                        controller.gstController.text =
-                                            item.gstPercentage.toString();
-                                        _calculateTotalSalesRate();
-                                        // Convert Info to Items
-                                        final newItem = Items(
-                                          itemCode: p.itemCode,
-                                          itemID: p.itemID ?? '',
-                                          itemName: p.itemName ?? '',
-                                          itemGroupCode: p.itemGroupCode ?? 0,
-                                          itemMakeCode: p.itemMakeCode ?? 0,
-                                          itemGenericCode:
-                                              p.itemGenericCode ?? 0,
-                                          barCodeId: '',
-                                          batchNo:
-                                              p.batchNoRequired?.toString() ??
-                                                  '',
-                                          mFGDate: '',
-                                          expiryDate: p.expiryDateFormat ?? '',
-                                          hsnCode:
-                                              int.tryParse(p.hSNCode ?? '0') ??
-                                                  0,
-                                          gstPercentage: p.gstPercentage ?? 0,
-                                          itemQuantity: p.maximumStockQty ?? 0,
-                                          freeQuantity: 0,
-                                          itemUnitCode: p.itemUnitCode ?? 0,
-                                          subQuantity: 0,
-                                          subQtyUnitCode: 0,
-                                          subQtyPurchaseRate: 0,
-                                          itemPurchaseRate: p.purchaseRate ?? 0,
-                                          purchaseRateBeforeTax: 0.0,
-                                          itemDiscountPercentage: 0,
-                                          itemDiscountValue: 0,
-                                          itemGstValue: 0,
-                                          itemValue: 0,
-                                          actualPurchaseRate: 0.0,
-                                          itemSaleRate: p.salesRate ?? 0,
-                                          itemMRPRate: p.mRPRate ?? 0,
-                                          itemSGSTPercentage: 0,
-                                          itemCGSTPercentage: 0,
-                                          itemIGSTPercentage: 0,
-                                          itemSGSTAmount: 0,
-                                          itemCGSTAmount: 0,
-                                          itemIGSTAmount: 0,
-                                          purchaseEntryMode: 0,
-                                          purchaseEntryType: 0,
-                                          createdUserCode:
-                                              p.createdUserCode ?? 0,
-                                          createdDate: p.createdDate ??
-                                              DateTime.now().toIso8601String(),
-                                          updatedUserCode: null,
-                                          updatedDate: null,
-                                          coCode: 0,
-                                          computerName: '',
-                                          finYearCode: '',
-                                          stockRequiredEffect: 0,
-                                        );
+                                              // Update controllers
+                                              controller
+                                                      .itemCodeController.text =
+                                                  item.itemID?.toString() ?? '';
+                                              controller.itemNameController
+                                                  .text = item.itemName ?? '';
+                                              controller
+                                                      .batchNoController.text =
+                                                  item.batchNoRequired
+                                                      .toString();
+                                              controller.expiryController.text =
+                                                  item.expiryDateFormat ?? '';
+                                              controller.hsnController.text =
+                                                  item.hSNCode ?? '';
+                                              controller.qtyController.text =
+                                                  item.maximumStockQty
+                                                      .toString();
+                                              controller.mrpController.text =
+                                                  item.mRPRate.toString();
+                                              controller.salesRateController
+                                                      .text =
+                                                  item.salesRate.toString();
+                                              controller.gstController.text =
+                                                  item.gstPercentage.toString();
+                                              controller
+                                                      .gstValueController.text =
+                                                  item.gstPercentage.toString();
+                                              _calculateTotalSalesRate();
+                                              // Convert Info to Items
+                                              final newItem = Items(
+                                                itemCode: p.itemCode,
+                                                itemID: p.itemID ?? '',
+                                                itemName: p.itemName ?? '',
+                                                itemGroupCode:
+                                                    p.itemGroupCode ?? 0,
+                                                itemMakeCode:
+                                                    p.itemMakeCode ?? 0,
+                                                itemGenericCode:
+                                                    p.itemGenericCode ?? 0,
+                                                barCodeId: '',
+                                                batchNo: p.batchNoRequired
+                                                        ?.toString() ??
+                                                    '',
+                                                mFGDate: '',
+                                                expiryDate:
+                                                    p.expiryDateFormat ?? '',
+                                                hsnCode: int.tryParse(
+                                                        p.hSNCode ?? '0') ??
+                                                    0,
+                                                gstPercentage:
+                                                    p.gstPercentage ?? 0,
+                                                itemQuantity:
+                                                    p.maximumStockQty ?? 0,
+                                                freeQuantity: 0,
+                                                itemUnitCode:
+                                                    p.itemUnitCode ?? 0,
+                                                subQuantity: 0,
+                                                subQtyUnitCode: 0,
+                                                subQtyPurchaseRate: 0,
+                                                itemPurchaseRate:
+                                                    p.purchaseRate ?? 0,
+                                                purchaseRateBeforeTax: 0.0,
+                                                itemDiscountPercentage: 0,
+                                                itemDiscountValue: 0,
+                                                itemGstValue: 0,
+                                                itemValue: 0,
+                                                actualPurchaseRate: 0.0,
+                                                itemSaleRate: p.salesRate ?? 0,
+                                                itemMRPRate: p.mRPRate ?? 0,
+                                                itemSGSTPercentage: 0,
+                                                itemCGSTPercentage: 0,
+                                                itemIGSTPercentage: 0,
+                                                itemSGSTAmount: 0,
+                                                itemCGSTAmount: 0,
+                                                itemIGSTAmount: 0,
+                                                purchaseEntryMode: 0,
+                                                purchaseEntryType: 0,
+                                                createdUserCode:
+                                                    p.createdUserCode ?? 0,
+                                                createdDate: p.createdDate ??
+                                                    DateTime.now()
+                                                        .toIso8601String(),
+                                                updatedUserCode: null,
+                                                updatedDate: null,
+                                                coCode: 0,
+                                                computerName: '',
+                                                finYearCode: '',
+                                                stockRequiredEffect: 0,
+                                              );
 
-                                        // Add to itemsList
-                                        itemsList.add(newItem);
-                                        if (_activeRowIndex ==
-                                            items.length - 1) {
-                                          items.add(product.Info());
-                                          controllers.add(ItemRowControllers());
-                                        }
+                                              // Add to itemsList
+                                              itemsList.add(newItem);
+                                              if (_activeRowIndex ==
+                                                  items.length - 1) {
+                                                items.add(product.Info());
+                                                controllers
+                                                    .add(ItemRowControllers());
+                                              }
 
-                                        // Hide sub-table & clear selection
-                                        _showSubTable = false;
-                                        _searchResults.clear();
-                                        _activeRowIndex = null;
-                                        // Print current count
-                                        print(
-                                            "Current itemsList count: ${itemsList.length}");
-                                      }
-                                    });
-                                  },
-                                  cells: [
-                                    DataCell(Text("${index + 1}")),
-                                    DataCell(
-                                        Text(p.itemCode?.toString() ?? "")),
-                                    DataCell(Text(p.itemName ?? "")),
-                                    DataCell(
-                                        Text(p.batchNoRequired.toString())),
-                                    DataCell(Text(p.expiryDateFormat ?? "")),
-                                    DataCell(Text(p.hSNCode.toString())),
-                                    DataCell(
-                                        Text(p.maximumStockQty.toString())),
-                                    DataCell(
-                                        Text(p.maximumStockQty.toString())),
-                                    DataCell(Text(p.mRPRate.toString())),
-                                    DataCell(Text(p.purchaseRate.toString())),
-                                    DataCell(Text(p.salesRate.toString())),
-                                  ],
-                                );
-                              }).toList(),
-                            ),
+                                              // Hide sub-table & clear selection
+                                              _showSubTable = false;
+                                              _searchResults.clear();
+                                              _activeRowIndex = null;
+                                              // Print current count
+                                              print(
+                                                  "Current itemsList count: ${itemsList.length}");
+                                            }
+                                          });
+                                        },
+                                        cells: [
+                                          DataCell(Text("${index + 1}")),
+                                          DataCell(
+                                              Text(p.itemID?.toString() ?? "")),
+                                          DataCell(Text(p.itemName ?? "")),
+                                          DataCell(Text(
+                                              p.batchNoRequired.toString())),
+                                          DataCell(
+                                              Text(p.expiryDateFormat ?? "")),
+                                          DataCell(Text(p.hSNCode.toString())),
+                                          DataCell(Text(
+                                              p.maximumStockQty.toString())),
+                                          DataCell(Text(
+                                              p.maximumStockQty.toString())),
+                                          DataCell(Text(p.mRPRate.toString())),
+                                          DataCell(
+                                              Text(p.purchaseRate.toString())),
+                                          DataCell(
+                                              Text(p.salesRate.toString())),
+                                        ],
+                                      );
+                                    }).toList(),
+                                  )
+                                : Container(
+                                    padding: const EdgeInsets.all(12),
+                                    alignment: Alignment.center,
+                                    child: const Text(
+                                      "No item found",
+                                      style: TextStyle(
+                                        color: red,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  ),
                           ),
                         ),
-                      ),
+                      )
                   ],
                 );
               }),
@@ -1558,19 +1663,8 @@ class _AddPurchaseMasterPageState extends State<AddPurchaseMasterPage> {
             : SizedBox());
   }
 
-  void _showEditPopup(BuildContext context, product.Info item, int index) {
-    // Setup controllers with existing values
-    final discountPercentageController = TextEditingController(
-        text: item.itemDiscountPercentage?.toString() ?? "");
-    final discountValueController =
-        TextEditingController(text: item.itemDiscountValue?.toString() ?? "");
-    final gstPercentageController =
-        TextEditingController(text: item.gstPercentage?.toString() ?? "");
-    final gstValueController = TextEditingController(text: "");
-    final taxableValueController = TextEditingController(text: "");
-    final netRateController = TextEditingController(text: "");
-    final netValueController = TextEditingController(text: "");
-    final remarkController = TextEditingController(text: "");
+  void _showEditPopup(BuildContext context, int index) {
+    final controller = controllers[index]; // get row’s controllers
 
     showDialog(
       context: context,
@@ -1579,21 +1673,100 @@ class _AddPurchaseMasterPageState extends State<AddPurchaseMasterPage> {
           backgroundColor: white,
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          title: const Text("Edit Item"),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                _buildTextField(
-                    "Discount Percentage", discountPercentageController),
-                _buildTextField("Discount Value", discountValueController),
-                _buildTextField("GST Percentage", gstPercentageController),
-                _buildTextField("GST Value", gstValueController),
-                _buildTextField("Taxable Value", taxableValueController),
-                _buildTextField("Net Rate", netRateController),
-                _buildTextField("Net Value", netValueController),
-                _buildTextField("Remark", remarkController),
-              ],
+          content: SizedBox(
+            width: 600,
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    "Purchase Entry",
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: black,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    "Product Name: ${controller.itemNameController.text}",
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: black,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Left Column - existing fields
+                      Expanded(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            _buildTextField(
+                                "Item Name", controller.itemNameController),
+                            _buildTextField(
+                                "Batch No", controller.batchNoController),
+                            _buildTextField(
+                                "Expiry", controller.expiryController),
+                            _buildTextField(
+                                "HSN Code", controller.hsnController),
+                            _buildTextField("Qty", controller.qtyController,
+                                keyboardType: TextInputType.number),
+                            _buildTextField(
+                                "MRP/Rate", controller.mrpController,
+                                keyboardType: TextInputType.number),
+                            _buildTextField(
+                                "Sales Rate", controller.salesRateController,
+                                keyboardType: TextInputType.number),
+                            _buildTextField("GST %", controller.gstController,
+                                keyboardType: TextInputType.number),
+                            _buildTextField(
+                                "GST Value", controller.gstValueController,
+                                keyboardType: TextInputType.number),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+
+                      // Right Column - new controllers
+                      Expanded(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            _buildTextField("Discount %",
+                                controller.discountPercentageController,
+                                keyboardType: TextInputType.number),
+                            _buildTextField("Discount Value",
+                                controller.discountValueController,
+                                keyboardType: TextInputType.number),
+                            _buildTextField(
+                                "GST %", controller.gstPercentageController,
+                                keyboardType: TextInputType.number),
+                            _buildTextField(
+                                "GST Value", controller.gstValueController,
+                                keyboardType: TextInputType.number),
+                            _buildTextField("Taxable Value",
+                                controller.taxableValueController,
+                                keyboardType: TextInputType.number),
+                            _buildTextField(
+                                "Net Rate", controller.netRateController,
+                                keyboardType: TextInputType.number),
+                            _buildTextField(
+                                "Net Value", controller.netValueController,
+                                keyboardType: TextInputType.number),
+                            _buildTextField(
+                                "Remark", controller.remarkController),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
           actions: [
@@ -1603,23 +1776,9 @@ class _AddPurchaseMasterPageState extends State<AddPurchaseMasterPage> {
             ),
             ElevatedButton(
               onPressed: () {
-                // ✅ Update item in list
                 setState(() {
-                  // items[index].itemDiscountPercentage =
-                  //     double.tryParse(discountPercentageController.text) ?? 0;
-                  // items[index].discountValue =
-                  //     int.tryParse(discountValueController.text) ?? 0;
-                  // items[index].gstPercentage =
-                  //     int.tryParse(gstPercentageController.text) ?? 0;
-                  // items[index].gstValue =
-                  //     int.tryParse(gstValueController.text) ?? 0;
-                  // items[index].taxableValue =
-                  //     double.tryParse(taxableValueController.text) ?? 0.0;
-                  // items[index].netRate =
-                  //     double.tryParse(netRateController.text) ?? 0.0;
-                  // items[index].netValue =
-                  //     double.tryParse(netValueController.text) ?? 0.0;
-                  // items[index].remark = remarkController.text;
+                  _calculateTotalSalesRate();
+                  // No need to manually assign — controllers are already linked to DataTable
                 });
                 Navigator.pop(context);
               },
@@ -1631,12 +1790,13 @@ class _AddPurchaseMasterPageState extends State<AddPurchaseMasterPage> {
     );
   }
 
-// helper widget
-  Widget _buildTextField(String label, TextEditingController controller) {
+  Widget _buildTextField(String label, TextEditingController controller,
+      {TextInputType keyboardType = TextInputType.text}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6.0),
       child: TextField(
         controller: controller,
+        keyboardType: keyboardType,
         decoration: InputDecoration(
           labelText: label,
           border: const OutlineInputBorder(),
@@ -1644,4 +1804,104 @@ class _AddPurchaseMasterPageState extends State<AddPurchaseMasterPage> {
       ),
     );
   }
+
+  void _showAddEditBottomSheet(product.Info? unit) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true, // almost full screen
+      backgroundColor: white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (context) => Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom, // handle keyboard
+        ),
+        child: SizedBox(
+          height: MediaQuery.of(context).size.height * 0.85,
+          child: AddProductMasterPage(
+            unitInfo: unit,
+            onSaved: (success) {
+              Navigator.pop(context); // close sheet
+              _onSaved(success); // your callback
+            },
+          ),
+        ),
+      ),
+    );
+  }
+  // void _showEditPopup(BuildContext context, product.Info item, int index) {
+  //   // Setup controllers with existing values
+  //   final discountPercentageController = TextEditingController(
+  //       text: item.itemDiscountPercentage?.toString() ?? "");
+  //   final discountValueController =
+  //       TextEditingController(text: item.itemDiscountValue?.toString() ?? "");
+  //   final gstPercentageController =
+  //       TextEditingController(text: item.gstPercentage?.toString() ?? "");
+  //   final gstValueController = TextEditingController(text: "");
+  //   final taxableValueController = TextEditingController(text: "");
+  //   final netRateController = TextEditingController(text: "");
+  //   final netValueController = TextEditingController(text: "");
+  //   final remarkController = TextEditingController(text: "");
+
+  //   showDialog(
+  //     context: context,
+  //     builder: (context) {
+  //       return AlertDialog(
+  //         backgroundColor: white,
+  //         shape:
+  //             RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+  //         title: const Text("Edit Item"),
+  //         content: SingleChildScrollView(
+  //           child: Column(
+  //             mainAxisSize: MainAxisSize.min,
+  //             children: [
+  //               _buildTextField(
+  //                   "Discount Percentage", discountPercentageController),
+  //               _buildTextField("Discount Value", discountValueController),
+  //               _buildTextField("GST Percentage", gstPercentageController),
+  //               _buildTextField("GST Value", gstValueController),
+  //               _buildTextField("Taxable Value", taxableValueController),
+  //               _buildTextField("Net Rate", netRateController),
+  //               _buildTextField("Net Value", netValueController),
+  //               _buildTextField("Remark", remarkController),
+  //             ],
+  //           ),
+  //         ),
+  //         actions: [
+  //           TextButton(
+  //             onPressed: () => Navigator.pop(context),
+  //             child: const Text("Cancel"),
+  //           ),
+  //           ElevatedButton(
+  //             onPressed: () {
+  //               // ✅ Update item in list
+  //               setState(() {
+  //                 // items[index].itemDiscountPercentage =
+  //                 //     double.tryParse(discountPercentageController.text) ?? 0;
+  //                 // items[index].discountValue =
+  //                 //     int.tryParse(discountValueController.text) ?? 0;
+  //                 // items[index].gstPercentage =
+  //                 //     int.tryParse(gstPercentageController.text) ?? 0;
+  //                 // items[index].gstValue =
+  //                 //     int.tryParse(gstValueController.text) ?? 0;
+  //                 // items[index].taxableValue =
+  //                 //     double.tryParse(taxableValueController.text) ?? 0.0;
+  //                 // items[index].netRate =
+  //                 //     double.tryParse(netRateController.text) ?? 0.0;
+  //                 // items[index].netValue =
+  //                 //     double.tryParse(netValueController.text) ?? 0.0;
+  //                 // items[index].remark = remarkController.text;
+  //               });
+  //               Navigator.pop(context);
+  //             },
+  //             child: const Text("Save"),
+  //           ),
+  //         ],
+  //       );
+  //     },
+  //   );
+  // }
+
+// helper widget
 }

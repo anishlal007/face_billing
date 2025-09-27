@@ -35,7 +35,8 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _selectedParentIndex = 0;
-  int? _selectedSubIndex; // null means no sub-item selected
+  int? _selectedSubIndex;
+  bool _isMenuCollapsed = false;
 
   final List<MenuItemData> menuItems = [
     MenuItemData(
@@ -78,7 +79,7 @@ class _HomePageState extends State<HomePage> {
           page: const HnsMasterPage(),
         ),
         MenuItemData(
-          title:  "TAX Master",
+          title: "TAX Master",
           icon: Icons.ac_unit,
           page: const TaxMasterPage(),
         ),
@@ -96,7 +97,7 @@ class _HomePageState extends State<HomePage> {
           title: "Company Master",
           icon: Icons.ac_unit,
           page: const CompanyMasterPage(),
-        ), 
+        ),
         MenuItemData(
           title: "User Master",
           icon: Icons.ac_unit,
@@ -133,16 +134,6 @@ class _HomePageState extends State<HomePage> {
           page: const FinanceYearMaster(),
         ),
         MenuItemData(
-          title: "Product Master",
-          icon: Icons.money,
-          page: const ProductMasterPage(),
-        ),
-        MenuItemData(
-          title: "Purchase Master",
-          icon: Icons.money,
-          page: const PurchaseMasterPage(),
-        ),
-        MenuItemData(
           title: "Generics Master",
           icon: Icons.money,
           page: const GenericsMasterPage(),
@@ -150,12 +141,21 @@ class _HomePageState extends State<HomePage> {
       ],
     ),
     MenuItemData(
+      title: "Product Master",
+      icon: Icons.production_quantity_limits_rounded,
+      page: const ProductMasterPage(),
+    ),
+    MenuItemData(
+      title: "Purchase Master",
+      icon: Icons.shopping_basket,
+      page: const PurchaseMasterPage(),
+    ),
+    MenuItemData(
       title: "Transactions",
       icon: Icons.swap_horiz,
       page: const TransactionsPage(),
     ),
   ];
-
   Widget _getSelectedPage() {
     final parent = menuItems[_selectedParentIndex];
 
@@ -180,16 +180,24 @@ class _HomePageState extends State<HomePage> {
                 .subItems![_selectedSubIndex!]
                 .title
             : menuItems[_selectedParentIndex].title,
+        isMenuCollapsed: _isMenuCollapsed,
+        onToggleMenu: () {
+          setState(() {
+            _isMenuCollapsed = !_isMenuCollapsed;
+          });
+        },
       ),
       drawer: isMobile
           ? SideMenu(
               menuItems: menuItems,
               selectedParentIndex: _selectedParentIndex,
               selectedSubIndex: _selectedSubIndex,
+              isCollapsed: false, // Drawer always full
               onItemSelected: (parentIndex, [subIndex]) {
                 setState(() {
                   _selectedParentIndex = parentIndex;
                   _selectedSubIndex = subIndex;
+                  Navigator.pop(context);
                 });
               },
             )
@@ -201,6 +209,7 @@ class _HomePageState extends State<HomePage> {
               menuItems: menuItems,
               selectedParentIndex: _selectedParentIndex,
               selectedSubIndex: _selectedSubIndex,
+              isCollapsed: _isMenuCollapsed,
               onItemSelected: (parentIndex, [subIndex]) {
                 setState(() {
                   _selectedParentIndex = parentIndex;
@@ -208,7 +217,7 @@ class _HomePageState extends State<HomePage> {
                 });
               },
             ),
-          Expanded(child: HomeBody(page: _getSelectedPage())),
+          Expanded(child: _getSelectedPage()),
         ],
       ),
     );
