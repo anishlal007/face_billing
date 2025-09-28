@@ -6,10 +6,14 @@ typedef FetchCallback<T extends Object> = Future<List<T>> Function(
 typedef DisplayString<T extends Object> = String Function(T option);
 typedef OnSelected<T extends Object> = void Function(T selected);
 
+// ✅ New typedef
+typedef OnSubmitted<T extends Object> = void Function(String value);
+
 class SearchDropdownField<T extends Object> extends StatefulWidget {
   final FetchCallback<T> fetchItems; // API fetcher
   final DisplayString<T> displayString; // show item text
   final OnSelected<T> onSelected; // return selected item
+  final OnSubmitted<T>? onSubmitted; // ✅ new callback
   final String hintText;
   final IconData prefixIcon;
 
@@ -18,6 +22,7 @@ class SearchDropdownField<T extends Object> extends StatefulWidget {
     required this.fetchItems,
     required this.displayString,
     required this.onSelected,
+    this.onSubmitted, // ✅
     this.hintText = "Search",
     this.prefixIcon = Icons.search,
   });
@@ -56,8 +61,16 @@ class _SearchDropdownFieldState<T extends Object>
       fieldViewBuilder:
           (context, textEditingController, focusNode, onFieldSubmitted) {
         return TextField(
-          controller: textEditingController, // ✅ Use provided controller
-          focusNode: focusNode, // ✅ Use provided focusNode
+          controller: textEditingController,
+          focusNode: focusNode,
+          onSubmitted: (value) {
+            // ✅ trigger parent callback
+            if (widget.onSubmitted != null) {
+              widget.onSubmitted!(value);
+            }
+            // Also call RawAutocomplete's onFieldSubmitted
+            onFieldSubmitted();
+          },
           decoration: InputDecoration(
             hintText: widget.hintText,
             prefixIcon: Icon(widget.prefixIcon),

@@ -135,33 +135,47 @@ class _AddCountryScreenState extends State<AddCountryScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            SearchDropdownField<CountryInfo>(
-              hintText: "Search Country",
-              prefixIcon: Icons.search,
-              fetchItems: (q) async {
-                final response = await _service.getCountriesSearch(q);
-                if (response.isSuccess) {
-                  return (response.data?.info ?? [])
-                      .whereType<CountryInfo>()
-                      .toList();
-                }
-                return [];
-              },
-              displayString: (country) => country.countryName ?? "",
-              onSelected: (country) {
-                setState(() {
-                  _countryIdController.text = country.countryId ?? "";
-                  _countryNameController.text = country.countryName ?? "";
-                  _createdUserController.text =
-                      country.createdUserCode?.toString() ?? "1001";
-                  _activeStatus = (country.activeStatus ?? 1) == 1;
-                });
-
-                // ✅ Switch form into "Update mode"
-                widget.onSaved(false);
-              },
-            ),
-
+           SearchDropdownField<CountryInfo>(
+            
+  hintText: "Search Country",
+  prefixIcon: Icons.search,
+  //textController: _countryNameController,
+  fetchItems: (q) async {
+    final response = await _service.getCountriesSearch(q);
+    if (response.isSuccess) {
+      final list = (response.data?.info ?? []).whereType<CountryInfo>().toList();
+      return list;
+    }
+    return [];
+  },
+  displayString: (country) => country.countryName ?? "",
+  onSelected: (country) {
+    if (country != null) {
+      // ✅ Country selected from API list
+      setState(() {
+        _countryIdController.text = country.countryId ?? "";
+        _countryNameController.text = country.countryName ?? "";
+        _createdUserController.text =
+            country.createdUserCode?.toString() ?? "1001";
+        _activeStatus = (country.activeStatus ?? 1) == 1;
+      });
+      widget.onSaved(false);
+    }
+  },
+  onSubmitted: (typedValue) {
+    // ✅ User pressed enter or confirmed text without selecting
+    setState(() {
+      _countryIdController.clear(); // no id since not from API
+      _countryNameController.text = typedValue; 
+      print("_countryNameController.text");// use typed text
+      print(_countryNameController.text);// use typed text
+      _createdUserController.text = "1001";
+      _activeStatus = true;
+    });
+    widget.onSaved(false);
+  },
+),
+         
             const SizedBox(height: 26),
             // SwitchListTile(
             //   value: _activeStatus,
@@ -187,23 +201,23 @@ class _AddCountryScreenState extends State<AddCountryScreen> {
                 ),
               ],
             ),
-            CustomTextField(
-              title: "Country Name",
-              hintText: "Enter Country Name",
-              controller: _countryNameController,
-              prefixIcon: Icons.flag,
-              isValidate: true,
-              validator: (value) =>
-                  value == null || value.isEmpty ? "Enter country name" : null,
-              focusNode: _countryNameFocus,
-              textInputAction: TextInputAction.next,
-              // onEditingComplete: () {
-              //   FocusScope.of(context).requestFocus(_createdUserFocus);
-              // },
-              onEditingComplete: () => _fieldFocusChange(
-                  context, _countryNameFocus, _countryIdFocus),
-              autoFocus: true,
-            ),
+            // CustomTextField(
+            //   title: "Country Name",
+            //   hintText: "Enter Country Name",
+            //   controller: _countryNameController,
+            //   prefixIcon: Icons.flag,
+            //   isValidate: true,
+            //   validator: (value) =>
+            //       value == null || value.isEmpty ? "Enter country name" : null,
+            //   focusNode: _countryNameFocus,
+            //   textInputAction: TextInputAction.next,
+            //   // onEditingComplete: () {
+            //   //   FocusScope.of(context).requestFocus(_createdUserFocus);
+            //   // },
+            //   onEditingComplete: () => _fieldFocusChange(
+            //       context, _countryNameFocus, _countryIdFocus),
+            //   autoFocus: true,
+            // ),
             const SizedBox(height: 16),
             CustomTextField(
               title: "Country Code",

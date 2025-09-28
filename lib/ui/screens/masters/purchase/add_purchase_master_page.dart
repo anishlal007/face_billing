@@ -137,6 +137,7 @@ class _AddPurchaseMasterPageState extends State<AddPurchaseMasterPage> {
   }
 
   String? error;
+bool _isBottomBarExpanded = false;
 
   ///model
 
@@ -612,7 +613,7 @@ class _AddPurchaseMasterPageState extends State<AddPurchaseMasterPage> {
     final isEdit = widget.unitInfo != null;
 
     return Scaffold(
-        backgroundColor: gray,
+        backgroundColor: white,
         body: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(16.0),
@@ -679,7 +680,7 @@ class _AddPurchaseMasterPageState extends State<AddPurchaseMasterPage> {
                       width: constraints.maxWidth / columns - 20,
                       child: CustomDropdownField<int>(
                         title: "Supplier Name",
-                        hintText: "Choose a Supplier Name",
+                        hintText: "Select Supplier Name",
                         items: getAllMasterListModel!.info!.suppliers!
                             .map((e) => DropdownMenuItem<int>(
                                   value: e.supCode!,
@@ -938,7 +939,7 @@ class _AddPurchaseMasterPageState extends State<AddPurchaseMasterPage> {
 
                           const DataColumn(
                               label: Text(
-                            "Back No",
+                            "Batch No",
                             style: TextStyle(color: white),
                           )),
                           const DataColumn(
@@ -948,7 +949,7 @@ class _AddPurchaseMasterPageState extends State<AddPurchaseMasterPage> {
                           )),
                           const DataColumn(
                               label: Text(
-                            "VOM",
+                            "UOM",
                             style: TextStyle(color: white),
                           )),
                           const DataColumn(
@@ -1187,27 +1188,33 @@ class _AddPurchaseMasterPageState extends State<AddPurchaseMasterPage> {
 
                                         // ✅ Delete icon
                                         IconButton(
-                                          icon: const Icon(Icons.delete,
-                                              color: red),
-                                          onPressed: () {
-                                            setState(() {
-                                              items.removeAt(index);
-                                              if (items.isEmpty)
-                                                items.add(product.Info());
-                                            });
-                                          },
-                                        ),
+  icon: const Icon(Icons.delete, color: red),
+  onPressed: () {
+    setState(() {
+      if (items.length > 1) {
+        // ✅ Delete row at the same index for both lists
+        items.removeAt(index);
+        controllers.removeAt(index);
+      } else {
+        // ✅ If it's the last row, just reset it instead of deleting
+        items[0] = product.Info();
+        controllers[0] = ItemRowControllers();
+      }
+    });
+  },
+),
                                       ],
                                     )
                                   : const SizedBox.shrink(), // nothing if empty
                             ),
+                         
                           ]);
                         }),
                       ),
                     ),
 
                     const SizedBox(
-                      height: 20,
+                      height: 0,
                     ),
                     if (!_showSubTable)
                       SizedBox(
@@ -1464,203 +1471,193 @@ class _AddPurchaseMasterPageState extends State<AddPurchaseMasterPage> {
                           ),
                         ),
                       )
+                 
                   ],
                 );
               }),
             ),
           ),
         ),
-        bottomNavigationBar: controllers.length > 1
-            ? Container(
-                color: white,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal, // avoid overflow
-                  child: Column(
+      bottomNavigationBar: Container(
+      color: white,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (_isBottomBarExpanded) ...[
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  GstDataTableWidget(totalAmount: _totalSalesRate),
+                  const SizedBox(width: 16),
+                  // First column
+                  Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-//             Text(
-//   "Total Sales Rate: $_totalSalesRate",
-//   style: const TextStyle(
-//     fontSize: 16,
-//     fontWeight: FontWeight.bold,
-//     color: Colors.blue,
-//   ),
-// ),
-                          GstDataTableWidget(
-                            totalAmount: _totalSalesRate,
-                          ),
-                          const SizedBox(width: 16),
-                          // Your first column
-                          Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              LabeledTextField(
-                                focusNode: _sgstpreFocus,
-                                label: "SGST %",
-                                controller: _sgstpreController,
-                              ),
-                              LabeledTextField(
-                                focusNode: _cgstpreFocus,
-                                label: "CGST %",
-                                controller: _cgstpreController,
-                                readOnly: true,
-                              ),
-                              LabeledTextField(
-                                focusNode: _igstpreFocus,
-                                label: "IGST %",
-                                controller: _igstpreController,
-                                readOnly: true,
-                              ),
-                            ],
-                          ),
-
-                          const SizedBox(width: 16),
-                          // Your second column
-                          Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              LabeledTextField(
-                                focusNode: _sgstAmtFocus,
-                                label: "SGST Amount",
-                                controller: _sgstAmtController,
-                                readOnly: true,
-                              ),
-                              LabeledTextField(
-                                focusNode: _cgstAmtFocus,
-                                label: "CGST Amount",
-                                controller: _cgstAmtController,
-                                readOnly: true,
-                              ),
-                              LabeledTextField(
-                                focusNode: _igstAmtFocus,
-                                label: "IGST Amount",
-                                controller: _igstAmtController,
-                                readOnly: true,
-                              ),
-                              LabeledTextField(
-                                focusNode: _totalGstAmtFocus,
-                                label: "Total GST Amount",
-                                controller: _totalGstAmtController,
-                                readOnly: true,
-                              ),
-                            ],
-                          ),
-                          const SizedBox(width: 16),
-                          // Your third column
-                          Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              LabeledTextField(
-                                focusNode: _subTotalFocus,
-                                label: "Sub Total Value",
-                                controller: _subTotalValueController,
-                                readOnly: true,
-                              ),
-                              LabeledTextField(
-                                focusNode: _gstValueFocus,
-                                label: "GST Value",
-                                controller: _gstValueController,
-                                readOnly: true,
-                              ),
-                              LabeledTextField(
-                                focusNode: _discountFocus,
-                                label: "Discount",
-                                controller: _discountController,
-                                readOnly: true,
-                              ),
-                              LabeledTextField(
-                                focusNode: _roundOFfFocus,
-                                label: "Round Off",
-                                controller: _roundOffController,
-                                readOnly: true,
-                              ),
-                              LabeledTextField(
-                                focusNode: _frightFocus,
-                                label: "Freight Charges",
-                                controller: _frightChargesController,
-                                readOnly: true,
-                              ),
-                              LabeledTextField(
-                                focusNode: _roundOFfFocus,
-                                label: "Net Amount",
-                                controller: _netAmountController,
-                                readOnly: true,
-                              ),
-                            ],
-                          ),
-                        ],
+                      LabeledTextField(
+                        focusNode: _sgstpreFocus,
+                        label: "SGST %",
+                        controller: _sgstpreController,
                       ),
-                      const SizedBox(height: 16),
-
-                      // Row with 3 buttons
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: green,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
-                            onPressed: () {
-                              _submit();
-                              // Save logic here
-                            },
-                            child: const Text(
-                              "Save",
-                              style: TextStyle(color: white),
-                            ),
-                          ),
-                          const SizedBox(
-                            width: 20,
-                          ),
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: primary,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
-                            onPressed: () {
-                              _submit();
-                              // Edit logic here
-                            },
-                            child: const Text(
-                              "Edit",
-                              style: TextStyle(color: white),
-                            ),
-                          ),
-                          const SizedBox(
-                            width: 20,
-                          ),
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: red,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
-                            onPressed: () {
-                              // Delete logic here
-                            },
-                            child: const Text(
-                              "Delete",
-                              style: TextStyle(color: white),
-                            ),
-                          ),
-                        ],
+                      LabeledTextField(
+                        focusNode: _cgstpreFocus,
+                        label: "CGST %",
+                        controller: _cgstpreController,
+                        readOnly: true,
+                      ),
+                      LabeledTextField(
+                        focusNode: _igstpreFocus,
+                        label: "IGST %",
+                        controller: _igstpreController,
+                        readOnly: true,
                       ),
                     ],
                   ),
+                  const SizedBox(width: 16),
+                  // Second column
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      LabeledTextField(
+                        focusNode: _sgstAmtFocus,
+                        label: "SGST Amount",
+                        controller: _sgstAmtController,
+                        readOnly: true,
+                      ),
+                      LabeledTextField(
+                        focusNode: _cgstAmtFocus,
+                        label: "CGST Amount",
+                        controller: _cgstAmtController,
+                        readOnly: true,
+                      ),
+                      LabeledTextField(
+                        focusNode: _igstAmtFocus,
+                        label: "IGST Amount",
+                        controller: _igstAmtController,
+                        readOnly: true,
+                      ),
+                      LabeledTextField(
+                        focusNode: _totalGstAmtFocus,
+                        label: "Total GST Amount",
+                        controller: _totalGstAmtController,
+                        readOnly: true,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(width: 16),
+                  // Third column
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      LabeledTextField(
+                        focusNode: _subTotalFocus,
+                        label: "Sub Total Value",
+                        controller: _subTotalValueController,
+                        readOnly: true,
+                      ),
+                      LabeledTextField(
+                        focusNode: _gstValueFocus,
+                        label: "GST Value",
+                        controller: _gstValueController,
+                        readOnly: true,
+                      ),
+                      LabeledTextField(
+                        focusNode: _discountFocus,
+                        label: "Discount",
+                        controller: _discountController,
+                        readOnly: true,
+                      ),
+                      LabeledTextField(
+                        focusNode: _roundOFfFocus,
+                        label: "Round Off",
+                        controller: _roundOffController,
+                        readOnly: true,
+                      ),
+                      LabeledTextField(
+                        focusNode: _frightFocus,
+                        label: "Freight Charges",
+                        controller: _frightChargesController,
+                        readOnly: true,
+                      ),
+                      LabeledTextField(
+                        focusNode: _roundOFfFocus,
+                        label: "Net Amount",
+                        controller: _netAmountController,
+                        readOnly: true,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+
+              // Save / Edit / Delete buttons
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: green,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    onPressed: _submit,
+                    child: const Text("Save", style: TextStyle(color: white)),
+                  ),
+                  const SizedBox(width: 20),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: primary,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    onPressed: _submit,
+                    child: const Text("Edit", style: TextStyle(color: white)),
+                  ),
+                  const SizedBox(width: 20),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: red,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    onPressed: () {
+                      // Delete logic
+                    },
+                    child: const Text("Delete", style: TextStyle(color: white)),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+            ],
+
+            // Always visible Show/Hide button
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: primary,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
                 ),
-              )
-            : SizedBox());
+              ),
+              onPressed: () {
+                setState(() {
+                  _isBottomBarExpanded = !_isBottomBarExpanded;
+                });
+              },
+              child: Text(
+                _isBottomBarExpanded ? "Hide" : "Show",
+                style: const TextStyle(color: white),
+              ),
+            ),
+          ],
+        ),
+      ),
+    ));
   }
 
   void _showEditPopup(BuildContext context, int index) {
@@ -1830,78 +1827,5 @@ class _AddPurchaseMasterPageState extends State<AddPurchaseMasterPage> {
       ),
     );
   }
-  // void _showEditPopup(BuildContext context, product.Info item, int index) {
-  //   // Setup controllers with existing values
-  //   final discountPercentageController = TextEditingController(
-  //       text: item.itemDiscountPercentage?.toString() ?? "");
-  //   final discountValueController =
-  //       TextEditingController(text: item.itemDiscountValue?.toString() ?? "");
-  //   final gstPercentageController =
-  //       TextEditingController(text: item.gstPercentage?.toString() ?? "");
-  //   final gstValueController = TextEditingController(text: "");
-  //   final taxableValueController = TextEditingController(text: "");
-  //   final netRateController = TextEditingController(text: "");
-  //   final netValueController = TextEditingController(text: "");
-  //   final remarkController = TextEditingController(text: "");
 
-  //   showDialog(
-  //     context: context,
-  //     builder: (context) {
-  //       return AlertDialog(
-  //         backgroundColor: white,
-  //         shape:
-  //             RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-  //         title: const Text("Edit Item"),
-  //         content: SingleChildScrollView(
-  //           child: Column(
-  //             mainAxisSize: MainAxisSize.min,
-  //             children: [
-  //               _buildTextField(
-  //                   "Discount Percentage", discountPercentageController),
-  //               _buildTextField("Discount Value", discountValueController),
-  //               _buildTextField("GST Percentage", gstPercentageController),
-  //               _buildTextField("GST Value", gstValueController),
-  //               _buildTextField("Taxable Value", taxableValueController),
-  //               _buildTextField("Net Rate", netRateController),
-  //               _buildTextField("Net Value", netValueController),
-  //               _buildTextField("Remark", remarkController),
-  //             ],
-  //           ),
-  //         ),
-  //         actions: [
-  //           TextButton(
-  //             onPressed: () => Navigator.pop(context),
-  //             child: const Text("Cancel"),
-  //           ),
-  //           ElevatedButton(
-  //             onPressed: () {
-  //               // ✅ Update item in list
-  //               setState(() {
-  //                 // items[index].itemDiscountPercentage =
-  //                 //     double.tryParse(discountPercentageController.text) ?? 0;
-  //                 // items[index].discountValue =
-  //                 //     int.tryParse(discountValueController.text) ?? 0;
-  //                 // items[index].gstPercentage =
-  //                 //     int.tryParse(gstPercentageController.text) ?? 0;
-  //                 // items[index].gstValue =
-  //                 //     int.tryParse(gstValueController.text) ?? 0;
-  //                 // items[index].taxableValue =
-  //                 //     double.tryParse(taxableValueController.text) ?? 0.0;
-  //                 // items[index].netRate =
-  //                 //     double.tryParse(netRateController.text) ?? 0.0;
-  //                 // items[index].netValue =
-  //                 //     double.tryParse(netValueController.text) ?? 0.0;
-  //                 // items[index].remark = remarkController.text;
-  //               });
-  //               Navigator.pop(context);
-  //             },
-  //             child: const Text("Save"),
-  //           ),
-  //         ],
-  //       );
-  //     },
-  //   );
-  // }
-
-// helper widget
 }

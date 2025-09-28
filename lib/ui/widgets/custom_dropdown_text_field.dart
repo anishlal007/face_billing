@@ -108,15 +108,15 @@ class _CustomDropdownFieldState<T> extends State<CustomDropdownField<T>> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (widget.title != null)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 6),
-              child: Text(
-                widget.title!,
-                style:
-                    const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-              ),
-            ),
+          // if (widget.title != null)
+          //   Padding(
+          //     padding: const EdgeInsets.only(bottom: 6),
+          //     child: Text(
+          //       widget.title!,
+          //       style:
+          //           const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+          //     ),
+          //   ),
           Row(
             children: [
               Expanded(
@@ -126,6 +126,7 @@ class _CustomDropdownFieldState<T> extends State<CustomDropdownField<T>> {
                   hint: Text(widget.hintText ?? "Select"),
                   icon: const Icon(Icons.arrow_drop_down),
                   decoration: InputDecoration(
+                      labelText: widget.title,
                     prefixIcon: widget.prefixIcon != null
                         ? Icon(widget.prefixIcon)
                         : null,

@@ -61,18 +61,18 @@ class _CustomTextFieldState extends State<CustomTextField> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (widget.title != null)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 6),
-            child: Text(
-              widget.title!,
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: Colors.black87,
-              ),
-            ),
-          ),
+        // if (widget.title != null)
+        //   Padding(
+        //     padding: const EdgeInsets.only(bottom: 6),
+        //     child: Text(
+        //       widget.title!,
+        //       style: const TextStyle(
+        //         fontSize: 14,
+        //         fontWeight: FontWeight.w500,
+        //         color: Colors.black87,
+        //       ),
+        //     ),
+        //   ),
         TextField(
           controller: widget.controller,
           focusNode: widget.focusNode,
@@ -90,6 +90,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
               widget.isNumeric ? [FilteringTextInputFormatter.digitsOnly] : [],
 
           decoration: InputDecoration(
+             labelText: widget.title,
             hintText: widget.hintText,
             prefixIcon:
                 widget.prefixIcon != null ? Icon(widget.prefixIcon) : null,

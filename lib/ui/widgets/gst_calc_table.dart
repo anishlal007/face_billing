@@ -1,3 +1,4 @@
+import 'package:facebilling/core/colors.dart';
 import 'package:flutter/material.dart';
 
 class GstDataTableWidget extends StatefulWidget {
@@ -61,50 +62,66 @@ class _GstDataTableWidgetState extends State<GstDataTableWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: DataTable(
-        headingRowColor: MaterialStateProperty.all(Colors.blue.shade50),
-        columns: const [
-          DataColumn(label: Text('GST%')),
-          DataColumn(label: Text('GST Amount')),
-          DataColumn(label: Text('Total Amount')),
-        ],
-        rows: List.generate(gstRates.length, (index) {
-          return DataRow(cells: [
-            DataCell(Text("${gstRates[index]}%")),
-            DataCell(
-              SizedBox(
-                width: 100,
-                child: TextField(
-                  controller: _gstAmountControllers[index],
-                  readOnly: true,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    isDense: true,
-                    contentPadding:
-                        EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+    return Container(
+          margin: const EdgeInsets.all(8),
+    padding: const EdgeInsets.all(8),
+    decoration: BoxDecoration(
+      color: white,
+      borderRadius: BorderRadius.circular(8),
+      border: Border.all(color: gray, width: 1),
+      boxShadow: [
+        BoxShadow(
+          color: black,
+          blurRadius: 6,
+          offset: const Offset(2, 2),
+        ),
+      ],
+    ),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: DataTable(
+          headingRowColor: MaterialStateProperty.all(primary),
+          columns: const [
+            DataColumn(label: Text('GST%',style: TextStyle(color: white),)),
+            DataColumn(label: Text('GST Amount',style: TextStyle(color: white),)),
+            DataColumn(label: Text('Total Amount',style: TextStyle(color: white),)),
+          ],
+          rows: List.generate(gstRates.length, (index) {
+            return DataRow(cells: [
+              DataCell(Text("${gstRates[index]}%")),
+              DataCell(
+                SizedBox(
+                  width: 100,
+                  child: TextField(
+                    controller: _gstAmountControllers[index],
+                    readOnly: true,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      isDense: true,
+                      contentPadding:
+                          EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                    ),
                   ),
                 ),
               ),
-            ),
-            DataCell(
-              SizedBox(
-                width: 100,
-                child: TextField(
-                  controller: _totalAmountControllers[index],
-                  readOnly: true,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    isDense: true,
-                    contentPadding:
-                        EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+              DataCell(
+                SizedBox(
+                  width: 100,
+                  child: TextField(
+                    controller: _totalAmountControllers[index],
+                    readOnly: true,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      isDense: true,
+                      contentPadding:
+                          EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                    ),
                   ),
                 ),
               ),
-            ),
-          ]);
-        }),
+            ]);
+          }),
+        ),
       ),
     );
   }
