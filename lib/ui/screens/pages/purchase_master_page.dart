@@ -1,29 +1,23 @@
-import 'package:facebilling/ui/screens/masters/purchase/add_purchase_master_page.dart' show AddPurchaseMasterPage;
+import 'package:facebilling/ui/screens/entrys/purchase/add_purchase_master_page.dart'
+    show AddPurchaseMasterPage;
 import 'package:flutter/material.dart';
 
 import '../../../core/colors.dart';
-
-
-
-
 
 import '../../../data/models/purchase_model/purchase_list_model.dart';
 import '../masters/product_master/add_product_master_page.dart';
 import '../masters/user_master/add_user_master_page.dart';
 import '../masters/user_master/user_master_list_page.dart';
 
-
-
 class PurchaseMasterPage extends StatefulWidget {
   const PurchaseMasterPage({super.key});
 
   @override
-  State<PurchaseMasterPage> createState() =>
-      _PurchaseMasterPageState();
+  State<PurchaseMasterPage> createState() => _PurchaseMasterPageState();
 }
 
 class _PurchaseMasterPageState extends State<PurchaseMasterPage> {
-   Info? editingUnit;
+  Info? editingUnit;
   bool refreshList = false;
 
   void _onSaved(bool success) {
@@ -65,14 +59,12 @@ class _PurchaseMasterPageState extends State<PurchaseMasterPage> {
   @override
   Widget build(BuildContext context) {
     final isMobile = MediaQuery.of(context).size.width < 600;
- return Scaffold(
+    return Scaffold(
       backgroundColor: lightgray,
       body: AddPurchaseMasterPage(
         unitInfo: editingUnit,
         onSaved: _onSaved,
       ),
     );
-   
- 
   }
 }

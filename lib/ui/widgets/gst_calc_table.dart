@@ -63,28 +63,40 @@ class _GstDataTableWidgetState extends State<GstDataTableWidget> {
   @override
   Widget build(BuildContext context) {
     return Container(
-          margin: const EdgeInsets.all(8),
-    padding: const EdgeInsets.all(8),
-    decoration: BoxDecoration(
-      color: white,
-      borderRadius: BorderRadius.circular(8),
-      border: Border.all(color: gray, width: 1),
-      boxShadow: [
-        BoxShadow(
-          color: black,
-          blurRadius: 6,
-          offset: const Offset(2, 2),
-        ),
-      ],
-    ),
+      margin: const EdgeInsets.all(8),
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: white,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: gray, width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: const Color.fromARGB(50, 0, 0, 0),
+            blurRadius: 2,
+            offset: const Offset(1, 1),
+          ),
+        ],
+      ),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: DataTable(
           headingRowColor: MaterialStateProperty.all(primary),
           columns: const [
-            DataColumn(label: Text('GST%',style: TextStyle(color: white),)),
-            DataColumn(label: Text('GST Amount',style: TextStyle(color: white),)),
-            DataColumn(label: Text('Total Amount',style: TextStyle(color: white),)),
+            DataColumn(
+                label: Text(
+              'GST%',
+              style: TextStyle(color: white),
+            )),
+            DataColumn(
+                label: Text(
+              'GST Amount',
+              style: TextStyle(color: white),
+            )),
+            DataColumn(
+                label: Text(
+              'Total Amount',
+              style: TextStyle(color: white),
+            )),
           ],
           rows: List.generate(gstRates.length, (index) {
             return DataRow(cells: [

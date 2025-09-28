@@ -141,12 +141,12 @@ class _HomePageState extends State<HomePage> {
       ],
     ),
     MenuItemData(
-      title: "Product Master",
+      title: "Product",
       icon: Icons.production_quantity_limits_rounded,
       page: const ProductMasterPage(),
     ),
     MenuItemData(
-      title: "Purchase Master",
+      title: "Purchase",
       icon: Icons.shopping_basket,
       page: const PurchaseMasterPage(),
     ),
