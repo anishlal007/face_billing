@@ -421,34 +421,7 @@ class _AddProductMasterPageState extends State<AddProductMasterPage> {
                 runSpacing: 16,
                 children: [
                   // Example fields (replace with all your CustomTextField/Dropdown etc.)
-                  SearchDropdownField<Info>(
-                    hintText: "Search Product",
-                    // prefixIcon: Icons.search,
-                    fetchItems: (q) async {
-                      final response =
-                          await _service.getProductServiceSearch(q);
-                      if (response.isSuccess) {
-                        return (response.data?.info ?? [])
-                            .whereType<Info>()
-                            .toList();
-                      }
-                      return [];
-                    },
-                    displayString: (unit) => unit.itemName ?? "",
-                    onSelected: (country) {
-                      setState(() {
-                        _itemIdController.text =
-                            country.itemCode.toString() ?? "";
-                        _itemNameController.text = country.itemName ?? "";
-                        // _createdUserController.text =
-                        //     country.createdUserCode?.toString() ?? "1001";
-                        // _activeStatus = (country.custActiveStatus ?? 1) == 1;
-                      });
 
-                      // ✅ Switch form into "Update mode"
-                      widget.onSaved(false);
-                    },
-                  ),
                   SizedBox(
                     width: constraints.maxWidth,
                     child: Row(
@@ -496,21 +469,65 @@ class _AddProductMasterPageState extends State<AddProductMasterPage> {
                   ),
                   SizedBox(
                     width: constraints.maxWidth / columns - 30,
-                    child: CustomTextField(
-                      title: "Product Name",
-                      hintText: "Enter Product Name",
-                      controller: _itemNameController,
-                      // prefixIcon: Icons.flag,
-                      isValidate: true,
-                      validator: (value) => value == null || value.isEmpty
-                          ? "Enter Product Name"
-                          : null,
-                      focusNode: _itemNameFocus,
-                      textInputAction: TextInputAction.next,
-                      onEditingComplete: () => _fieldFocusChange(
-                          context, _itemNameFocus, _itemTypeFocus),
-                      // autoFocus: true,
+                    child: SearchDropdownField<Info>(
+                      hintText: "Search Product",
+                      // prefixIcon: Icons.search,
+                      fetchItems: (q) async {
+                        final response =
+                            await _service.getProductServiceSearch(q);
+                        if (response.isSuccess) {
+                          return (response.data?.info ?? [])
+                              .whereType<Info>()
+                              .toList();
+                        }
+                        return [];
+                      },
+                      displayString: (unit) => unit.itemName ?? "",
+                      onSelected: (country) {
+                        setState(() {
+                          _itemIdController.text =
+                              country.itemCode.toString() ?? "";
+                          _itemNameController.text = country.itemName ?? "";
+                          // _createdUserController.text =
+                          //     country.createdUserCode?.toString() ?? "1001";
+                          // _activeStatus = (country.custActiveStatus ?? 1) == 1;
+                        });
+
+                        // ✅ Switch form into "Update mode"
+                        widget.onSaved(false);
+                      },
+
+                      onSubmitted: (typedValue) {
+                        // ✅ User pressed enter or confirmed text without selecting
+                        setState(() {
+                          _itemNameController
+                              .clear(); // no id since not from API
+                          _itemNameController.text = typedValue;
+                          print(
+                              "_countryNameController.text"); // use typed text
+                          print(_itemNameController.text); // use typed text
+                          _createdUserController.text = "1001";
+                          _activeStatus = true;
+                        });
+                        widget.onSaved(false);
+                      },
                     ),
+
+                    // CustomTextField(
+                    //   title: "Product Name",
+                    //   hintText: "Enter Product Name",
+                    //   controller: _itemNameController,
+                    //   // prefixIcon: Icons.flag,
+                    //   isValidate: true,
+                    //   validator: (value) => value == null || value.isEmpty
+                    //       ? "Enter Product Name"
+                    //       : null,
+                    //   focusNode: _itemNameFocus,
+                    //   textInputAction: TextInputAction.next,
+                    //   onEditingComplete: () => _fieldFocusChange(
+                    //       context, _itemNameFocus, _itemTypeFocus),
+                    //   // autoFocus: true,
+                    // ),
                   ),
                   SizedBox(
                     width: constraints.maxWidth / columns - 30,
