@@ -164,8 +164,9 @@ class _AddAreaMasterPageState extends State<AddAreaMasterPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
+            
             SearchDropdownField<Info>(
-              hintText: "Search Area",
+              hintText: "Area Name",
               prefixIcon: Icons.search,
               fetchItems: (q) async {
                 final response = await _service.getAreaMasterSearch(q);
@@ -176,7 +177,8 @@ class _AddAreaMasterPageState extends State<AddAreaMasterPage> {
               },
               displayString: (unit) => unit.areaName ?? "",
               onSelected: (country) {
-                setState(() {
+                  if (country != null) {
+     setState(() {
                   _unitIdController.text = country.areaCode.toString() ?? "";
                   _unitNameController.text = country.areaName ?? "";
                   // _createdUserController.text =
@@ -186,7 +188,21 @@ class _AddAreaMasterPageState extends State<AddAreaMasterPage> {
 
                 // ✅ Switch form into "Update mode"
                 widget.onSaved(false);
+    }
+                
               },
+               onSubmitted: (typedValue) {
+    // ✅ User pressed enter or confirmed text without selecting
+    setState(() {
+      _unitIdController.clear(); // no id since not from API
+      _unitNameController.text = typedValue; 
+      print("_countryNameController.text");// use typed text
+      print(_unitNameController.text);// use typed text
+      _createdUserController.text = "1001";
+      _activeStatus = true;
+    });
+    widget.onSaved(false);
+  },
             ),
 
             const SizedBox(height: 26),
@@ -219,21 +235,22 @@ class _AddAreaMasterPageState extends State<AddAreaMasterPage> {
             //   },
             // ),
             const SizedBox(height: 16),
-            CustomTextField(
-              title: "Area Name",
-              hintText: "Enter Area Name",
-              controller: _unitNameController,
-              prefixIcon: Icons.flag,
-              isValidate: true,
-              validator: (value) =>
-                  value == null || value.isEmpty ? "Enter Area name" : null,
-              focusNode: _unitNameFocus,
-              textInputAction: TextInputAction.next,
-              onEditingComplete: () {
-                // FocusScope.of(context).requestFocus(_createdUserFocus);
-              },
-            ),
-            const SizedBox(height: 16),
+            // CustomTextField(
+            //   title: "Area Name",
+            //   hintText: "Enter Area Name",
+            //   controller: _unitNameController,
+            //   prefixIcon: Icons.flag,
+            //   isValidate: true,
+            //   validator: (value) =>
+            //       value == null || value.isEmpty ? "Enter Area name" : null,
+            //   focusNode: _unitNameFocus,
+            //   textInputAction: TextInputAction.next,
+            //   onEditingComplete: () {
+            //     // FocusScope.of(context).requestFocus(_createdUserFocus);
+            //   },
+            // ),
+            // const SizedBox(height: 16),
+           
             CustomDropdownField<int>(
               title: "Select State",
               hintText: "Choose State",

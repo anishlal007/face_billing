@@ -21,6 +21,7 @@ import '../../../widgets/gst_calc_table.dart';
 import '../../../widgets/label_textfield.dart';
 import '../../../widgets/product_drop_down_field.dart';
 import '../../../widgets/product_search_field.dart';
+import '../../../widgets/search_dropdown.dart';
 import '../../../widgets/search_dropdown_field.dart';
 import '../../masters/product_master/add_product_master_page.dart';
 import 'add_purchase_controller.dart';
@@ -618,7 +619,8 @@ class _AddPurchaseMasterPageState extends State<AddPurchaseMasterPage> {
             padding: const EdgeInsets.all(16.0),
             child: Form(
               key: _formKey,
-              child: LayoutBuilder(builder: (context, constraints) {
+              child:
+               LayoutBuilder(builder: (context, constraints) {
                 int columns = 1; // default mobile
                 if (constraints.maxWidth > 1200) {
                   columns = 5;
@@ -674,38 +676,36 @@ class _AddPurchaseMasterPageState extends State<AddPurchaseMasterPage> {
                             context, _supNameFocus, _invoiceDateFocus),
                       ),
                     ),
-
+SizedBox(
+  width: constraints.maxWidth / columns - 20,
+  child: SearchableDropdown<master.Suppliers>(
+    hintText:"Select Supplier",
+    items: getAllMasterListModel!.info!.suppliers!,
+    itemLabel: (supplier) => supplier.supName ?? "",
+    onChanged: (supplier) {
+      if (supplier != null) {
+        _supplierNameController.text = supplier.supCode.toString();
+        print("Selected Code: ${supplier.supCode}");
+        print("Selected Name: ${supplier.supName}");
+      }
+    },
+  ),
+),
                     SizedBox(
                       width: constraints.maxWidth / columns - 20,
-                      child: CustomDropdownField<int>(
-                        title: "Supplier Name",
-                        hintText: "Select Supplier Name",
-                        items: getAllMasterListModel!.info!.suppliers!
-                            .map((e) => DropdownMenuItem<int>(
-                                  value: e.supCode!,
-                                  child: Text("${e.supName}"),
-                                ))
-                            .toList(),
-                        // initialValue: _taxCode, // ✅ use int value here
-                        onChanged: (value) {
-                          setState(() {
-                            //_taxCode = value;  // uhttps://dart.dev/diagnostics/cast_to_non_typepdate dropdown selection
-                            _supplierNameController.text = value
-                                .toString(); // update text controller if needed
-                          });
-
-                          final selected = getAllMasterListModel!
-                              .info!.suppliers!
-                              ?.firstWhere((c) => c.supCode == value,
-                                  orElse: () => master.Suppliers());
-
-                          print("Selected: ${selected?.supCode}");
-                          print("TAX Code: ${selected?.supName}");
-                        },
-                        isValidate: true,
-                        validator: (value) =>
-                            value == null ? "Please select a GST" : null,
-                      ),
+                       child: SearchableDropdown<master.Suppliers>(
+    hintText:"Supplier Name",
+    items: getAllMasterListModel!.info!.suppliers!,
+    itemLabel: (supplier) => supplier.supName ?? "",
+    onChanged: (supplier) {
+      if (supplier != null) {
+        _supplierNameController.text = supplier.supCode.toString();
+        print("Selected Code: ${supplier.supCode}");
+        print("Selected Name: ${supplier.supName}");
+      }
+    },
+  ),
+                    
                     ),
                     SizedBox(
                       width: constraints.maxWidth / columns - 20,
@@ -1474,6 +1474,7 @@ class _AddPurchaseMasterPageState extends State<AddPurchaseMasterPage> {
                   ],
                 );
               }),
+           
             ),
           ),
         ),

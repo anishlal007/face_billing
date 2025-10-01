@@ -137,7 +137,7 @@ class _AddCountryScreenState extends State<AddCountryScreen> {
           children: [
            SearchDropdownField<CountryInfo>(
             
-  hintText: "Search Country",
+  hintText: "Country Name",
   prefixIcon: Icons.search,
   //textController: _countryNameController,
   fetchItems: (q) async {

@@ -509,14 +509,15 @@ class _AddCompanyMasterPageState extends State<AddCompanyMasterPage> {
                   SizedBox(
                     width: constraints.maxWidth / columns - 20,
                     child: CustomDropdownField<int>(
+                      
                       title: "Select Country",
                       hintText: "Choose Country",
-                      items: getAllMasterListModel!.info!.countries!
-                          .map((e) => DropdownMenuItem<int>(
-                                value: e.countryCode, // 🔹 use taxCode as value
-                                child: Text("${e.countryName} "),
-                              ))
-                          .toList(),
+                  items: getAllMasterListModel!.info!.countries!
+    .map((e) => DropdownMenuItem<int>(
+          value: e.countryCode,
+          child: Text(e.countryName!), // ✅ must be Text
+        ))
+    .toList(),
                       // initialValue: _taxCode, // int? taxCode
                       onChanged: (value) {
                         setState(() {

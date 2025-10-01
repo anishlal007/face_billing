@@ -80,6 +80,7 @@ class _CountryMasterScreenState extends State<CountryMasterScreen> {
                       refreshList: refreshList,
                       onEdit: (country) {
                         setState(() {
+                          
                           editingCountry = country;
                           refreshList = false;
                         });

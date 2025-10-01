@@ -24,6 +24,7 @@ import '../../../widgets/custom_switch.dart';
 import '../../../widgets/custom_text_field.dart';
 import '../../../widgets/gradient_button.dart';
 import '../../../widgets/image_pickerField.dart';
+import '../../../widgets/search_dropdown.dart';
 import '../../../widgets/search_dropdown_field.dart';
 
 class AddProductMasterPage extends StatefulWidget {
@@ -554,85 +555,100 @@ class _AddProductMasterPageState extends State<AddProductMasterPage> {
                   //   ),
                   // ),
                   // 🔹 Continue wrapping all your fields the same way
-                  SizedBox(
-                    width: constraints.maxWidth / columns - 20,
-                    child: CustomDropdownField<int>(
-                      title: "Select Item Group",
-                      hintText: "Choose Item Group",
-                      items: getAllMasterListModel!.info!.itemGroups!
-                          .map((e) => DropdownMenuItem<int>(
-                                value:
-                                    e.itemGroupCode, // 🔹 use taxCode as value
-                                child: Text("${e.itemGroupName} "),
-                              ))
-                          .toList(),
-                      // initialValue: _taxCode, // int? taxCode
-                      onChanged: (value) {
-                        setState(() {
-                          _itemGroup = value;
-                          //  _taxCode = value;
-                        });
-
-                        final selected = getAllMasterListModel!
-                            .info!.itemGroups!
-                            .firstWhere((c) => c.itemGroupCode == value,
-                                orElse: () => master.ItemGroups());
-                      },
-                      isValidate: true,
-                      validator: (value) =>
-                          value == null ? "Please select Item Group" : null,
-                      focusNode: _itemGroupFocus,
-                      onEditingComplete: () => _fieldFocusChange(
+SizedBox(
+  width: constraints.maxWidth / columns - 20,
+  child: SearchableDropdown<master.ItemGroups>(
+    hintText: "Item Group",
+    items: getAllMasterListModel!.info!.itemGroups!,
+    itemLabel: (group) => group.itemGroupName ?? "",
+    onChanged: (group) {
+      if (group != null) {
+        _itemGroup = group.itemGroupCode;
+        print("Selected Code: ${group.itemGroupCode}");
+        print("Selected Name: ${group.itemGroupName}");
+      }
+    },
+          onEditingComplete: () => _fieldFocusChange(
                         context,
                         _itemGroupFocus,
                         _itemUnitCodeFocus,
                       ),
-                      addPage: Addgroupscreen(
-                        onSaved: (success) {
-                          if (success) {
+    // Add page popup
+    addPage: Addgroupscreen(
+      onSaved: (success) {
+            if (success) {
                             Navigator.pop(context, true);
                           }
-                        },
-                      ),
-                      addTooltip: "Add Item Group",
-                    ),
-                  ),
-                  SizedBox(
-                    width: constraints.maxWidth / columns - 20,
-                    child: CustomDropdownField<int>(
-                      title: "Select Item Make",
-                      hintText: "Choose  Item Make",
-                      items: getAllMasterListModel!.info!.itemMakes!
-                          .map((e) => DropdownMenuItem<int>(
-                                value:
-                                    e.itemMakeCode, // 🔹 use taxCode as value
-                                child: Text("${e.itemMaketName} "),
-                              ))
-                          .toList(),
-                      // initialValue: _taxCode, // int? taxCode
-                      onChanged: (value) {
-                        setState(() {
-                          _itemMake = value;
-                          //  _taxCode = value;
-                        });
+      },
+    ),
+    addTooltip: "Add Item Group",
+  ),
+),
+                  // SizedBox(
+                  //   width: constraints.maxWidth / columns - 20,
+                  //   child: 
+                  //   CustomDropdownField<int>(
+                  //     title: "Select Item Group",
+                  //     hintText: "Choose Item Group",
+                  //     items: getAllMasterListModel!.info!.itemGroups!
+                  //         .map((e) => DropdownMenuItem<int>(
+                  //               value:
+                  //                   e.itemGroupCode, // 🔹 use taxCode as value
+                  //               child: Text("${e.itemGroupName} "),
+                  //             ))
+                  //         .toList(),
+                  //     // initialValue: _taxCode, // int? taxCode
+                  //     onChanged: (value) {
+                  //       setState(() {
+                  //         _itemGroup = value;
+                  //         //  _taxCode = value;
+                  //       });
 
-                        final selected = getAllMasterListModel!.info!.itemMakes!
-                            .firstWhere((c) => c.itemMakeCode == value,
-                                orElse: () => master.ItemMakes());
-
-                        print("Selected GST %: ${selected.itemMakeCode}");
-                        print("Selected TAX Code: ${selected.itemMakeCode}");
-                      },
-                      isValidate: true,
-                      validator: (value) =>
-                          value == null ? "Please select Item Make Code" : null,
-                      focusNode: _itemMakeCodeFocus,
-                      onEditingComplete: () => _fieldFocusChange(
+                  //       final selected = getAllMasterListModel!
+                  //           .info!.itemGroups!
+                  //           .firstWhere((c) => c.itemGroupCode == value,
+                  //               orElse: () => master.ItemGroups());
+                  //     },
+                  //     isValidate: true,
+                  //     validator: (value) =>
+                  //         value == null ? "Please select Item Group" : null,
+                  //     focusNode: _itemGroupFocus,
+                      // onEditingComplete: () => _fieldFocusChange(
+                      //   context,
+                      //   _itemGroupFocus,
+                      //   _itemUnitCodeFocus,
+                      // ),
+                  //     addPage: Addgroupscreen(
+                  //       onSaved: (success) {
+                  //         if (success) {
+                  //           Navigator.pop(context, true);
+                  //         }
+                  //       },
+                  //     ),
+                  //     addTooltip: "Add Item Group",
+                  //   ),
+                  // ),
+               SizedBox(
+  width: constraints.maxWidth / columns - 20,
+  child: SearchableDropdown<master.ItemMakes>(
+    hintText: "Item Make",
+    items: getAllMasterListModel!.info!.itemMakes!,
+    itemLabel: (group) => group.itemMaketName ?? "",
+    onChanged: (group) {
+      if (group != null) {
+        _itemMake = group.itemMakeCode;
+        print("Selected Code: ${group.itemMakeCode}");
+        print("Selected Name: ${group.itemMaketName}");
+      }
+    },
+      focusNode: _itemMakeCodeFocus,
+         onEditingComplete: () => _fieldFocusChange(
                         context,
                         _itemMakeCodeFocus,
                         _itemGenericCodeFocus,
                       ),
-                      addPage: AddItemMakeMaster(
+    // Add page popup
+   addPage: AddItemMakeMaster(
                         onSaved: (success) {
                           if (success) {
                             Navigator.pop(context, true);
@@ -640,8 +656,9 @@ class _AddProductMasterPageState extends State<AddProductMasterPage> {
                         },
                       ),
                       addTooltip: "Add Item Make",
-                    ),
-                  ),
+  ),
+),
+                 
                   selectedPaymentType == 0
                       ? SizedBox(
                           width: constraints.maxWidth / columns - 20,
@@ -697,33 +714,20 @@ class _AddProductMasterPageState extends State<AddProductMasterPage> {
                     height: 10,
                   ),
                   const Divider(),
-
-                  SizedBox(
-                    width: constraints.maxWidth / columns - 20,
-                    child: CustomDropdownField<int>(
-                      title: "Select Unit",
-                      hintText: "Choose  Unit",
-                      items: getAllMasterListModel!.info!.units!
-                          .map((e) => DropdownMenuItem<int>(
-                                value: e.unitCode, // 🔹 use taxCode as value
-                                child: Text("${e.unitName} "),
-                              ))
-                          .toList(),
-                      // initialValue: _taxCode, // int? taxCode
-                      onChanged: (value) {
-                        setState(() {
-                          _itemUnit = value;
-                          //  _taxCode = value;
-                        });
-
-                        final selected = getAllMasterListModel!.info!.units!
-                            .firstWhere((c) => c.unitCode == value,
-                                orElse: () => master.Units());
-                      },
-                      isValidate: true,
-                      validator: (value) =>
-                          value == null ? "Please select Unit" : null,
-                      focusNode: _itemUnitCodeFocus,
+SizedBox(
+  width: constraints.maxWidth / columns - 20,
+  child: SearchableDropdown<master.Units>(
+    hintText: "Select unit",
+    items: getAllMasterListModel!.info!.units!,
+    itemLabel: (group) => group.unitName ?? "",
+    onChanged: (group) {
+      if (group != null) {
+        _unitCode = group.unitCode;
+        print("Selected Code: ${group.unitCode}");
+        print("Selected Name: ${group.unitName}");
+      }
+    },
+        focusNode: _itemUnitCodeFocus,
                       onEditingComplete: () => _fieldFocusChange(
                         context,
                         _itemUnitCodeFocus,
@@ -739,8 +743,10 @@ class _AddProductMasterPageState extends State<AddProductMasterPage> {
                         },
                       ),
                       addTooltip: "Add Unit",
-                    ),
-                  ),
+  ),
+),
+                 
+                 
                   SizedBox(
                     width: constraints.maxWidth / columns - 20,
                     child: CustomTextField(
@@ -998,33 +1004,26 @@ class _AddProductMasterPageState extends State<AddProductMasterPage> {
                     ),
                   ),
                   SizedBox(
-                    width: constraints.maxWidth / columns - 20,
-                    child: CustomDropdownField<int>(
-                      title: "HSN Code",
-                      hintText: "HSN Code",
-                      items: getAllMasterListModel!.info!.hsnMasters!
-                          .map((e) => DropdownMenuItem<int>(
-                                value: e.hsnCode, // 🔹 use taxCode as value
-                                child: Text("${e.hsnName}"),
-                              ))
-                          .toList(),
-                      // initialValue: _taxCode, // int? taxCode
-                      onChanged: (value) {
-                        setState(() {
-                          _taxCode = value;
-                          //  _taxCode = value;
-                        });
+  width: constraints.maxWidth / columns - 20,
+  child: SearchableDropdown<master.HsnMasters>(
+    hintText: "HSN Code",
+    items: getAllMasterListModel!.info!.hsnMasters!,
+    itemLabel: (group) => group.hsnName ?? "",
+    onChanged: (group) {
+      if (group != null) {
+        _taxCode = group.hsnCode;
+        print("Selected Code: ${group.hsnCode}");
+        print("Selected Name: ${group.hsnName}");
+      }
+    },
+        // focusNode: _itemUnitCodeFocus,
+        //               onEditingComplete: () => _fieldFocusChange(
+        //                 context,
+        //                 _itemUnitCodeFocus,
+        //                 _itemMakeCodeFocus,
+        //               ),
 
-                        final selected = getAllMasterListModel!
-                            .info!.hsnMasters!
-                            .firstWhere((c) => c.hsnCode == value,
-                                orElse: () => master.HsnMasters());
-                      },
-                      isValidate: true,
-                      validator: (value) =>
-                          value == null ? "Please select a GST" : null,
-
-                      addPage: AddHnsMasterPage(
+                        addPage: AddHnsMasterPage(
                         onSaved: (success) {
                           if (success) {
                             Navigator.pop(context, true);
@@ -1032,8 +1031,10 @@ class _AddProductMasterPageState extends State<AddProductMasterPage> {
                         },
                       ),
                       addTooltip: "Add HSN",
-                    ),
-                  ),
+  ),
+),
+        
+                  
                   SizedBox(
                     width: constraints.maxWidth / columns - 20,
                     child: CustomDropdownField<int>(

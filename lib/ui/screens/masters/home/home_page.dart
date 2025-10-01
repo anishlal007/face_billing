@@ -22,6 +22,7 @@ import '../../pages/supplier_master_page.dart';
 import '../../pages/transactions_page.dart';
 import '../../pages/tax_master_page.dart';
 import '../../pages/user_master_page.dart';
+import '../report_master/report_master_page.dart';
 import 'side_menu.dart';
 import 'top_navbar.dart';
 import 'home_body.dart';
@@ -149,6 +150,11 @@ class _HomePageState extends State<HomePage> {
       title: "Purchase",
       icon: Icons.shopping_basket,
       page: const PurchaseMasterPage(),
+    ),
+    MenuItemData(
+      title: "Reports",
+      icon: Icons.report,
+      page:  ReportMasterPage(),
     ),
     MenuItemData(
       title: "Transactions",
