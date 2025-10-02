@@ -28,7 +28,7 @@ class AddGenericsMasterPage extends StatefulWidget {
 class _AddGenericsMasterPageState extends State<AddGenericsMasterPage> {
   final _formKey = GlobalKey<FormState>();
   final GenericsMasterServices _service = GenericsMasterServices();
-
+ bool _isEditMode = false; 
   bool _activeStatus = true;
   bool _loading = false;
   String? _message;
@@ -52,6 +52,7 @@ class _AddGenericsMasterPageState extends State<AddGenericsMasterPage> {
     // _createdUserController = TextEditingController(
     //     text: widget.countryInfo?.createdUserCode?.toString() ?? "1001");
     _activeStatus = (widget.unitInfo?.activeStatus ?? 1) == 1;
+      _isEditMode = widget.unitInfo != null;
   }
 
   @override
@@ -72,10 +73,7 @@ class _AddGenericsMasterPageState extends State<AddGenericsMasterPage> {
       _loading = true;
       _message = null;
     });
-
-    if (widget.unitInfo == null) {
-      // ADD mode
-     final request = AddGenericsMasterModel(
+    final request = AddGenericsMasterModel(
 
   genericName: _unitNameController.text.trim(),
   createdUserCode:  loadData.userCode,     // if this is the "user code"
@@ -85,29 +83,20 @@ class _AddGenericsMasterPageState extends State<AddGenericsMasterPage> {
   activeStatus: _activeStatus ? 1 : 0,
 );
 print("request");
-print(request);
-      final response = await _service.addGenericsMaster(request);
-      _handleResponse(response.isSuccess, response.error);
-    } else {
+print(request.toJson());
+       if (_isEditMode && widget.unitInfo != null) {
       // EDIT mode
- final updated = AddGenericsMasterModel(
- 
-
-  genericName: _unitNameController.text.trim(),
-  createdUserCode:  loadData.userCode,     // if this is the "user code"
- 
-                           // hardcoded or from logged-in user
-
-  activeStatus: _activeStatus ? 1 : 0,
-);
-     print("updated");
-     print(updated);
       final response = await _service.updateGenericsMaster(
         widget.unitInfo!.genericCode!,
-        updated,
+        request,
       );
       _handleResponse(response.isSuccess, response.error);
+    } else {
+      // ADD mode
+      final response = await _service.addGenericsMaster(request);
+      _handleResponse(response.isSuccess, response.error);
     }
+
   }
 
   void _handleResponse(bool success, String? error) {
@@ -127,6 +116,7 @@ print(request);
       // _createdUserController.text =
       //     widget.countryInfo?.createdUserCode?.toString() ?? "1001";
       _activeStatus = (widget.unitInfo?.activeStatus ?? 1) == 1;
+          _isEditMode = widget.unitInfo != null;
     }
   }
 
@@ -142,8 +132,9 @@ print(request);
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             SearchDropdownField<Info>(
-              hintText: "Search Generics",
+              hintText: "Generics Name",
               prefixIcon: Icons.search,
+               controller: _unitNameController,
               fetchItems: (q) async {
                 final response = await _service.getGenericsMasterSearch(q);
                 if (response.isSuccess) {
@@ -155,15 +146,28 @@ print(request);
               },
               displayString: (unit) => unit.genericName ?? "",
               onSelected: (country) {
+                 if (country != null) {
                 setState(() {
                   _unitIdController.text = country.genericCode.toString() ?? "";
                   _unitNameController.text = country.genericName ?? "";
                   // _createdUserController.text =
                   //     country.createdUserCode?.toString() ?? "1001";
                   _activeStatus = (country.activeStatus ?? 1) == 1;
+                  _isEditMode = true;
                 });
 
                 // ✅ Switch form into "Update mode"
+                widget.onSaved(false);
+                }
+              },
+                 onSubmitted: (typedValue) {
+                setState(() {
+                  _unitIdController.clear();
+                  _unitNameController.text = typedValue;
+                  //_createdUserController.text = "1001";
+                  _activeStatus = true;
+                  _isEditMode = false; // <-- back to Add mode
+                });
                 widget.onSaved(false);
               },
             ),
@@ -197,22 +201,22 @@ print(request);
             //     FocusScope.of(context).requestFocus(_unitNameFocus);
             //   },
             // ),
-            const SizedBox(height: 16),
-            CustomTextField(
-              title: "Generics Name",
-              hintText: "Enter Generics Name",
-              controller: _unitNameController,
-              prefixIcon: Icons.flag,
-              isValidate: true,
-              validator: (value) =>
-                  value == null || value.isEmpty ? "Enter Generics name" : null,
-              focusNode: _unitNameFocus,
-              textInputAction: TextInputAction.next,
-              onEditingComplete: () {
-                // FocusScope.of(context).requestFocus(_createdUserFocus);
-              },
-            ),
-            const SizedBox(height: 16),
+            // const SizedBox(height: 16),
+            // CustomTextField(
+            //   title: "Generics Name",
+            //   hintText: "Enter Generics Name",
+            //   controller: _unitNameController,
+            //   prefixIcon: Icons.flag,
+            //   isValidate: true,
+            //   validator: (value) =>
+            //       value == null || value.isEmpty ? "Enter Generics name" : null,
+            //   focusNode: _unitNameFocus,
+            //   textInputAction: TextInputAction.next,
+            //   onEditingComplete: () {
+            //     // FocusScope.of(context).requestFocus(_createdUserFocus);
+            //   },
+            // ),
+            // const SizedBox(height: 16),
             // CustomTextField(
             //   title: "Create User",
             //   controller: _createdUserController,
@@ -233,7 +237,7 @@ print(request);
               const CircularProgressIndicator()
             else
               GradientButton(
-                  text: isEdit ? "Update Generics" : "Add Generics",
+                  text: _isEditMode ? "Update Generics" : "Add Generics",
                   onPressed: _submit),
             if (_message != null) ...[
               const SizedBox(height: 16),

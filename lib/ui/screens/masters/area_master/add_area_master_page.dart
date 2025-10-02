@@ -38,7 +38,7 @@ class _AddAreaMasterPageState extends State<AddAreaMasterPage> {
   bool _loading = false;
   String? _message;
   int? _stateCode;
-
+  bool _isEditMode = false; 
   late TextEditingController _unitIdController;
   late TextEditingController _unitNameController;
   late TextEditingController _createdUserController;
@@ -59,6 +59,7 @@ class _AddAreaMasterPageState extends State<AddAreaMasterPage> {
     // _createdUserController = TextEditingController(
     //     text: widget.countryInfo?.createdUserCode?.toString() ?? "1001");
     _activeStatus = (widget.unitInfo?.activeStatus ?? 1) == 1;
+     _isEditMode = widget.unitInfo != null;
   }
 
   Future<void> _loadList() async {
@@ -95,15 +96,7 @@ class _AddAreaMasterPageState extends State<AddAreaMasterPage> {
       _loading = true;
       _message = null;
     });
-
-    if (widget.unitInfo == null) {
-      // ADD mode
-      String? areaId;
-      String? areaName;
-      int? stateCode;
-      int? createdUserCode;
-      int? activeStatus;
-      final request = AddAreaMasterModel(
+  final request = AddAreaMasterModel(
         areaName: _unitNameController.text.trim(),
         areaId: _unitIdController.text.trim(),
 
@@ -112,25 +105,19 @@ class _AddAreaMasterPageState extends State<AddAreaMasterPage> {
       );
       print("request");
       print(request);
-      final response = await _service.addAreaMaster(request);
-      _handleResponse(response.isSuccess, response.error);
-    } else {
+       if (_isEditMode && widget.unitInfo != null) {
       // EDIT mode
-      final updated = AddAreaMasterModel(
-        areaName: _unitNameController.text.trim(),
-        areaId: _unitIdController.text.trim(),
-
-        // current timestamp
-        activeStatus: _activeStatus ? 1 : 0,
-      );
-      print("updated");
-      print(updated);
       final response = await _service.updateAreaMaster(
         widget.unitInfo!.areaCode!,
-        updated,
+        request,
       );
       _handleResponse(response.isSuccess, response.error);
+    } else {
+      // ADD mode
+      final response = await _service.addAreaMaster(request);
+      _handleResponse(response.isSuccess, response.error);
     }
+
   }
 
   void _handleResponse(bool success, String? error) {
@@ -150,11 +137,15 @@ class _AddAreaMasterPageState extends State<AddAreaMasterPage> {
       // _createdUserController.text =
       //     widget.countryInfo?.createdUserCode?.toString() ?? "1001";
       _activeStatus = (widget.unitInfo?.activeStatus ?? 1) == 1;
+          _isEditMode = widget.unitInfo != null;
     }
   }
 
   @override
   Widget build(BuildContext context) {
+       if (_getAllLoading) return const Center(child: CircularProgressIndicator());
+    if (error != null) return Center(child: Text("Error: $error"));
+
     final isEdit = widget.unitInfo != null;
 
     return Padding(
@@ -166,6 +157,7 @@ class _AddAreaMasterPageState extends State<AddAreaMasterPage> {
           children: [
             
             SearchDropdownField<Info>(
+              controller: _unitNameController,
               hintText: "Area Name",
               prefixIcon: Icons.search,
               fetchItems: (q) async {
@@ -184,6 +176,7 @@ class _AddAreaMasterPageState extends State<AddAreaMasterPage> {
                   // _createdUserController.text =
                   //     country.createdUserCode?.toString() ?? "1001";
                   _activeStatus = (country.activeStatus ?? 1) == 1;
+                  _isEditMode = true;
                 });
 
                 // ✅ Switch form into "Update mode"
@@ -200,6 +193,7 @@ class _AddAreaMasterPageState extends State<AddAreaMasterPage> {
       print(_unitNameController.text);// use typed text
       _createdUserController.text = "1001";
       _activeStatus = true;
+            _isEditMode = false;
     });
     widget.onSaved(false);
   },
@@ -306,7 +300,7 @@ class _AddAreaMasterPageState extends State<AddAreaMasterPage> {
               const CircularProgressIndicator()
             else
               GradientButton(
-                  text: isEdit ? "Update Area" : "Add Area",
+                  text: _isEditMode ? "Update Area" : "Add Area",
                   onPressed: _submit),
             if (_message != null) ...[
               const SizedBox(height: 16),

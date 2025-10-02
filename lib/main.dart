@@ -1,6 +1,8 @@
 import 'package:facebilling/ui/screens/masters/home/home_page.dart';
 import 'package:flutter/material.dart';
 
+import 'ui/screens/pages/login_page.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -14,7 +16,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Inventory System',
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: const HomePage(),
+      home: const WebmailLoginScreen(),
     );
   }
 }

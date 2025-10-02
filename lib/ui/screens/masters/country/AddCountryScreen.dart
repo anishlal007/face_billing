@@ -38,10 +38,12 @@ class _AddCountryScreenState extends State<AddCountryScreen> {
   final FocusNode _countryNameFocus = FocusNode();
   final FocusNode _createdUserFocus = FocusNode();
 
+  bool _isEditMode = false; // <-- Tracks button text dynamically
+
   @override
   void initState() {
     super.initState();
-    Future.delayed(Duration(milliseconds: 300), () {
+    Future.delayed(const Duration(milliseconds: 300), () {
       FocusScope.of(context).requestFocus(_countryNameFocus);
     });
     _countryIdController =
@@ -51,6 +53,9 @@ class _AddCountryScreenState extends State<AddCountryScreen> {
     _createdUserController = TextEditingController(
         text: widget.countryInfo?.createdUserCode?.toString() ?? "1001");
     _activeStatus = (widget.countryInfo?.activeStatus ?? 1) == 1;
+
+    // Set edit mode if editing existing country
+    _isEditMode = widget.countryInfo != null;
   }
 
   void _fieldFocusChange(
@@ -78,28 +83,23 @@ class _AddCountryScreenState extends State<AddCountryScreen> {
       _message = null;
     });
 
-    if (widget.countryInfo == null) {
-      // ADD mode
-      final request = AddCountryRequest(
-        countryId: _countryIdController.text.trim(),
-        countryName: _countryNameController.text.trim(),
-        createdUserCode: int.parse(_createdUserController.text.trim()),
-        activeStatus: _activeStatus ? 1 : 0,
-      );
-      final response = await _service.addCountry(request);
-      _handleResponse(response.isSuccess, response.error);
-    } else {
+    final request = AddCountryRequest(
+      countryId: _countryIdController.text.trim(),
+      countryName: _countryNameController.text.trim(),
+      createdUserCode: int.parse(_createdUserController.text.trim()),
+      activeStatus: _activeStatus ? 1 : 0,
+    );
+
+    if (_isEditMode && widget.countryInfo != null) {
       // EDIT mode
-      final updated = AddCountryRequest(
-        countryId: _countryIdController.text.trim(),
-        countryName: _countryNameController.text.trim(),
-        createdUserCode: int.parse(_createdUserController.text.trim()),
-        activeStatus: _activeStatus ? 1 : 0,
-      );
       final response = await _service.updateCountry(
         widget.countryInfo!.countryCode!,
-        updated,
+        request,
       );
+      _handleResponse(response.isSuccess, response.error);
+    } else {
+      // ADD mode
+      final response = await _service.addCountry(request);
       _handleResponse(response.isSuccess, response.error);
     }
   }
@@ -112,22 +112,21 @@ class _AddCountryScreenState extends State<AddCountryScreen> {
     if (success) widget.onSaved(true);
   }
 
-  @override
-  void didUpdateWidget(covariant AddCountryScreen oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.countryInfo != oldWidget.countryInfo) {
-      _countryIdController.text = widget.countryInfo?.countryId ?? "";
-      _countryNameController.text = widget.countryInfo?.countryName ?? "";
-      _createdUserController.text =
-          widget.countryInfo?.createdUserCode?.toString() ?? "1001";
-      _activeStatus = (widget.countryInfo?.activeStatus ?? 1) == 1;
-    }
+@override
+void didUpdateWidget(covariant AddCountryScreen oldWidget) {
+  super.didUpdateWidget(oldWidget);
+  if (widget.countryInfo != oldWidget.countryInfo) {
+    _countryIdController.text = widget.countryInfo?.countryId ?? "";
+    _countryNameController.text = widget.countryInfo?.countryName ?? "";
+    _createdUserController.text =
+        widget.countryInfo?.createdUserCode?.toString() ?? "1001";
+    _activeStatus = (widget.countryInfo?.activeStatus ?? 1) == 1;
+    _isEditMode = widget.countryInfo != null; // update button too
   }
+}
 
   @override
   Widget build(BuildContext context) {
-    final isEdit = widget.countryInfo != null;
-
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Form(
@@ -136,19 +135,10 @@ class _AddCountryScreenState extends State<AddCountryScreen> {
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             const SizedBox(height: 26),
-            // SwitchListTile(
-            //   value: _activeStatus,
-            //   title: const Text("Active Status"),
-            //   onChanged: (val) => setState(() => _activeStatus = val),
-            // ),
             Row(
               crossAxisAlignment: CrossAxisAlignment.end,
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                // const Text("Country Status"),
-                // const SizedBox(
-                //   width: 10,
-                // ),
                 CustomSwitch(
                   value: _activeStatus,
                   title: "Is Discount Required",
@@ -160,10 +150,9 @@ class _AddCountryScreenState extends State<AddCountryScreen> {
                 ),
               ],
             ),
-            SizedBox(
-              height: 20,
-            ),
+            const SizedBox(height: 20),
             SearchDropdownField<CountryInfo>(
+              controller: _countryNameController,
               hintText: "Country Name",
               prefixIcon: Icons.search,
               fetchItems: (q) async {
@@ -179,47 +168,28 @@ class _AddCountryScreenState extends State<AddCountryScreen> {
               displayString: (country) => country.countryName ?? "",
               onSelected: (country) {
                 if (country != null) {
-                  // ✅ Country selected from API list
                   setState(() {
                     _countryIdController.text = country.countryId ?? "";
                     _countryNameController.text = country.countryName ?? "";
                     _createdUserController.text =
                         country.createdUserCode?.toString() ?? "1001";
                     _activeStatus = (country.activeStatus ?? 1) == 1;
+                    _isEditMode = true; // <-- update button text
                   });
                   widget.onSaved(false);
                 }
               },
               onSubmitted: (typedValue) {
-                // ✅ User pressed enter or confirmed text without selecting
                 setState(() {
-                  _countryIdController.clear(); // no id since not from API
+                  _countryIdController.clear();
                   _countryNameController.text = typedValue;
-                  print("_countryNameController.text"); // use typed text
-                  print(_countryNameController.text); // use typed text
                   _createdUserController.text = "1001";
                   _activeStatus = true;
+                  _isEditMode = false; // <-- back to Add mode
                 });
                 widget.onSaved(false);
               },
             ),
-            // CustomTextField(
-            //   title: "Country Name",
-            //   hintText: "Enter Country Name",
-            //   controller: _countryNameController,
-            //   prefixIcon: Icons.flag,
-            //   isValidate: true,
-            //   validator: (value) =>
-            //       value == null || value.isEmpty ? "Enter country name" : null,
-            //   focusNode: _countryNameFocus,
-            //   textInputAction: TextInputAction.next,
-            //   // onEditingComplete: () {
-            //   //   FocusScope.of(context).requestFocus(_createdUserFocus);
-            //   // },
-            //   onEditingComplete: () => _fieldFocusChange(
-            //       context, _countryNameFocus, _countryIdFocus),
-            //   autoFocus: true,
-            // ),
             const SizedBox(height: 16),
             CustomTextField(
               title: "Country Code",
@@ -244,17 +214,11 @@ class _AddCountryScreenState extends State<AddCountryScreen> {
               onEditingComplete: _submit,
             ),
             const SizedBox(height: 16),
-            // SwitchListTile(
-            //   value: _activeStatus,
-            //   title: const Text("Active Status"),
-            //   onChanged: (val) => setState(() => _activeStatus = val),
-            // ),
-            const SizedBox(height: 16),
             if (_loading)
               const CircularProgressIndicator()
             else
               GradientButton(
-                  text: isEdit ? "Update Country" : "Add Country",
+                  text: _isEditMode ? "Update Country" : "Add Country",
                   onPressed: _submit),
             if (_message != null) ...[
               const SizedBox(height: 16),

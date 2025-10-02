@@ -12,6 +12,7 @@ import '../../../widgets/custom_dropdown_text_field.dart';
 import '../../../widgets/custom_switch.dart';
 import '../../../widgets/custom_text_field.dart';
 import '../../../widgets/gradient_button.dart';
+import '../../../widgets/search_dropdown.dart';
 import '../../../widgets/search_dropdown_field.dart';
 
 class AddHnsMasterPage extends StatefulWidget {
@@ -47,6 +48,7 @@ class _AddHnsMasterPageState extends State<AddHnsMasterPage> {
   final FocusNode _taxNameFocus = FocusNode();
   // final FocusNode _createdUserFocus = FocusNode();
 dynamic _taxCode;
+  bool _isEditMode = false; 
   @override
   void initState() {
     super.initState();
@@ -61,6 +63,7 @@ _loadTax();
     // _createdUserController = TextEditingController(
     //     text: widget.countryInfo?.createdUserCode?.toString() ?? "1001");
     _activeStatus = (widget.unitInfo?.activeStatus ?? 1) == 1;
+      _isEditMode = widget.unitInfo != null;
   }
 
   @override
@@ -95,10 +98,6 @@ _loadTax();
       _loading = true;
       _message = null;
     });
-
-    if (widget.unitInfo == null) {
-      // ADD mode
-
 final request = AddHnsModel(
   hsnName: _unitNameController.text.trim(),   // ❌ not in model
   cratedUserCode: loadData.userCode,    // ✅ but should be user ID, not DateTime
@@ -107,27 +106,16 @@ final request = AddHnsModel(
   cessPercentage: 0,       // ✅ correct
   activeStatus: _activeStatus ? 1 : 0,                 // ✅ correct
 );
-print("request");
-print(request);
-      final response = await _service.addHnsMasterr(request);
-      _handleResponse(response.isSuccess, response.error);
-    } else {
+  if (_isEditMode && widget.unitInfo != null) {
       // EDIT mode
- final updated =  AddHnsModel(
-  
-  hsnName: _unitNameController.text.trim(),   // ❌ not in model
-  cratedUserCode: loadData.userCode,    // ✅ but should be user ID, not DateTime
-  gstPercentage:0,       // ✅ correct
-  hsnNo: _unitIdController.text.trim(),                               // ✅ int
-  cessPercentage: 0,       // ✅ correct
-  activeStatus: _activeStatus ? 1 : 0,                 // ✅ correct
-);
-     print("updated");
-     print(updated);
       final response = await _service.updateHnsMasterr(
         widget.unitInfo!.hsnCode!,
-        updated,
+        request,
       );
+      _handleResponse(response.isSuccess, response.error);
+    } else {
+      // ADD mode
+      final response = await _service.addHnsMasterr(request);
       _handleResponse(response.isSuccess, response.error);
     }
   }
@@ -175,6 +163,7 @@ print(request);
           children: [
             SearchDropdownField<Info>(
               hintText: "Search HNS",
+              controller: _taxNameController,
               prefixIcon: Icons.search,
               fetchItems: (q) async {
                 final response = await _service.getHnsMasterSearch(q);
@@ -186,18 +175,31 @@ print(request);
                 return [];
               },
               displayString: (unit) => unit.hsnName ?? "",
-              onSelected: (country) {
+                  onSelected: (country) {
+                  if (country != null) {
                 setState(() {
                   _unitIdController.text = country.hsnCode.toString() ?? "";
                   _unitNameController.text = country.hsnName ?? "";
-               _taxCode = widget.unitInfo?.gstPercentage; //
-                         _taxNameController.text = _taxCode?.toString() ?? ""; 
                   // _createdUserController.text =
                   //     country.createdUserCode?.toString() ?? "1001";
                   _activeStatus = (country.activeStatus ?? 1) == 1;
+                  _isEditMode = true;
                 });
 
                 // ✅ Switch form into "Update mode"
+                widget.onSaved(false);
+                }
+            
+                
+              },
+                   onSubmitted: (typedValue) {
+                setState(() {
+                  _unitIdController.clear();
+                  _unitNameController.text = typedValue;
+                  //_createdUserController.text = "1001";
+                  _activeStatus = true;
+                  _isEditMode = false; // <-- back to Add mode
+                });
                 widget.onSaved(false);
               },
             ),
@@ -217,6 +219,7 @@ print(request);
                 });
               },
             ),
+            const SizedBox(height: 16,),
             CustomTextField(
               title: "HSN Code",
               hintText: "Enter HSN Code",
@@ -233,46 +236,61 @@ print(request);
             ),
           
             const SizedBox(height: 16),
-            CustomTextField(
-              title: "HNS Name",
-              hintText: "Enter HNS Name",
-              controller: _unitNameController,
-              prefixIcon: Icons.flag,
-              isValidate: true,
-              validator: (value) =>
-                  value == null || value.isEmpty ? "Enter HNS name" : null,
-              focusNode: _unitNameFocus,
-              textInputAction: TextInputAction.next,
-              onEditingComplete: () {
-                // FocusScope.of(context).requestFocus(_createdUserFocus);
-              },
-            ),
+            // CustomTextField(
+            //   title: "HNS Name",
+            //   hintText: "Enter HNS Name",
+            //   controller: _unitNameController,
+            //   prefixIcon: Icons.flag,
+            //   isValidate: true,
+            //   validator: (value) =>
+            //       value == null || value.isEmpty ? "Enter HNS name" : null,
+            //   focusNode: _unitNameFocus,
+            //   textInputAction: TextInputAction.next,
+            //   onEditingComplete: () {
+            //     // FocusScope.of(context).requestFocus(_createdUserFocus);
+            //   },
+            // ),
             const SizedBox(height: 16),
-CustomDropdownField<int>(
-  title: "Select GST",
-  hintText: "Choose a GST",
-  items: taxMasterListModel!.info!
-      .map((e) => DropdownMenuItem<int>(
-            value: e.taxPercentage,
-            child: Text("${e.taxName} (${e.taxPercentage}%)"),
-          ))
-      .toList(),
-  initialValue: _taxCode, // ✅ use int value here
-  onChanged: (value) {
-    setState(() {
-      _taxCode = value;  // update dropdown selection
-      _taxNameController.text = value.toString(); // update text controller if needed
-    });
+                  SearchableDropdown<tax.Info>(
+                    
+                    hintText: "Select GST",
+                    items: taxMasterListModel!.info!,
+                    itemLabel: (supplier) => supplier.taxName ?? "",
+                    onChanged: (supplier) {
+                      if (supplier != null) {
+                        _taxCode= supplier.taxName.toString();
+                    
+                           
+                        print("Selected Code: ${supplier.taxCode}");
+                        print("Selected Name: ${supplier.taxName}");
+                      }
+                    },
+                  ),
+// CustomDropdownField<int>(
+//   title: "Select GST",
+//   hintText: "Choose a GST",
+//   items: taxMasterListModel!.info!
+//       .map((e) => DropdownMenuItem<int>(
+//             value: e.taxPercentage,
+//             child: Text("${e.taxName} (${e.taxPercentage}%)"),
+//           ))
+//       .toList(),
+//   initialValue: _taxCode, // ✅ use int value here
+//   onChanged: (value) {
+//     setState(() {
+//       _taxCode = value;  // update dropdown selection
+//       _taxNameController.text = value.toString(); // update text controller if needed
+//     });
 
-    final selected = taxMasterListModel!.info
-        ?.firstWhere((c) => c.taxCode == value, orElse: () => null as tax.Info);
+//     final selected = taxMasterListModel!.info
+//         ?.firstWhere((c) => c.taxCode == value, orElse: () => null as tax.Info);
 
-    print("Selected: ${selected?.taxPercentage}");
-    print("TAX Code: ${selected?.taxCode}");
-  },
-  isValidate: true,
-  validator: (value) => value == null ? "Please select a GST" : null,
-),
+//     print("Selected: ${selected?.taxPercentage}");
+//     print("TAX Code: ${selected?.taxCode}");
+//   },
+//   isValidate: true,
+//   validator: (value) => value == null ? "Please select a GST" : null,
+// ),
      
             // CustomTextField(
             //   title: "Create User",
@@ -294,7 +312,7 @@ CustomDropdownField<int>(
               const CircularProgressIndicator()
             else
               GradientButton(
-                  text: isEdit ? "Update HNS" : "Add HNS",
+                  text: _isEditMode ? "Update HNS" : "Add HNS",
                   onPressed: _submit),
             if (_message != null) ...[
               const SizedBox(height: 16),

@@ -27,7 +27,7 @@ class AddSupplierGroupMasterPage extends StatefulWidget {
 class _AddSupplierGroupMasterPageState extends State<AddSupplierGroupMasterPage> {
   final _formKey = GlobalKey<FormState>();
   final SupplierGroupMasterService _service = SupplierGroupMasterService();
-
+bool _isEditMode = false; 
   bool _activeStatus = true;
   bool _loading = false;
   String? _message;
@@ -55,6 +55,7 @@ Country? country;
     _countryNameController = TextEditingController(
         text: "");
     _activeStatus = (widget.unitInfo?.activeStatus ?? 1) == 1;
+      _isEditMode = widget.unitInfo != null;
   }
 
   @override
@@ -75,10 +76,6 @@ Country? country;
       _loading = true;
       _message = null;
     });
-
-    if (widget.unitInfo == null) {
-      // ADD mode
-
 final request = AddSupplierGroupMasterModel(
   supGroupName :_unitNameController.text.trim(),
  cratedUserCode: DateTime.now().toIso8601String(),     // required by API
@@ -86,25 +83,20 @@ final request = AddSupplierGroupMasterModel(
   activeStatus: _activeStatus ? 1 : 0,           // Active (1=Active, 0=Inactive)
 );
 print("request");
-print(request);
-      final response = await _service.addSupplierGroupMaster(request);
-      _handleResponse(response.isSuccess, response.error);
-    } else {
+print(request.toJson());
+    if (_isEditMode && widget.unitInfo != null) {
       // EDIT mode
- final updated = AddSupplierGroupMasterModel(
-  supGroupName :_unitNameController.text.trim(),
- cratedUserCode: DateTime.now().toIso8601String(),     // required by API
-  updatedUserCode: "1001", 
-  activeStatus: _activeStatus ? 1 : 0,
-);
-     print("updated");
-     print(updated);
       final response = await _service.updateSupplierGroupMasterr(
         widget.unitInfo!.supGroupCode!,
-        updated,
+        request,
       );
       _handleResponse(response.isSuccess, response.error);
+    } else {
+      // ADD mode
+      final response = await _service.addSupplierGroupMaster(request);
+      _handleResponse(response.isSuccess, response.error);
     }
+
   }
 
   void _handleResponse(bool success, String? error) {
@@ -124,6 +116,7 @@ print(request);
       // _createdUserController.text =
       //     widget.countryInfo?.createdUserCode?.toString() ?? "1001";
       _activeStatus = (widget.unitInfo?.activeStatus ?? 1) == 1;
+       _isEditMode = widget.unitInfo != null;
     }
   }
 
@@ -139,7 +132,8 @@ print(request);
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             SearchDropdownField<Info>(
-              hintText: "Search State",
+              hintText: "Supplier Group Name",
+               controller: _unitNameController,
               prefixIcon: Icons.search,
               fetchItems: (q) async {
                 final response = await _service.getSupplierGroupMasterSearch(q);
@@ -152,15 +146,28 @@ print(request);
               },
               displayString: (unit) => unit.supGroupName ?? "",
               onSelected: (country) {
+                if (country != null) {
                 setState(() {
                   _unitIdController.text = country.supGroupCode.toString() ?? "";
                   _unitNameController.text = country.supGroupName ?? "";
                   // _createdUserController.text =
                   //     country.createdUserCode?.toString() ?? "1001";
                   _activeStatus = (country.activeStatus ?? 1) == 1;
+                  _isEditMode = true;
                 });
 
                 // ✅ Switch form into "Update mode"
+                widget.onSaved(false);
+                }
+              },
+                 onSubmitted: (typedValue) {
+                setState(() {
+                  _unitIdController.clear();
+                  _unitNameController.text = typedValue;
+                  //_createdUserController.text = "1001";
+                  _activeStatus = true;
+                  _isEditMode = false; // <-- back to Add mode
+                });
                 widget.onSaved(false);
               },
             ),
@@ -195,21 +202,21 @@ print(request);
             //   },
             // ),
             const SizedBox(height: 16),
-            CustomTextField(
-              title: "Location State",
-              hintText: "Enter Location State",
-              controller: _unitNameController,
-              prefixIcon: Icons.flag,
-              isValidate: true,
-              validator: (value) =>
-                  value == null || value.isEmpty ? "Enter Location State" : null,
-              focusNode: _unitNameFocus,
-              textInputAction: TextInputAction.next,
-              onEditingComplete: () {
-                // FocusScope.of(context).requestFocus(_createdUserFocus);
-              },
-            ),
-            const SizedBox(height: 16),
+            // CustomTextField(
+            //   title: "Location State",
+            //   hintText: "Enter Location State",
+            //   controller: _unitNameController,
+            //   prefixIcon: Icons.flag,
+            //   isValidate: true,
+            //   validator: (value) =>
+            //       value == null || value.isEmpty ? "Enter Location State" : null,
+            //   focusNode: _unitNameFocus,
+            //   textInputAction: TextInputAction.next,
+            //   onEditingComplete: () {
+            //     // FocusScope.of(context).requestFocus(_createdUserFocus);
+            //   },
+            // ),
+            // const SizedBox(height: 16),
 // CustomDropdownField(
 //   title: "Select Country",
 //   hintText: "Choose a country",
@@ -259,7 +266,7 @@ print(request);
               const CircularProgressIndicator()
             else
               GradientButton(
-                  text: isEdit ? "Update State" : "Add State",
+                  text: _isEditMode ? "Update Supplier group" : "Add Supplier Group",
                   onPressed: _submit),
             if (_message != null) ...[
               const SizedBox(height: 16),

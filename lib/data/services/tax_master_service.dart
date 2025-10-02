@@ -68,7 +68,7 @@ print("Sending JSON: ${jsonEncode(request.toJson())}");
   }
 
   /// EDIT Country (PUT) -> /countrymaster
-  Future<ApiResponse<bool>> updateTaxMaster(int id, AddTaxModelReq request) async {
+  Future<ApiResponse<bool>> updateTaxMaster(dynamic id, AddTaxModelReq request) async {
     try {
       final response = await _dio.put("taxmaster/$id", data: request.toJson());
 

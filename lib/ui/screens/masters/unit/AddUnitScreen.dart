@@ -28,7 +28,7 @@ class _AddunitscreenState extends State<Addunitscreen> {
   bool _activeStatus = true;
   bool _loading = false;
   String? _message;
-
+  bool _isEditMode = false; 
   late TextEditingController _unitIdController;
   late TextEditingController _unitNameController;
   // late TextEditingController _createdUserController;
@@ -48,6 +48,7 @@ class _AddunitscreenState extends State<Addunitscreen> {
     // _createdUserController = TextEditingController(
     //     text: widget.countryInfo?.createdUserCode?.toString() ?? "1001");
     _activeStatus = (widget.unitInfo?.activeStatus ?? 1) == 1;
+     _isEditMode = widget.unitInfo != null;
   }
 
   @override
@@ -68,31 +69,25 @@ class _AddunitscreenState extends State<Addunitscreen> {
       _loading = true;
       _message = null;
     });
-
-    if (widget.unitInfo == null) {
-      // ADD mode
-      final request = AddUnitRequest(
+   final request = AddUnitRequest(
         unitId: _unitIdController.text.trim(),
         unitName: _unitNameController.text.trim(),
         // createdUserCode: int.parse(_createdUserController.text.trim()),
         activeStatus: _activeStatus ? 1 : 0,
       );
-      final response = await _service.addUnit(request);
-      _handleResponse(response.isSuccess, response.error);
-    } else {
+       if (_isEditMode && widget.unitInfo != null) {
       // EDIT mode
-      final updated = AddUnitRequest(
-        unitId: _unitIdController.text.trim(),
-        unitName: _unitNameController.text.trim(),
-        // createdUserCode: int.parse(_createdUserController.text.trim()),
-        activeStatus: _activeStatus ? 1 : 0,
-      );
       final response = await _service.updateUnit(
         widget.unitInfo!.unitCode!,
-        updated,
+        request,
       );
       _handleResponse(response.isSuccess, response.error);
+    } else {
+      // ADD mode
+      final response = await _service.addUnit(request);
+      _handleResponse(response.isSuccess, response.error);
     }
+   
   }
 
   void _handleResponse(bool success, String? error) {
@@ -112,6 +107,7 @@ class _AddunitscreenState extends State<Addunitscreen> {
       // _createdUserController.text =
       //     widget.countryInfo?.createdUserCode?.toString() ?? "1001";
       _activeStatus = (widget.unitInfo?.activeStatus ?? 1) == 1;
+         _isEditMode = widget.unitInfo != null;
     }
   }
 
@@ -127,7 +123,8 @@ class _AddunitscreenState extends State<Addunitscreen> {
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             SearchDropdownField<UnitInfo>(
-              hintText: "Search Unit",
+              hintText: "Unit Name",
+              controller: _unitNameController,
               prefixIcon: Icons.search,
               fetchItems: (q) async {
                 final response = await _service.getUnitSearch(q);
@@ -140,15 +137,30 @@ class _AddunitscreenState extends State<Addunitscreen> {
               },
               displayString: (unit) => unit.unitName ?? "",
               onSelected: (country) {
+                  if (country != null) {
                 setState(() {
                   _unitIdController.text = country.unitId ?? "";
                   _unitNameController.text = country.unitName ?? "";
                   // _createdUserController.text =
                   //     country.createdUserCode?.toString() ?? "1001";
                   _activeStatus = (country.activeStatus ?? 1) == 1;
+                  _isEditMode = true;
                 });
 
                 // ✅ Switch form into "Update mode"
+                widget.onSaved(false);
+                }
+            
+                
+              },
+                   onSubmitted: (typedValue) {
+                setState(() {
+                  _unitIdController.clear();
+                  _unitNameController.text = typedValue;
+                  //_createdUserController.text = "1001";
+                  _activeStatus = true;
+                  _isEditMode = false; // <-- back to Add mode
+                });
                 widget.onSaved(false);
               },
             ),
@@ -182,22 +194,22 @@ class _AddunitscreenState extends State<Addunitscreen> {
                 FocusScope.of(context).requestFocus(_unitNameFocus);
               },
             ),
-            const SizedBox(height: 16),
-            CustomTextField(
-              title: "unit Name",
-              hintText: "Enter unit Name",
-              controller: _unitNameController,
-              prefixIcon: Icons.flag,
-              isValidate: true,
-              validator: (value) =>
-                  value == null || value.isEmpty ? "Enter unit name" : null,
-              focusNode: _unitNameFocus,
-              textInputAction: TextInputAction.next,
-              onEditingComplete: () {
-                // FocusScope.of(context).requestFocus(_createdUserFocus);
-              },
-            ),
-            const SizedBox(height: 16),
+            // const SizedBox(height: 16),
+            // CustomTextField(
+            //   title: "unit Name",
+            //   hintText: "Enter unit Name",
+            //   controller: _unitNameController,
+            //   prefixIcon: Icons.flag,
+            //   isValidate: true,
+            //   validator: (value) =>
+            //       value == null || value.isEmpty ? "Enter unit name" : null,
+            //   focusNode: _unitNameFocus,
+            //   textInputAction: TextInputAction.next,
+            //   onEditingComplete: () {
+            //     // FocusScope.of(context).requestFocus(_createdUserFocus);
+            //   },
+            // ),
+          const SizedBox(height: 16),
             // CustomTextField(
             //   title: "Create User",
             //   controller: _createdUserController,
@@ -218,7 +230,7 @@ class _AddunitscreenState extends State<Addunitscreen> {
               const CircularProgressIndicator()
             else
               GradientButton(
-                  text: isEdit ? "Update Unit" : "Add Unit",
+                  text: _isEditMode ? "Update Unit" : "Add Unit",
                   onPressed: _submit),
             if (_message != null) ...[
               const SizedBox(height: 16),

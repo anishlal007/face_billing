@@ -40,7 +40,7 @@ class _AddLocationMasterState extends State<AddLocationMaster> {
   final FocusNode _unitIdFocus = FocusNode();
   final FocusNode _unitNameFocus = FocusNode();
   // final FocusNode _createdUserFocus = FocusNode();
-
+bool _isEditMode = false; 
   @override
   void initState() {
     super.initState();
@@ -52,6 +52,7 @@ class _AddLocationMasterState extends State<AddLocationMaster> {
     // _createdUserController = TextEditingController(
     //     text: widget.countryInfo?.createdUserCode?.toString() ?? "1001");
     _activeStatus = (widget.unitInfo?.activeStatus ?? 1) == 1;
+        _isEditMode = widget.unitInfo != null;
   }
 
   @override
@@ -72,9 +73,6 @@ class _AddLocationMasterState extends State<AddLocationMaster> {
       _loading = true;
       _message = null;
     });
-
-    if (widget.unitInfo == null) {
-      // ADD mode
      final request = AddLocationMasterReq(
   itemLocationName: _unitNameController.text.trim(),
   cratedUserCode:  DateTime.now().toIso8601String(),     // if this is the "user code"
@@ -83,26 +81,16 @@ class _AddLocationMasterState extends State<AddLocationMaster> {
   updatedDate: DateTime.now().toIso8601String(),     // current timestamp
   activeStatus: _activeStatus ? 1 : 0,
 );
-print("request");
-print(request);
-      final response = await _service.addLocationMaster(request);
-      _handleResponse(response.isSuccess, response.error);
-    } else {
+   if (_isEditMode && widget.unitInfo != null) {
       // EDIT mode
- final updated = AddLocationMasterReq(
-  itemLocationName: _unitNameController.text.trim(),
-  cratedUserCode:  DateTime.now().toIso8601String(),     // if this is the "user code"
-  createdDate: DateTime.now().toIso8601String(),     // required by API
-  updatedUserCode: loadData.userCode.toString(),                             // hardcoded or from logged-in user
-  updatedDate: DateTime.now().toIso8601String(),     // current timestamp
-  activeStatus: _activeStatus ? 1 : 0,
-);
-     print("updated");
-     print(updated);
       final response = await _service.updateLocationMaster(
         widget.unitInfo!.itemLocationCode!,
-        updated,
+        request,
       );
+      _handleResponse(response.isSuccess, response.error);
+    } else {
+      // ADD mode
+      final response = await _service.addLocationMaster(request);
       _handleResponse(response.isSuccess, response.error);
     }
   }
@@ -124,6 +112,7 @@ print(request);
       // _createdUserController.text =
       //     widget.countryInfo?.createdUserCode?.toString() ?? "1001";
       _activeStatus = (widget.unitInfo?.activeStatus ?? 1) == 1;
+       _isEditMode = widget.unitInfo != null;
     }
   }
 
@@ -139,7 +128,8 @@ print(request);
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             SearchDropdownField<Info>(
-              hintText: "Search Location",
+              hintText: "Location Name",
+              controller: _unitNameController,
               prefixIcon: Icons.search,
               fetchItems: (q) async {
                 final response = await _service.getLocationMasterSearch(q);
@@ -152,15 +142,30 @@ print(request);
               },
               displayString: (unit) => unit.itemLocationName ?? "",
               onSelected: (country) {
-                setState(() {
-                  _unitIdController.text = country.itemLocationCode ?? "";
+                if(country!=null){
+setState(() {
+                  _unitIdController.text = country.itemLocationCode.toString() ?? "";
                   _unitNameController.text = country.itemLocationName ?? "";
                   // _createdUserController.text =
                   //     country.createdUserCode?.toString() ?? "1001";
                   _activeStatus = (country.activeStatus ?? 1) == 1;
+                   _isEditMode = true;
                 });
 
                 // ✅ Switch form into "Update mode"
+                widget.onSaved(false);
+                }
+
+                
+              },
+               onSubmitted: (typedValue) {
+                setState(() {
+                  _unitIdController.clear();
+                  _unitNameController.text = typedValue;
+                 // _createdUserController.text = "1001";
+                  _activeStatus = true;
+                  _isEditMode = false; // <-- back to Add mode
+                });
                 widget.onSaved(false);
               },
             ),
@@ -230,7 +235,7 @@ print(request);
               const CircularProgressIndicator()
             else
               GradientButton(
-                  text: isEdit ? "Update Location" : "Add Location",
+                  text: _isEditMode ? "Update Location" : "Add Location",
                   onPressed: _submit),
             if (_message != null) ...[
               const SizedBox(height: 16),

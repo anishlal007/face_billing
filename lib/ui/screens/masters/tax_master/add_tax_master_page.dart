@@ -30,7 +30,7 @@ class AddTaxMasterPage extends StatefulWidget {
 class _AddTaxMasterPageState extends State<AddTaxMasterPage> {
   final _formKey = GlobalKey<FormState>();
   final TaxMasterService _service = TaxMasterService();
-
+bool _isEditMode = false; 
   bool _activeStatus = true;
   bool _loading = false;
   String? _message;
@@ -56,6 +56,7 @@ class _AddTaxMasterPageState extends State<AddTaxMasterPage> {
     // _createdUserController = TextEditingController(
     //     text: widget.countryInfo?.createdUserCode?.toString() ?? "1001");
     _activeStatus = (widget.unitInfo?.activeStatus ?? 1) == 1;
+       _isEditMode = widget.unitInfo != null;
   }
 
   @override
@@ -76,10 +77,6 @@ class _AddTaxMasterPageState extends State<AddTaxMasterPage> {
       _loading = true;
       _message = null;
     });
-
-    if (widget.unitInfo == null) {
-      // ADD mode
-
 final request = AddTaxModelReq(
   taxType: 1,
   taxPercentage:_taxPercentageController.text.trim() ,
@@ -93,27 +90,16 @@ final request = AddTaxModelReq(
 );
 print("request");
 print(request);
-      final response = await _service.addTaxMaster(request);
+      if (_isEditMode && widget.unitInfo != null) {
+      // EDIT mode
+      final response = await _service.updateTaxMaster(
+        widget.unitInfo!.taxId!,
+        request,
+      );
       _handleResponse(response.isSuccess, response.error);
     } else {
-      // EDIT mode
- final updated = AddTaxModelReq(
-  taxType: 1,
-  taxPercentage:_taxPercentageController.text.trim() ,
-  taxId: _unitIdController.text.trim(),
-  taxName: _unitNameController.text.trim(),   // ❌ not in model
-  cratedUserCode: DateTime.now().toIso8601String(),    // ✅ but should be user ID, not DateTime
-  createdDate: DateTime.now().toIso8601String(),       // ✅ correct
-  updatedUserCode: 1001,                               // ✅ int
-  updatedDate: DateTime.now().toIso8601String(),       // ✅ correct
-  activeStatus: _activeStatus ? 1 : 0,                 // ✅ correct
-);
-     print("updated");
-     print(updated);
-      final response = await _service.updateTaxMaster(
-        widget.unitInfo!.taxCode!,
-        updated,
-      );
+      // ADD mode
+      final response = await _service.addTaxMaster(request);
       _handleResponse(response.isSuccess, response.error);
     }
   }
@@ -136,6 +122,7 @@ print(request);
       // _createdUserController.text =
       //     widget.countryInfo?.createdUserCode?.toString() ?? "1001";
       _activeStatus = (widget.unitInfo?.activeStatus ?? 1) == 1;
+            _isEditMode = widget.unitInfo != null;
     }
   }
 
@@ -151,7 +138,7 @@ print(request);
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             SearchDropdownField<Info>(
-              hintText: "Search TAX",
+              hintText: "TAX Name",
               prefixIcon: Icons.search,
               fetchItems: (q) async {
                 final response = await _service.getTaxMasterSearch(q);
@@ -164,14 +151,29 @@ print(request);
               },
               displayString: (unit) => unit.taxName ?? "",
               onSelected: (country) {
-                setState(() {
+                if(country != null){
+   setState(() {
                   _unitIdController.text = country.taxCode.toString() ?? "";
                   _unitNameController.text = country.taxName ?? "";
                   _taxPercentageController.text = country.taxPercentage ?.toString() ?? "";
                   _activeStatus = (country.activeStatus ?? 1) == 1;
+                   _isEditMode = true;
                 });
 
                 // ✅ Switch form into "Update mode"
+                widget.onSaved(false);
+                }
+             
+              },
+                 onSubmitted: (typedValue) {
+                setState(() {
+                  _unitIdController.clear();
+                  _unitNameController.text = typedValue;
+                  _taxPercentageController.text = _taxPercentageController.text ;
+                  //_createdUserController.text = "1001";
+                  _activeStatus = true;
+                  _isEditMode = false; // <-- back to Add mode
+                }); 
                 widget.onSaved(false);
               },
             ),
@@ -193,21 +195,22 @@ print(request);
             ),
         
             const SizedBox(height: 16),
-            CustomTextField(
-              title: "TAX Name",
-              hintText: "Enter TAX Name",
-              controller: _unitNameController,
-              prefixIcon: Icons.flag,
-              isValidate: true,
-              validator: (value) =>
-                  value == null || value.isEmpty ? "Enter TAX name" : null,
-              focusNode: _unitNameFocus,
-              textInputAction: TextInputAction.next,
-              onEditingComplete: () {
-                // FocusScope.of(context).requestFocus(_createdUserFocus);
-              },
-            ),
-            const SizedBox(height: 16),
+            // CustomTextField(
+            //   title: "TAX Name",
+            //   hintText: "Enter TAX Name",
+            //   controller: _unitNameController,
+            //   prefixIcon: Icons.flag,
+            //   isValidate: true,
+            //   validator: (value) =>
+            //       value == null || value.isEmpty ? "Enter TAX name" : null,
+            //   focusNode: _unitNameFocus,
+            //   textInputAction: TextInputAction.next,
+            //   onEditingComplete: () {
+            //     // FocusScope.of(context).requestFocus(_createdUserFocus);
+            //   },
+            // ),
+            // const SizedBox(height: 16),
+            
                 CustomTextField(
               title: "Tax Code",
               hintText: "Enter Tax Code",
@@ -259,7 +262,7 @@ print(request);
               const CircularProgressIndicator()
             else
               GradientButton(
-                  text: isEdit ? "Update TAX" : "Add TAX",
+                  text: _isEditMode ? "Update TAX" : "Add TAX",
                   onPressed: _submit),
             if (_message != null) ...[
               const SizedBox(height: 16),

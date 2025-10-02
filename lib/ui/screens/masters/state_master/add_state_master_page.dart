@@ -45,7 +45,9 @@ class _AddStateMasterPageState extends State<AddStateMasterPage> {
   // final FocusNode _createdUserFocus = FocusNode();
   Country? country;
   bool loading = true;
+  bool countryLoading = true;
   String? error;
+    bool _isEditMode = false; 
   @override
   void initState() {
     super.initState();
@@ -55,7 +57,8 @@ class _AddStateMasterPageState extends State<AddStateMasterPage> {
     _unitNameController =
         TextEditingController(text: widget.unitInfo?.stateName ?? "");
     _countryNameController = TextEditingController(text: "");
-    _activeStatus = (widget.unitInfo?.activeStatus ?? 1) == 1;
+   bool _isEditMode = false; 
+     _activeStatus = (widget.unitInfo?.activeStatus ?? 1) == 1;
   }
 
   Future<void> _loadCountries() async {
@@ -63,13 +66,13 @@ class _AddStateMasterPageState extends State<AddStateMasterPage> {
     if (response.isSuccess) {
       setState(() {
         country = response.data!;
-        loading = false;
+        countryLoading = false;
         error = null;
       });
     } else {
       setState(() {
         error = response.error;
-        loading = false;
+        countryLoading = false;
       });
     }
   }
@@ -92,11 +95,7 @@ class _AddStateMasterPageState extends State<AddStateMasterPage> {
       _loading = true;
       _message = null;
     });
-
-    if (widget.unitInfo == null) {
-      // ADD mode
-
-      final request = AddStateModel(
+   final request = AddStateModel(
         stateName: _unitNameController.text.trim(),
         stateId: "0",
         countryCode: 0,
@@ -106,28 +105,20 @@ class _AddStateMasterPageState extends State<AddStateMasterPage> {
         activeStatus: _activeStatus ? 1 : 0,
       );
       print("request");
-      print(request);
-      final response = await _service.addStateMaster(request);
-      _handleResponse(response.isSuccess, response.error);
-    } else {
+      print(request.toJson());
+           if (_isEditMode && widget.unitInfo != null) {
       // EDIT mode
-      final updated = AddStateModel(
-        stateName: _unitNameController.text.trim(),
-        stateId: "0",
-        countryCode: 0,
-        // required by API
-        createdUserCode: 1001, // hardcoded or from logged-in user
-        // current timestamp
-        activeStatus: _activeStatus ? 1 : 0,
-      );
-      print("updated");
-      print(updated);
       final response = await _service.updateStateMasterr(
         widget.unitInfo!.stateId!,
-        updated,
+        request,
       );
       _handleResponse(response.isSuccess, response.error);
+    } else {
+      // ADD mode
+      final response = await _service.addStateMaster(request);
+      _handleResponse(response.isSuccess, response.error);
     }
+
   }
 
   void _handleResponse(bool success, String? error) {
@@ -147,11 +138,15 @@ class _AddStateMasterPageState extends State<AddStateMasterPage> {
       // _createdUserController.text =
       //     widget.countryInfo?.createdUserCode?.toString() ?? "1001";
       _activeStatus = (widget.unitInfo?.activeStatus ?? 1) == 1;
+    _isEditMode = widget.unitInfo != null;
     }
   }
 
   @override
   Widget build(BuildContext context) {
+         if (countryLoading) return const Center(child: CircularProgressIndicator());
+    if (error != null) return Center(child: Text("Error: $error"));
+
     final isEdit = widget.unitInfo != null;
 
     return Padding(
@@ -162,7 +157,7 @@ class _AddStateMasterPageState extends State<AddStateMasterPage> {
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             SearchDropdownField<Info>(
-              hintText: "Search State",
+              hintText: "Location State",
               prefixIcon: Icons.search,
               fetchItems: (q) async {
                 final response = await _service.getStateMasterSearch(q);
@@ -173,7 +168,8 @@ class _AddStateMasterPageState extends State<AddStateMasterPage> {
               },
               displayString: (unit) => unit.stateName ?? "",
               onSelected: (country) {
-                setState(() {
+                if(country !=null){
+     setState(() {
                   _unitIdController.text = country.stateCode.toString() ?? "";
                   _unitNameController.text = country.stateName ?? "";
                   // _createdUserController.text =
@@ -182,6 +178,21 @@ class _AddStateMasterPageState extends State<AddStateMasterPage> {
                 });
 
                 // ✅ Switch form into "Update mode"
+                widget.onSaved(false);
+                 _isEditMode = true;
+                }
+           
+              },
+                onSubmitted: (typedValue) {
+                setState(() {
+                 // _unitIdController.clear();
+                  _unitNameController.text = _unitNameController.text;
+                  print( _unitNameController.text);
+                  print( _unitNameController.text);
+                  //_createdUserController.text = "1001";
+                  _activeStatus = true;
+                  _isEditMode = false; // <-- back to Add mode
+                });
                 widget.onSaved(false);
               },
             ),
@@ -216,61 +227,58 @@ class _AddStateMasterPageState extends State<AddStateMasterPage> {
             //   },
             // ),
             const SizedBox(height: 16),
-            CustomTextField(
-              title: "Location State",
-              hintText: "Enter Location State",
-              controller: _unitNameController,
-              prefixIcon: Icons.flag,
-              isValidate: true,
-              validator: (value) => value == null || value.isEmpty
-                  ? "Enter Location State"
-                  : null,
-              focusNode: _unitNameFocus,
-              textInputAction: TextInputAction.next,
-              onEditingComplete: () {
-                // FocusScope.of(context).requestFocus(_createdUserFocus);
-              },
-            ),
-            const SizedBox(height: 16),
-            CustomDropdownField<String>(
-              title: "Select Country",
-              hintText: "Choose a country",
-              items: country!.info
-                      ?.map((e) => DropdownMenuItem<String>(
-                            value:
-                                e?.countryName ?? "", // 🔹 value = country name
-                            child: Text(e?.countryName ?? ""), // 🔹 UI label
-                          ))
-                      .toList() ??
-                  [],
-              initialValue: null, // 🔹 empty initially
-              onChanged: (value) {
-                print("Selected: $value");
-
-                final selected = country!.info?.firstWhere(
-                  (c) => c?.countryName == value,
-                  orElse: () => null,
-                );
-
-                print("Country Code: ${selected?.countryCode}");
-              },
-              isValidate: true,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return "Please select a country";
-                }
-                return null;
-              },
-              addPage: AddCountryScreen(
-                onSaved: (success) {
-                  if (success) {
-                    Navigator.pop(context, true);
-                  }
-                },
-              ),
-              addTooltip: "Add Country",
-            ),
             // CustomTextField(
+            //   title: "Location State",
+            //   hintText: "Enter Location State",
+            //   controller: _unitNameController,
+            //   prefixIcon: Icons.flag,
+            //   isValidate: true,
+            //   validator: (value) => value == null || value.isEmpty
+            //       ? "Enter Location State"
+            //       : null,
+            //   focusNode: _unitNameFocus,
+            //   textInputAction: TextInputAction.next,
+            //   onEditingComplete: () {
+            //     // FocusScope.of(context).requestFocus(_createdUserFocus);
+            //   },
+            // ),
+            // const SizedBox(height: 16),
+           
+         CustomDropdownField<int>(
+  title: "Select Country",
+  hintText: "Choose a country",
+  items: (country?.info ?? [])
+      .where((e) => e?.countryCode != null && e?.countryName != null)
+      .map((e) => DropdownMenuItem<int>(
+            value: e!.countryCode!, // ✅ send code, not name
+            child: Text(e.countryName!), // ✅ show name
+          ))
+      .toList(),
+  initialValue: null, // must be null or one of the codes
+  onChanged: (code) {
+    print("Selected CountryCode: $code");
+
+    final selected = country?.info?.firstWhere(
+      (c) => c?.countryCode == code,
+    );
+
+    print("Country Name: ${selected?.countryName}");
+  },
+  isValidate: true,
+  validator: (value) {
+    if (value == null) {
+      return "Please select a country";
+    }
+    return null;
+  },
+  addPage: AddCountryScreen(
+    onSaved: (success) {
+      if (success) Navigator.pop(context, true);
+    },
+  ),
+  addTooltip: "Add Country",
+),
+           // CustomTextField(
             //   title: "Country Name",
             //   hintText: "Enter Country Name",
             //   controller: _unitNameController,
@@ -295,7 +303,7 @@ class _AddStateMasterPageState extends State<AddStateMasterPage> {
               const CircularProgressIndicator()
             else
               GradientButton(
-                  text: isEdit ? "Update State" : "Add State",
+                  text: _isEditMode ? "Update State" : "Add State",
                   onPressed: _submit),
             if (_message != null) ...[
               const SizedBox(height: 16),

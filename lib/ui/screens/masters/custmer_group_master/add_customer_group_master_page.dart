@@ -27,7 +27,7 @@ class AddCustomerGroupMasterPage extends StatefulWidget {
 class _AddCustomerGroupMasterPageState extends State<AddCustomerGroupMasterPage> {
   final _formKey = GlobalKey<FormState>();
   final CustomerGroupMasterService _service = CustomerGroupMasterService();
-
+  bool _isEditMode = false; 
   bool _activeStatus = true;
   bool _loading = false;
   String? _message;
@@ -51,6 +51,7 @@ class _AddCustomerGroupMasterPageState extends State<AddCustomerGroupMasterPage>
     // _createdUserController = TextEditingController(
     //     text: widget.countryInfo?.createdUserCode?.toString() ?? "1001");
     _activeStatus = (widget.unitInfo?.activeStatus ?? 1) == 1;
+       _isEditMode = widget.unitInfo != null;
   }
 
   @override
@@ -71,10 +72,6 @@ class _AddCustomerGroupMasterPageState extends State<AddCustomerGroupMasterPage>
       _loading = true;
       _message = null;
     });
-
-    if (widget.unitInfo == null) {
-      // ADD mode
-
      final request = AddCustomerGroupMasterModel(
   custGroupName: _unitNameController.text.trim(),
   cratedUserCode:loadData.userCode,
@@ -83,26 +80,20 @@ class _AddCustomerGroupMasterPageState extends State<AddCustomerGroupMasterPage>
   activeStatus: _activeStatus ? 1 : 0,
 );
 print("request");
-print(request);
-      final response = await _service.addCCustomerGroupMaster(request);
-      _handleResponse(response.isSuccess, response.error);
-    } else {
+print(request.toJson());
+ if (_isEditMode && widget.unitInfo != null) {
       // EDIT mode
- final updated = AddCustomerGroupMasterModel(
-   custGroupName: _unitNameController.text.trim(),
-  cratedUserCode:loadData.userCode,
-  updatedUserCode:loadData.userCode,
-    // current timestamp
-  activeStatus: _activeStatus ? 1 : 0,
-);
-     print("updated");
-     print(updated);
       final response = await _service.updateCCustomerGroupMaster(
         widget.unitInfo!.custGroupCode!,
-        updated,
+        request,
       );
       _handleResponse(response.isSuccess, response.error);
+    } else {
+      // ADD mode
+      final response = await _service.addCCustomerGroupMaster(request);
+      _handleResponse(response.isSuccess, response.error);
     }
+
   }
 
   void _handleResponse(bool success, String? error) {
@@ -122,6 +113,7 @@ print(request);
       // _createdUserController.text =
       //     widget.countryInfo?.createdUserCode?.toString() ?? "1001";
       _activeStatus = (widget.unitInfo?.activeStatus ?? 1) == 1;
+          _isEditMode = widget.unitInfo != null;
     }
   }
 
@@ -137,7 +129,8 @@ print(request);
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             SearchDropdownField<Info>(
-              hintText: "Search Customer Group",
+              hintText: "Customer Group Name",
+              controller: _unitNameController,
               prefixIcon: Icons.search,
               fetchItems: (q) async {
                 final response = await _service.getCCustomerGroupMasterSearch(q);
@@ -150,15 +143,28 @@ print(request);
               },
               displayString: (unit) => unit.custGroupName ?? "",
               onSelected: (country) {
+                  if (country != null) {
                 setState(() {
                   _unitIdController.text = country.custGroupCode.toString() ?? "";
                   _unitNameController.text = country.custGroupName ?? "";
                   // _createdUserController.text =
                   //     country.createdUserCode?.toString() ?? "1001";
                   _activeStatus = (country.activeStatus ?? 1) == 1;
+                  _isEditMode = true;
                 });
 
                 // ✅ Switch form into "Update mode"
+                widget.onSaved(false);
+                }
+              },
+                onSubmitted: (typedValue) {
+                setState(() {
+                  _unitIdController.clear();
+                  _unitNameController.text = typedValue;
+                  //_createdUserController.text = "1001";
+                  _activeStatus = true;
+                  _isEditMode = false; // <-- back to Add mode
+                });
                 widget.onSaved(false);
               },
             ),
@@ -193,21 +199,21 @@ print(request);
             //   },
             // ),
             const SizedBox(height: 16),
-            CustomTextField(
-              title: "Customer Group Name",
-              hintText: "Enter Customer Group Name",
-              controller: _unitNameController,
-              prefixIcon: Icons.flag,
-              isValidate: true,
-              validator: (value) =>
-                  value == null || value.isEmpty ? "Enter Customer Group name" : null,
-              focusNode: _unitNameFocus,
-              textInputAction: TextInputAction.next,
-              onEditingComplete: () {
-                // FocusScope.of(context).requestFocus(_createdUserFocus);
-              },
-            ),
-            const SizedBox(height: 16),
+            // CustomTextField(
+            //   title: "Customer Group Name",
+            //   hintText: "Enter Customer Group Name",
+            //   controller: _unitNameController,
+            //   prefixIcon: Icons.flag,
+            //   isValidate: true,
+            //   validator: (value) =>
+            //       value == null || value.isEmpty ? "Enter Customer Group name" : null,
+            //   focusNode: _unitNameFocus,
+            //   textInputAction: TextInputAction.next,
+            //   onEditingComplete: () {
+            //     // FocusScope.of(context).requestFocus(_createdUserFocus);
+            //   },
+            // ),
+            // const SizedBox(height: 16),
             // CustomTextField(
             //   title: "Create User",
             //   controller: _createdUserController,
@@ -228,7 +234,7 @@ print(request);
               const CircularProgressIndicator()
             else
               GradientButton(
-                  text: isEdit ? "Update Customer Group" : "Add Customer Group",
+                  text: _isEditMode ? "Update Customer Group" : "Add Customer Group",
                   onPressed: _submit),
             if (_message != null) ...[
               const SizedBox(height: 16),

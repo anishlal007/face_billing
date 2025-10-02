@@ -28,7 +28,7 @@ class _AddgroupscreenState extends State<Addgroupscreen> {
   bool _activeStatus = true;
   bool _loading = false;
   String? _message;
-
+bool _isEditMode = false;
   late TextEditingController _itemGroupNameController;
   // late TextEditingController _countryNameController;
   late TextEditingController _createdUserController;
@@ -44,8 +44,9 @@ class _AddgroupscreenState extends State<Addgroupscreen> {
     _itemGroupNameController =
         TextEditingController(text: widget.groupInfo?.itemGroupName ?? "");
     _createdUserController = TextEditingController(
-        text: widget.groupInfo?.cratedUserCode?.toString() ?? "1");
+        text: widget.groupInfo?.cratedUserCode?.toString() ?? "1001");
     _activeStatus = (widget.groupInfo?.activeStatus ?? 1) == 1;
+    _isEditMode = widget.groupInfo != null;
   }
 
   @override
@@ -64,10 +65,7 @@ class _AddgroupscreenState extends State<Addgroupscreen> {
       _loading = true;
       _message = null;
     });
-
-    if (widget.groupInfo == null) {
-      // ADD mode
-      final request = AddGroupRequest(
+  final request = AddGroupRequest(
         itemGroupName: _itemGroupNameController.text.trim(),
         createdUserCode: _createdUserController.text.trim(),
         createdDate:
@@ -75,22 +73,20 @@ class _AddgroupscreenState extends State<Addgroupscreen> {
         // updatedUserCode: _createdUserController.text.trim(),
         activeStatus: _activeStatus ? 1 : 0,
       );
-      final response = await _service.addItemGroup(request);
-      _handleResponse(response.isSuccess, response.error);
-    } else {
+
+    if (_isEditMode && widget.groupInfo != null) {
       // EDIT mode
-      final updated = AddGroupRequest(
-        itemGroupName: _itemGroupNameController.text.trim(),
-        updatedUserCode: _createdUserController.text.trim(),
-        // createdUserCode: int.parse(_createdUserController.text.trim()),
-        activeStatus: _activeStatus ? 1 : 0,
-      );
       final response = await _service.updateItemGroup(
         widget.groupInfo!.itemGroupCode!,
-        updated,
+        request,
       );
       _handleResponse(response.isSuccess, response.error);
+    } else {
+      // ADD mode
+      final response = await _service.addItemGroup(request);
+      _handleResponse(response.isSuccess, response.error);
     }
+  
   }
 
   void _handleResponse(bool success, String? error) {
@@ -110,6 +106,7 @@ class _AddgroupscreenState extends State<Addgroupscreen> {
       _createdUserController.text =
           widget.groupInfo?.cratedUserCode?.toString() ?? "1001";
       _activeStatus = (widget.groupInfo?.activeStatus ?? 1) == 1;
+       _isEditMode = widget.groupInfo != null; // update button too
     }
   }
 
@@ -125,7 +122,8 @@ class _AddgroupscreenState extends State<Addgroupscreen> {
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             SearchDropdownField<ItemGroupInfo>(
-              hintText: "Search Group",
+              hintText: "Group Name",
+              controller: _itemGroupNameController,
               prefixIcon: Icons.search,
               fetchItems: (q) async {
                 final response = await _service.getItemGroupSearch(q);
@@ -145,21 +143,13 @@ class _AddgroupscreenState extends State<Addgroupscreen> {
                   _createdUserController.text =
                       country.cratedUserCode?.toString() ?? "1001";
                   _activeStatus = (country.activeStatus ?? 1) == 1;
+                   _isEditMode = true;
                 });
 
                 // ✅ Switch form into "Update mode"
                 widget.onSaved(false); 
                 }
-                setState(() {
-                  _itemGroupNameController.text =
-                      country.itemGroupName.toString();
-                  _createdUserController.text =
-                      country.cratedUserCode?.toString() ?? "1001";
-                  _activeStatus = (country.activeStatus ?? 1) == 1;
-                });
-
-                // ✅ Switch form into "Update mode"
-                widget.onSaved(false);
+               
               },
                 onSubmitted: (typedValue) {
     // ✅ User pressed enter or confirmed text without selecting
@@ -170,6 +160,7 @@ class _AddgroupscreenState extends State<Addgroupscreen> {
       print(_itemGroupNameController.text);// use typed text
       _createdUserController.text = "1001";
       _activeStatus = true;
+       _isEditMode = false;
     });
     widget.onSaved(false);
   },
@@ -190,20 +181,21 @@ class _AddgroupscreenState extends State<Addgroupscreen> {
                 });
               },
             ),
-            CustomTextField(
-              title: "Group Name",
-              hintText: "Enter Group Name",
-              controller: _itemGroupNameController,
-              prefixIcon: Icons.flag_circle,
-              isValidate: true,
-              validator: (value) =>
-                  value == null || value.isEmpty ? "Enter Group Name" : null,
-              focusNode: _itemGroupNameFocus,
-              textInputAction: TextInputAction.next,
-              onEditingComplete: () {
-                FocusScope.of(context).requestFocus(_itemGroupNameFocus);
-              },
-            ),
+            // CustomTextField(
+            //   title: "Group Name",
+            //   hintText: "Enter Group Name",
+            //   controller: _itemGroupNameController,
+            //   prefixIcon: Icons.flag_circle,
+            //   isValidate: true,
+            //   validator: (value) =>
+            //       value == null || value.isEmpty ? "Enter Group Name" : null,
+            //   focusNode: _itemGroupNameFocus,
+            //   textInputAction: TextInputAction.next,
+            //   onEditingComplete: () {
+            //     FocusScope.of(context).requestFocus(_itemGroupNameFocus);
+            //   },
+            // ),
+            
             const SizedBox(height: 16),
             CustomTextField(
               title: "Create User",
@@ -225,7 +217,7 @@ class _AddgroupscreenState extends State<Addgroupscreen> {
               const CircularProgressIndicator()
             else
               GradientButton(
-                  text: isEdit ? "Update Group" : "Add Group",
+                  text: _isEditMode ? "Update Group" : "Add Group",
                   onPressed: _submit),
             if (_message != null) ...[
               const SizedBox(height: 16),

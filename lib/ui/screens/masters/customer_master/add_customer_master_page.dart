@@ -28,7 +28,7 @@ class _AddCustomerMasterPageState extends State<AddCustomerMasterPage> {
   final _formKey = GlobalKey<FormState>();
   final CustomerMasterService _service = CustomerMasterService();
   final GetAllMasterService _getAllMasterService = GetAllMasterService();
-
+  bool _isEditMode = false; 
   bool _loading = false;
   String? _message;
   bool _getAllLoading = true;

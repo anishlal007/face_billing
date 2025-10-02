@@ -41,7 +41,7 @@ class _AddItemMakeMasterState extends State<AddItemMakeMaster> {
   final FocusNode _unitIdFocus = FocusNode();
   final FocusNode _unitNameFocus = FocusNode();
   // final FocusNode _createdUserFocus = FocusNode();
-
+bool _isEditMode = false; 
   @override
   void initState() {
     super.initState();
@@ -53,6 +53,7 @@ class _AddItemMakeMasterState extends State<AddItemMakeMaster> {
     // _createdUserController = TextEditingController(
     //     text: widget.countryInfo?.createdUserCode?.toString() ?? "1001");
     _activeStatus = (widget.unitInfo?.activeStatus ?? 1) == 1;
+    _isEditMode = widget.unitInfo != null;
   }
 
   @override
@@ -73,10 +74,7 @@ class _AddItemMakeMasterState extends State<AddItemMakeMaster> {
       _loading = true;
       _message = null;
     });
-
-    if (widget.unitInfo == null) {
-      // ADD mode
-     final request = AddItemMakeUnit(
+  final request = AddItemMakeUnit(
 
   itemMaketName: _unitNameController.text.trim(),
   cratedUserCode:  DateTime.now().toIso8601String(),     // if this is the "user code"
@@ -85,27 +83,16 @@ class _AddItemMakeMasterState extends State<AddItemMakeMaster> {
 
   activeStatus: _activeStatus ? 1 : 0,
 );
-print("request");
-print(request);
-      final response = await _service.addItemMakeMaster(request);
-      _handleResponse(response.isSuccess, response.error);
-    } else {
+   if (_isEditMode && widget.unitInfo != null) {
       // EDIT mode
- final updated = AddItemMakeUnit(
- 
-  itemMaketName: _unitNameController.text.trim(),
-  cratedUserCode:  DateTime.now().toIso8601String(),     // if this is the "user code"
- 
-  updatedUserCode: "1001",                             // hardcoded or from logged-in user
-
-  activeStatus: _activeStatus ? 1 : 0,
-);
-     print("updated");
-     print(updated);
       final response = await _service.updateItemMakeMaster(
         widget.unitInfo!.itemMakeCode!,
-        updated,
+        request,
       );
+      _handleResponse(response.isSuccess, response.error);
+    } else {
+      // ADD mode
+      final response = await _service.addItemMakeMaster(request);
       _handleResponse(response.isSuccess, response.error);
     }
   }
@@ -127,6 +114,7 @@ print(request);
       // _createdUserController.text =
       //     widget.countryInfo?.createdUserCode?.toString() ?? "1001";
       _activeStatus = (widget.unitInfo?.activeStatus ?? 1) == 1;
+    _isEditMode = widget.unitInfo != null;
     }
   }
 
@@ -142,7 +130,8 @@ print(request);
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             SearchDropdownField<Info>(
-              hintText: "Search ItemMake",
+              controller: _unitNameController,
+              hintText: "ItemMake Name",
               prefixIcon: Icons.search,
               fetchItems: (q) async {
                 final response = await _service.getItemMakeMasterSearch(q);
@@ -155,15 +144,30 @@ print(request);
               },
               displayString: (unit) => unit.itemMaketName ?? "",
               onSelected: (country) {
-                setState(() {
+                if(country!=null){
+setState(() {
                   _unitIdController.text = country.itemMakeCode.toString() ?? "";
                   _unitNameController.text = country.itemMaketName ?? "";
                   // _createdUserController.text =
                   //     country.createdUserCode?.toString() ?? "1001";
                   _activeStatus = (country.activeStatus ?? 1) == 1;
+                   _isEditMode = true;
                 });
 
                 // ✅ Switch form into "Update mode"
+                widget.onSaved(false);
+                }
+
+                
+              },
+               onSubmitted: (typedValue) {
+                setState(() {
+                  _unitIdController.clear();
+                  _unitNameController.text = typedValue;
+                 // _createdUserController.text = "1001";
+                  _activeStatus = true;
+                  _isEditMode = false; // <-- back to Add mode
+                });
                 widget.onSaved(false);
               },
             ),
@@ -198,20 +202,20 @@ print(request);
             //   },
             // ),
             const SizedBox(height: 16),
-            CustomTextField(
-              title: "ItemMake Name",
-              hintText: "Enter ItemMake Name",
-              controller: _unitNameController,
-              prefixIcon: Icons.flag,
-              isValidate: true,
-              validator: (value) =>
-                  value == null || value.isEmpty ? "Enter ItemMake name" : null,
-              focusNode: _unitNameFocus,
-              textInputAction: TextInputAction.next,
-              onEditingComplete: () {
-                // FocusScope.of(context).requestFocus(_createdUserFocus);
-              },
-            ),
+            // CustomTextField(
+            //   title: "ItemMake Name",
+            //   hintText: "Enter ItemMake Name",
+            //   controller: _unitNameController,
+            //   prefixIcon: Icons.flag,
+            //   isValidate: true,
+            //   validator: (value) =>
+            //       value == null || value.isEmpty ? "Enter ItemMake name" : null,
+            //   focusNode: _unitNameFocus,
+            //   textInputAction: TextInputAction.next,
+            //   onEditingComplete: () {
+            //     // FocusScope.of(context).requestFocus(_createdUserFocus);
+            //   },
+            // ),
             const SizedBox(height: 16),
             // CustomTextField(
             //   title: "Create User",
@@ -233,7 +237,7 @@ print(request);
               const CircularProgressIndicator()
             else
               GradientButton(
-                  text: isEdit ? "Update ItemMake" : "Add ItemMake",
+                  text: _isEditMode ? "Update ItemMake" : "Add ItemMake",
                   onPressed: _submit),
             if (_message != null) ...[
               const SizedBox(height: 16),
