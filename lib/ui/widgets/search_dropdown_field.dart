@@ -71,6 +71,7 @@ class _SearchDropdownFieldState<T extends Object>
             // Also call RawAutocomplete's onFieldSubmitted
             onFieldSubmitted();
           },
+          style: TextStyle(fontSize: 12.0, height: 1.0, color: Colors.black),
           decoration: InputDecoration(
             hintText: widget.hintText,
             prefixIcon: Icon(widget.prefixIcon),

@@ -135,47 +135,6 @@ class _AddCountryScreenState extends State<AddCountryScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-           SearchDropdownField<CountryInfo>(
-            
-  hintText: "Country Name",
-  prefixIcon: Icons.search,
-  //textController: _countryNameController,
-  fetchItems: (q) async {
-    final response = await _service.getCountriesSearch(q);
-    if (response.isSuccess) {
-      final list = (response.data?.info ?? []).whereType<CountryInfo>().toList();
-      return list;
-    }
-    return [];
-  },
-  displayString: (country) => country.countryName ?? "",
-  onSelected: (country) {
-    if (country != null) {
-      // ✅ Country selected from API list
-      setState(() {
-        _countryIdController.text = country.countryId ?? "";
-        _countryNameController.text = country.countryName ?? "";
-        _createdUserController.text =
-            country.createdUserCode?.toString() ?? "1001";
-        _activeStatus = (country.activeStatus ?? 1) == 1;
-      });
-      widget.onSaved(false);
-    }
-  },
-  onSubmitted: (typedValue) {
-    // ✅ User pressed enter or confirmed text without selecting
-    setState(() {
-      _countryIdController.clear(); // no id since not from API
-      _countryNameController.text = typedValue; 
-      print("_countryNameController.text");// use typed text
-      print(_countryNameController.text);// use typed text
-      _createdUserController.text = "1001";
-      _activeStatus = true;
-    });
-    widget.onSaved(false);
-  },
-),
-         
             const SizedBox(height: 26),
             // SwitchListTile(
             //   value: _activeStatus,
@@ -186,10 +145,10 @@ class _AddCountryScreenState extends State<AddCountryScreen> {
               crossAxisAlignment: CrossAxisAlignment.end,
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                const Text("Country Status"),
-                const SizedBox(
-                  width: 10,
-                ),
+                // const Text("Country Status"),
+                // const SizedBox(
+                //   width: 10,
+                // ),
                 CustomSwitch(
                   value: _activeStatus,
                   title: "Is Discount Required",
@@ -200,6 +159,49 @@ class _AddCountryScreenState extends State<AddCountryScreen> {
                   },
                 ),
               ],
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            SearchDropdownField<CountryInfo>(
+              hintText: "Country Name",
+              prefixIcon: Icons.search,
+              fetchItems: (q) async {
+                final response = await _service.getCountriesSearch(q);
+                if (response.isSuccess) {
+                  final list = (response.data?.info ?? [])
+                      .whereType<CountryInfo>()
+                      .toList();
+                  return list;
+                }
+                return [];
+              },
+              displayString: (country) => country.countryName ?? "",
+              onSelected: (country) {
+                if (country != null) {
+                  // ✅ Country selected from API list
+                  setState(() {
+                    _countryIdController.text = country.countryId ?? "";
+                    _countryNameController.text = country.countryName ?? "";
+                    _createdUserController.text =
+                        country.createdUserCode?.toString() ?? "1001";
+                    _activeStatus = (country.activeStatus ?? 1) == 1;
+                  });
+                  widget.onSaved(false);
+                }
+              },
+              onSubmitted: (typedValue) {
+                // ✅ User pressed enter or confirmed text without selecting
+                setState(() {
+                  _countryIdController.clear(); // no id since not from API
+                  _countryNameController.text = typedValue;
+                  print("_countryNameController.text"); // use typed text
+                  print(_countryNameController.text); // use typed text
+                  _createdUserController.text = "1001";
+                  _activeStatus = true;
+                });
+                widget.onSaved(false);
+              },
             ),
             // CustomTextField(
             //   title: "Country Name",

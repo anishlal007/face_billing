@@ -58,62 +58,77 @@ class _CustomTextFieldState extends State<CustomTextField> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // if (widget.title != null)
-        //   Padding(
-        //     padding: const EdgeInsets.only(bottom: 6),
-        //     child: Text(
-        //       widget.title!,
-        //       style: const TextStyle(
-        //         fontSize: 14,
-        //         fontWeight: FontWeight.w500,
-        //         color: Colors.black87,
-        //       ),
-        //     ),
-        //   ),
-        TextField(
-          controller: widget.controller,
-          focusNode: widget.focusNode,
-          textInputAction: widget.textInputAction,
-          onEditingComplete: widget.onEditingComplete,
-          obscureText: widget.isPassword ? _obscureText : false,
-          keyboardType:
-              widget.isNumeric ? TextInputType.number : TextInputType.text,
-          enabled: !widget.isEdit,
-          onChanged: widget.isEdit ? null : _validate,
-          autofocus: widget.autoFocus,
+    return Container(
+      // height: 50,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        border:
+            Border.all(color: const Color.fromARGB(76, 0, 0, 0), width: 1.2),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // if (widget.title != null)
+          //   Padding(
+          //     padding: const EdgeInsets.only(bottom: 6),
+          //     child: Text(
+          //       widget.title!,
+          //       style: const TextStyle(
+          //         fontSize: 14,
+          //         fontWeight: FontWeight.w500,
+          //         color: Colors.black87,
+          //       ),
+          //     ),
+          //   ),
+          TextField(
+            style: TextStyle(fontSize: 12.0, height: 1.0, color: Colors.black),
+            controller: widget.controller,
+            focusNode: widget.focusNode,
+            textInputAction: widget.textInputAction,
+            onEditingComplete: widget.onEditingComplete,
+            obscureText: widget.isPassword ? _obscureText : false,
+            keyboardType:
+                widget.isNumeric ? TextInputType.number : TextInputType.text,
+            enabled: !widget.isEdit,
+            onChanged: widget.isEdit ? null : _validate,
+            autofocus: widget.autoFocus,
 
-          // ✅ Only allow numbers if isNumeric = true
-          inputFormatters:
-              widget.isNumeric ? [FilteringTextInputFormatter.digitsOnly] : [],
+            // ✅ Only allow numbers if isNumeric = true
+            inputFormatters: widget.isNumeric
+                ? [FilteringTextInputFormatter.digitsOnly]
+                : [],
 
-          decoration: InputDecoration(
-             labelText: widget.title,
-            hintText: widget.hintText,
-            prefixIcon:
-                widget.prefixIcon != null ? Icon(widget.prefixIcon) : null,
-            suffixIcon: widget.isPassword
-                ? IconButton(
-                    icon: Icon(
-                        _obscureText ? Icons.visibility : Icons.visibility_off),
-                    onPressed: widget.isEdit
-                        ? null
-                        : () {
-                            setState(() {
-                              _obscureText = !_obscureText;
-                            });
-                          },
-                  )
-                : (widget.suffixIcon != null ? Icon(widget.suffixIcon) : null),
-            errorText: _errorText,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
+            decoration: InputDecoration(
+              // labelText: widget.title,
+              hintText: widget.hintText,
+              // prefixIcon:
+              //     widget.prefixIcon != null ? Icon(widget.prefixIcon) : null,
+              suffixIcon: widget.isPassword
+                  ? IconButton(
+                      icon: Icon(_obscureText
+                          ? Icons.visibility
+                          : Icons.visibility_off),
+                      onPressed: widget.isEdit
+                          ? null
+                          : () {
+                              setState(() {
+                                _obscureText = !_obscureText;
+                              });
+                            },
+                    )
+                  : (widget.suffixIcon != null
+                      ? Icon(widget.suffixIcon)
+                      : null),
+              errorText: _errorText,
+              // border: OutlineInputBorder(
+              //   borderRadius: BorderRadius.circular(8),
+              // ),
+              border: InputBorder.none,
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

@@ -120,7 +120,7 @@ class _HomePageState extends State<HomePage> {
           page: const SupplierGrpupMasterPage(),
         ),
         MenuItemData(
-          title: "Customer Master",
+          title: "Pataint Master",
           icon: Icons.person,
           page: const CustomerMasterPage(),
         ),
@@ -154,7 +154,7 @@ class _HomePageState extends State<HomePage> {
     MenuItemData(
       title: "Reports",
       icon: Icons.report,
-      page:  ReportMasterPage(),
+      page: ReportMasterPage(),
     ),
     MenuItemData(
       title: "Transactions",

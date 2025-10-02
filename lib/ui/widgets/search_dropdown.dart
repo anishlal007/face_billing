@@ -9,7 +9,8 @@ class SearchableDropdown<T> extends StatefulWidget {
   final Widget? addPage;
   final String addTooltip;
   final FocusNode? focusNode; // Add focus node
-  final VoidCallback? onEditingComplete; // callback when user selects item or presses enter
+  final VoidCallback?
+      onEditingComplete; // callback when user selects item or presses enter
 
   const SearchableDropdown({
     super.key,
@@ -72,7 +73,8 @@ class _SearchableDropdownState<T> extends State<SearchableDropdown<T>> {
       showDialog(
         context: context,
         builder: (context) => Dialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 500, maxHeight: 600),
             child: widget.addPage!,
@@ -124,7 +126,8 @@ class _SearchableDropdownState<T> extends State<SearchableDropdown<T>> {
                   onChanged: (value) {
                     setState(() {
                       _filteredItems = widget.items
-                          .where((e) => widget.itemLabel(e)
+                          .where((e) => widget
+                              .itemLabel(e)
                               .toLowerCase()
                               .contains(value.toLowerCase()))
                           .toList();
@@ -143,7 +146,8 @@ class _SearchableDropdownState<T> extends State<SearchableDropdown<T>> {
                 ConstrainedBox(
                   constraints: const BoxConstraints(maxHeight: 200),
                   child: _filteredItems.isEmpty
-                      ? const Center(child: Padding(
+                      ? const Center(
+                          child: Padding(
                           padding: EdgeInsets.all(8.0),
                           child: Text("No items found"),
                         ))
@@ -176,39 +180,48 @@ class _SearchableDropdownState<T> extends State<SearchableDropdown<T>> {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: CompositedTransformTarget(
-            link: _layerLink,
-            child: GestureDetector(
-              onTap: _isOpen ? _closeDropdown : _openDropdown,
-              child: InputDecorator(
-                decoration: InputDecoration(
-                  hintText: widget.hintText,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        border:
+            Border.all(color: const Color.fromARGB(76, 0, 0, 0), width: 1.2),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: CompositedTransformTarget(
+              link: _layerLink,
+              child: GestureDetector(
+                onTap: _isOpen ? _closeDropdown : _openDropdown,
+                child: InputDecorator(
+                  decoration: InputDecoration(
+                    hintText: widget.hintText,
+                    // border: OutlineInputBorder(
+                    //   borderRadius: BorderRadius.circular(12),
+                    // ),
+                    border: InputBorder.none,
+                    // suffixIcon: const Icon(Icons.arrow_drop_down),
                   ),
-                 // suffixIcon: const Icon(Icons.arrow_drop_down),
-                ),
-                child: Text(
-                  _selectedItem != null
-                      ? widget.itemLabel(_selectedItem!)
-                      : widget.hintText,
+                  child: Text(
+                    _selectedItem != null
+                        ? widget.itemLabel(_selectedItem!)
+                        : widget.hintText,
+                  ),
                 ),
               ),
             ),
           ),
-        ),
-        if (widget.addPage != null) ...[
-          const SizedBox(width: 8),
-          IconButton(
-            icon: const Icon(Icons.add_circle, color: primary, size: 30),
-            tooltip: widget.addTooltip,
-            onPressed: _openAddPopup,
-          ),
+          if (widget.addPage != null) ...[
+            const SizedBox(width: 8),
+            IconButton(
+              icon: const Icon(Icons.add_circle, color: primary, size: 30),
+              tooltip: widget.addTooltip,
+              onPressed: _openAddPopup,
+            ),
+          ],
         ],
-      ],
+      ),
     );
   }
 }

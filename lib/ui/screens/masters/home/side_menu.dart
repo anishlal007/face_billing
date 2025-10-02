@@ -99,7 +99,13 @@ class SideMenu extends StatelessWidget {
 
           return ListTile(
             leading: Icon(item.icon),
-            title: Text(item.title),
+            title: Text(
+              item.title,
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             selected: isParentSelected,
             onTap: () => onItemSelected(parentIndex),
           );

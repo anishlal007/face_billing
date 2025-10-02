@@ -332,6 +332,30 @@ class _AddCompanyMasterPageState extends State<AddCompanyMasterPage> {
                 spacing: 16,
                 runSpacing: 16,
                 children: [
+                  SizedBox(
+                    width: constraints.maxWidth,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        // Text("Company Status"),
+                        // SizedBox(
+                        //   width: 10,
+                        // ),
+                        CustomSwitch(
+                          value: _activeStatus,
+                          title: "Active Status",
+                          onChanged: (val) {
+                            setState(() {
+                              _activeStatus = val;
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
                   // Example fields (replace with all your CustomTextField/Dropdown etc.)
                   SearchDropdownField<Info>(
                     hintText: "Search Company",
@@ -361,27 +385,7 @@ class _AddCompanyMasterPageState extends State<AddCompanyMasterPage> {
                       widget.onSaved(false);
                     },
                   ),
-                  SizedBox(
-                    width: constraints.maxWidth,
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text("Company Status"),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        CustomSwitch(
-                          value: _activeStatus,
-                          title: "Active Status",
-                          onChanged: (val) {
-                            setState(() {
-                              _activeStatus = val;
-                            });
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
+
                   SizedBox(
                     width: constraints.maxWidth / columns - 20,
                     child: CustomTextField(
@@ -509,15 +513,14 @@ class _AddCompanyMasterPageState extends State<AddCompanyMasterPage> {
                   SizedBox(
                     width: constraints.maxWidth / columns - 20,
                     child: CustomDropdownField<int>(
-                      
                       title: "Select Country",
                       hintText: "Choose Country",
-                  items: getAllMasterListModel!.info!.countries!
-    .map((e) => DropdownMenuItem<int>(
-          value: e.countryCode,
-          child: Text(e.countryName!), // ✅ must be Text
-        ))
-    .toList(),
+                      items: getAllMasterListModel!.info!.countries!
+                          .map((e) => DropdownMenuItem<int>(
+                                value: e.countryCode,
+                                child: Text(e.countryName!), // ✅ must be Text
+                              ))
+                          .toList(),
                       // initialValue: _taxCode, // int? taxCode
                       onChanged: (value) {
                         setState(() {

@@ -412,9 +412,9 @@ class _AddProductMasterPageState extends State<AddProductMasterPage> {
               // Decide columns by screen width
               int columns = 1; // default mobile
               if (constraints.maxWidth > 1200) {
-                columns = 5;
-              } else if (constraints.maxWidth > 800) {
                 columns = 4;
+              } else if (constraints.maxWidth > 800) {
+                columns = 3;
               }
 
               return Wrap(
@@ -422,34 +422,34 @@ class _AddProductMasterPageState extends State<AddProductMasterPage> {
                 runSpacing: 16,
                 children: [
                   // Example fields (replace with all your CustomTextField/Dropdown etc.)
-                  SearchDropdownField<Info>(
-                    hintText: "Search Product",
-                    // prefixIcon: Icons.search,
-                    fetchItems: (q) async {
-                      final response =
-                          await _service.getProductServiceSearch(q);
-                      if (response.isSuccess) {
-                        return (response.data?.info ?? [])
-                            .whereType<Info>()
-                            .toList();
-                      }
-                      return [];
-                    },
-                    displayString: (unit) => unit.itemName ?? "",
-                    onSelected: (country) {
-                      setState(() {
-                        _itemIdController.text =
-                            country.itemCode.toString() ?? "";
-                        _itemNameController.text = country.itemName ?? "";
-                        // _createdUserController.text =
-                        //     country.createdUserCode?.toString() ?? "1001";
-                        // _activeStatus = (country.custActiveStatus ?? 1) == 1;
-                      });
+                  // SearchDropdownField<Info>(
+                  //   hintText: "Search Product",
+                  //   // prefixIcon: Icons.search,
+                  //   fetchItems: (q) async {
+                  //     final response =
+                  //         await _service.getProductServiceSearch(q);
+                  //     if (response.isSuccess) {
+                  //       return (response.data?.info ?? [])
+                  //           .whereType<Info>()
+                  //           .toList();
+                  //     }
+                  //     return [];
+                  //   },
+                  //   displayString: (unit) => unit.itemName ?? "",
+                  //   onSelected: (country) {
+                  //     setState(() {
+                  //       _itemIdController.text =
+                  //           country.itemCode.toString() ?? "";
+                  //       _itemNameController.text = country.itemName ?? "";
+                  //       // _createdUserController.text =
+                  //       //     country.createdUserCode?.toString() ?? "1001";
+                  //       // _activeStatus = (country.custActiveStatus ?? 1) == 1;
+                  //     });
 
-                      // ✅ Switch form into "Update mode"
-                      widget.onSaved(false);
-                    },
-                  ),
+                  //     // ✅ Switch form into "Update mode"
+                  //     widget.onSaved(false);
+                  //   },
+                  // ),
                   SizedBox(
                     width: constraints.maxWidth,
                     child: Row(
@@ -497,20 +497,48 @@ class _AddProductMasterPageState extends State<AddProductMasterPage> {
                   ),
                   SizedBox(
                     width: constraints.maxWidth / columns - 30,
-                    child: CustomTextField(
-                      title: "Product Name",
-                      hintText: "Enter Product Name",
-                      controller: _itemNameController,
-                      // prefixIcon: Icons.flag,
-                      isValidate: true,
-                      validator: (value) => value == null || value.isEmpty
-                          ? "Enter Product Name"
-                          : null,
-                      focusNode: _itemNameFocus,
-                      textInputAction: TextInputAction.next,
-                      onEditingComplete: () => _fieldFocusChange(
-                          context, _itemNameFocus, _itemTypeFocus),
-                      // autoFocus: true,
+                    child: SearchDropdownField<Info>(
+                      hintText: "Item Name",
+                      prefixIcon: Icons.search,
+                      fetchItems: (q) async {
+                        final response =
+                            await _service.getProductServiceSearch(q);
+                        if (response.isSuccess) {
+                          final list = (response.data?.info ?? [])
+                              .whereType<Info>()
+                              .toList();
+                          return list;
+                        }
+                        return [];
+                      },
+                      displayString: (item) => item.itemName ?? "",
+                      onSelected: (product) {
+                        if (product != null) {
+                          // ✅ Country selected from API list
+                          setState(() {
+                            _itemIdController.text =
+                                product.itemCode.toString();
+                            _itemNameController.text = product.itemName ?? "";
+                            _createdUserController.text =
+                                product.createdUserCode?.toString() ?? "1001";
+                            // _activeStatus = (product.stat ?? 1) == 1;
+                          });
+                          widget.onSaved(false);
+                        }
+                      },
+                      onSubmitted: (typedValue) {
+                        // ✅ User pressed enter or confirmed text without selecting
+                        setState(() {
+                          _itemIdController.clear(); // no id since not from API
+                          _itemNameController.text = typedValue;
+                          print(
+                              "_countryNameController.text"); // use typed text
+                          print(_itemNameController.text); // use typed text
+                          _createdUserController.text = "1001";
+                          _activeStatus = true;
+                        });
+                        widget.onSaved(false);
+                      },
                     ),
                   ),
                   SizedBox(
@@ -555,38 +583,38 @@ class _AddProductMasterPageState extends State<AddProductMasterPage> {
                   //   ),
                   // ),
                   // 🔹 Continue wrapping all your fields the same way
-SizedBox(
-  width: constraints.maxWidth / columns - 20,
-  child: SearchableDropdown<master.ItemGroups>(
-    hintText: "Item Group",
-    items: getAllMasterListModel!.info!.itemGroups!,
-    itemLabel: (group) => group.itemGroupName ?? "",
-    onChanged: (group) {
-      if (group != null) {
-        _itemGroup = group.itemGroupCode;
-        print("Selected Code: ${group.itemGroupCode}");
-        print("Selected Name: ${group.itemGroupName}");
-      }
-    },
-          onEditingComplete: () => _fieldFocusChange(
+                  SizedBox(
+                    width: constraints.maxWidth / columns - 20,
+                    child: SearchableDropdown<master.ItemGroups>(
+                      hintText: "Item Group",
+                      items: getAllMasterListModel!.info!.itemGroups!,
+                      itemLabel: (group) => group.itemGroupName ?? "",
+                      onChanged: (group) {
+                        if (group != null) {
+                          _itemGroup = group.itemGroupCode;
+                          print("Selected Code: ${group.itemGroupCode}");
+                          print("Selected Name: ${group.itemGroupName}");
+                        }
+                      },
+                      onEditingComplete: () => _fieldFocusChange(
                         context,
                         _itemGroupFocus,
                         _itemUnitCodeFocus,
                       ),
-    // Add page popup
-    addPage: Addgroupscreen(
-      onSaved: (success) {
-            if (success) {
+                      // Add page popup
+                      addPage: Addgroupscreen(
+                        onSaved: (success) {
+                          if (success) {
                             Navigator.pop(context, true);
                           }
-      },
-    ),
-    addTooltip: "Add Item Group",
-  ),
-),
+                        },
+                      ),
+                      addTooltip: "Add Item Group",
+                    ),
+                  ),
                   // SizedBox(
                   //   width: constraints.maxWidth / columns - 20,
-                  //   child: 
+                  //   child:
                   //   CustomDropdownField<int>(
                   //     title: "Select Item Group",
                   //     hintText: "Choose Item Group",
@@ -613,11 +641,11 @@ SizedBox(
                   //     validator: (value) =>
                   //         value == null ? "Please select Item Group" : null,
                   //     focusNode: _itemGroupFocus,
-                      // onEditingComplete: () => _fieldFocusChange(
-                      //   context,
-                      //   _itemGroupFocus,
-                      //   _itemUnitCodeFocus,
-                      // ),
+                  // onEditingComplete: () => _fieldFocusChange(
+                  //   context,
+                  //   _itemGroupFocus,
+                  //   _itemUnitCodeFocus,
+                  // ),
                   //     addPage: Addgroupscreen(
                   //       onSaved: (success) {
                   //         if (success) {
@@ -628,27 +656,27 @@ SizedBox(
                   //     addTooltip: "Add Item Group",
                   //   ),
                   // ),
-               SizedBox(
-  width: constraints.maxWidth / columns - 20,
-  child: SearchableDropdown<master.ItemMakes>(
-    hintText: "Item Make",
-    items: getAllMasterListModel!.info!.itemMakes!,
-    itemLabel: (group) => group.itemMaketName ?? "",
-    onChanged: (group) {
-      if (group != null) {
-        _itemMake = group.itemMakeCode;
-        print("Selected Code: ${group.itemMakeCode}");
-        print("Selected Name: ${group.itemMaketName}");
-      }
-    },
-      focusNode: _itemMakeCodeFocus,
-         onEditingComplete: () => _fieldFocusChange(
+                  SizedBox(
+                    width: constraints.maxWidth / columns - 20,
+                    child: SearchableDropdown<master.ItemMakes>(
+                      hintText: "Item Make",
+                      items: getAllMasterListModel!.info!.itemMakes!,
+                      itemLabel: (group) => group.itemMaketName ?? "",
+                      onChanged: (group) {
+                        if (group != null) {
+                          _itemMake = group.itemMakeCode;
+                          print("Selected Code: ${group.itemMakeCode}");
+                          print("Selected Name: ${group.itemMaketName}");
+                        }
+                      },
+                      focusNode: _itemMakeCodeFocus,
+                      onEditingComplete: () => _fieldFocusChange(
                         context,
                         _itemMakeCodeFocus,
                         _itemGenericCodeFocus,
                       ),
-    // Add page popup
-   addPage: AddItemMakeMaster(
+                      // Add page popup
+                      addPage: AddItemMakeMaster(
                         onSaved: (success) {
                           if (success) {
                             Navigator.pop(context, true);
@@ -656,9 +684,9 @@ SizedBox(
                         },
                       ),
                       addTooltip: "Add Item Make",
-  ),
-),
-                 
+                    ),
+                  ),
+
                   selectedPaymentType == 0
                       ? SizedBox(
                           width: constraints.maxWidth / columns - 20,
@@ -714,26 +742,25 @@ SizedBox(
                     height: 10,
                   ),
                   const Divider(),
-SizedBox(
-  width: constraints.maxWidth / columns - 20,
-  child: SearchableDropdown<master.Units>(
-    hintText: "Select unit",
-    items: getAllMasterListModel!.info!.units!,
-    itemLabel: (group) => group.unitName ?? "",
-    onChanged: (group) {
-      if (group != null) {
-        _unitCode = group.unitCode;
-        print("Selected Code: ${group.unitCode}");
-        print("Selected Name: ${group.unitName}");
-      }
-    },
-        focusNode: _itemUnitCodeFocus,
+                  SizedBox(
+                    width: constraints.maxWidth / columns - 20,
+                    child: SearchableDropdown<master.Units>(
+                      hintText: "Select unit",
+                      items: getAllMasterListModel!.info!.units!,
+                      itemLabel: (group) => group.unitName ?? "",
+                      onChanged: (group) {
+                        if (group != null) {
+                          _unitCode = group.unitCode;
+                          print("Selected Code: ${group.unitCode}");
+                          print("Selected Name: ${group.unitName}");
+                        }
+                      },
+                      focusNode: _itemUnitCodeFocus,
                       onEditingComplete: () => _fieldFocusChange(
                         context,
                         _itemUnitCodeFocus,
                         _itemMakeCodeFocus,
                       ),
-
                       addPage: Addunitscreen(
                         onSaved: (success) {
                           if (success) {
@@ -743,10 +770,9 @@ SizedBox(
                         },
                       ),
                       addTooltip: "Add Unit",
-  ),
-),
-                 
-                 
+                    ),
+                  ),
+
                   SizedBox(
                     width: constraints.maxWidth / columns - 20,
                     child: CustomTextField(
@@ -1004,26 +1030,26 @@ SizedBox(
                     ),
                   ),
                   SizedBox(
-  width: constraints.maxWidth / columns - 20,
-  child: SearchableDropdown<master.HsnMasters>(
-    hintText: "HSN Code",
-    items: getAllMasterListModel!.info!.hsnMasters!,
-    itemLabel: (group) => group.hsnName ?? "",
-    onChanged: (group) {
-      if (group != null) {
-        _taxCode = group.hsnCode;
-        print("Selected Code: ${group.hsnCode}");
-        print("Selected Name: ${group.hsnName}");
-      }
-    },
-        // focusNode: _itemUnitCodeFocus,
-        //               onEditingComplete: () => _fieldFocusChange(
-        //                 context,
-        //                 _itemUnitCodeFocus,
-        //                 _itemMakeCodeFocus,
-        //               ),
+                    width: constraints.maxWidth / columns - 20,
+                    child: SearchableDropdown<master.HsnMasters>(
+                      hintText: "HSN Code",
+                      items: getAllMasterListModel!.info!.hsnMasters!,
+                      itemLabel: (group) => group.hsnName ?? "",
+                      onChanged: (group) {
+                        if (group != null) {
+                          _taxCode = group.hsnCode;
+                          print("Selected Code: ${group.hsnCode}");
+                          print("Selected Name: ${group.hsnName}");
+                        }
+                      },
+                      // focusNode: _itemUnitCodeFocus,
+                      //               onEditingComplete: () => _fieldFocusChange(
+                      //                 context,
+                      //                 _itemUnitCodeFocus,
+                      //                 _itemMakeCodeFocus,
+                      //               ),
 
-                        addPage: AddHnsMasterPage(
+                      addPage: AddHnsMasterPage(
                         onSaved: (success) {
                           if (success) {
                             Navigator.pop(context, true);
@@ -1031,10 +1057,9 @@ SizedBox(
                         },
                       ),
                       addTooltip: "Add HSN",
-  ),
-),
-        
-                  
+                    ),
+                  ),
+
                   SizedBox(
                     width: constraints.maxWidth / columns - 20,
                     child: CustomDropdownField<int>(
@@ -1294,7 +1319,6 @@ SizedBox(
     );
   }
 }
-
 
 // import 'package:facebilling/core/const.dart';
 // import 'package:flutter/material.dart';
@@ -1589,7 +1613,7 @@ SizedBox(
 //       padding: const EdgeInsets.all(16.0),
 //       child: Form(
 //         key: _formKey,
-//         child: 
+//         child:
 //         Column(
 //           crossAxisAlignment: CrossAxisAlignment.end,
 //           children: [
@@ -1725,7 +1749,7 @@ SizedBox(
 //             ]
 //           ],
 //         ),
-    
+
 //       ),
 //     );
 //   }

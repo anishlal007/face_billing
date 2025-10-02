@@ -53,27 +53,26 @@ class _CustomDropdownFieldState<T> extends State<CustomDropdownField<T>> {
     _filteredItems = widget.items;
   }
 
-void _filterItems(String query) {
-  setState(() {
-    if (query.isEmpty) {
-      _filteredItems = widget.items;
-    } else {
-      _filteredItems = widget.items
-          .where((item) {
-            final text = (item.child as Text).data?.toLowerCase() ?? '';
-            return text.contains(query.toLowerCase()); // 🔹 FIXED
-          })
-          .toList();
-    }
+  void _filterItems(String query) {
+    setState(() {
+      if (query.isEmpty) {
+        _filteredItems = widget.items;
+      } else {
+        _filteredItems = widget.items.where((item) {
+          final text = (item.child as Text).data?.toLowerCase() ?? '';
+          return text.contains(query.toLowerCase()); // 🔹 FIXED
+        }).toList();
+      }
 
-    print("Typed: $query");
-    print("Filtered items:");
-    for (var item in _filteredItems) {
-      final text = (item.child as Text).data ?? '';
-      print(text);
-    }
-  });
-}
+      print("Typed: $query");
+      print("Filtered items:");
+      for (var item in _filteredItems) {
+        final text = (item.child as Text).data ?? '';
+        print(text);
+      }
+    });
+  }
+
   void _openPopup() {
     if (widget.addPage != null) {
       showDialog(
@@ -107,71 +106,86 @@ void _filterItems(String query) {
         }
         return KeyEventResult.ignored;
       },
-      child: Row(
-        children: [
-          Expanded(
-            child:DropdownButtonFormField<T>(
-  key: _dropdownKey,
-  value: _selectedValue,
-  hint: Text(widget.hintText ?? "Select"),
-  icon: const Icon(Icons.arrow_drop_down),
-  decoration: InputDecoration(
-    labelText: widget.title,
-    prefixIcon: widget.prefixIcon != null ? Icon(widget.prefixIcon) : null,
-    border: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(8),
-    ),
-  ),
-items: [
-  DropdownMenuItem<T>(
-    enabled: false,
-    child: StatefulBuilder(
-      builder: (context, setInnerState) {
-        return SizedBox(
-          width: 400,
-          child: TextField(
-            controller: _searchController,
-            decoration: const InputDecoration(
-              hintText: "Search...",
-              isDense: true,
-              contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-            ),
-            onChanged: (value) {
-              _filterItems(value);
-              setInnerState(() {}); // 🔹 force refresh of dropdown
-            },
-          ),
-        );
-      },
-    ),
-  ),
-  ..._filteredItems,
-],
-  validator: widget.isValidate ? widget.validator : null,
-  onChanged: widget.isEdit
-      ? null
-      : (value) {
-          setState(() => _selectedValue = value);
-          widget.onChanged?.call(value);
-
-          if (widget.onEditingComplete != null) {
-            widget.onEditingComplete!();
-          }
-      },
-)
-          ),
-          if (widget.addPage != null) ...[
-            IconButton(
-              tooltip: widget.addTooltip,
-              icon: const Icon(
-                Icons.add_circle,
-                color: primary,
-                size: 30,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          border:
+              Border.all(color: const Color.fromARGB(76, 0, 0, 0), width: 1.2),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+                child: DropdownButtonFormField<T>(
+              style: TextStyle(fontSize: 12.0, height: 1.0, color: black),
+              key: _dropdownKey,
+              value: _selectedValue,
+              hint: Text(widget.hintText ?? "Select"),
+              icon: const Icon(Icons.arrow_drop_down),
+              decoration: InputDecoration(
+                // labelText: widget.title,
+                prefixIcon:
+                    widget.prefixIcon != null ? Icon(widget.prefixIcon) : null,
+                // border: OutlineInputBorder(
+                //   borderRadius: BorderRadius.circular(8),
+                // ),
+                border: InputBorder.none,
               ),
-              onPressed: _openPopup,
-            ),
+              items: [
+                DropdownMenuItem<T>(
+                  enabled: false,
+                  child: StatefulBuilder(
+                    builder: (context, setInnerState) {
+                      return SizedBox(
+                        width: 200,
+                        child: TextField(
+                          style: const TextStyle(
+                              fontSize: 12.0, height: 1.0, color: black),
+                          controller: _searchController,
+                          decoration: const InputDecoration(
+                            hintText: "Search",
+                            isDense: true,
+                            // contentPadding: EdgeInsets.symmetric(
+                            //     horizontal: 8, vertical: 8),
+                            border: InputBorder.none,
+                          ),
+                          onChanged: (value) {
+                            _filterItems(value);
+                            setInnerState(
+                                () {}); // 🔹 force refresh of dropdown
+                          },
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                ..._filteredItems,
+              ],
+              validator: widget.isValidate ? widget.validator : null,
+              onChanged: widget.isEdit
+                  ? null
+                  : (value) {
+                      setState(() => _selectedValue = value);
+                      widget.onChanged?.call(value);
+
+                      if (widget.onEditingComplete != null) {
+                        widget.onEditingComplete!();
+                      }
+                    },
+            )),
+            if (widget.addPage != null) ...[
+              IconButton(
+                tooltip: widget.addTooltip,
+                icon: const Icon(
+                  Icons.add_circle,
+                  color: primary,
+                  size: 30,
+                ),
+                onPressed: _openPopup,
+              ),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }

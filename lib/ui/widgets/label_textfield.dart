@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 
+import '../../core/colors.dart';
+
 class LabeledTextField extends StatelessWidget {
   final String label;
   final TextEditingController controller;
   final FocusNode focusNode;
-  final FocusNode? nextFocusNode;   // 👈 next field to focus
+  final FocusNode? nextFocusNode; // 👈 next field to focus
   final bool readOnly;
   final TextInputType keyboardType;
   final ValueChanged<String>? onChanged;
@@ -44,12 +46,14 @@ class LabeledTextField extends StatelessWidget {
           SizedBox(
             width: fieldWidth,
             child: TextField(
+              style: const TextStyle(fontSize: 12.0, height: 2.0, color: black),
               controller: controller,
               focusNode: focusNode,
               readOnly: readOnly,
               keyboardType: keyboardType,
-              textInputAction:
-                  nextFocusNode != null ? TextInputAction.next : TextInputAction.done,
+              textInputAction: nextFocusNode != null
+                  ? TextInputAction.next
+                  : TextInputAction.done,
               decoration: InputDecoration(
                 isDense: true,
                 contentPadding:

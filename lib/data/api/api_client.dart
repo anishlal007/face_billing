@@ -9,6 +9,7 @@ class ApiClient {
       receiveTimeout: const Duration(seconds: 10),
       headers: {
         'Content-Type': 'application/json',
+        'Accept': 'application/json'
       },
     ),
   )..interceptors.add(LogInterceptor(responseBody: true)); // log requests
