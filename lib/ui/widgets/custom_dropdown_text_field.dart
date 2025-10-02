@@ -1,9 +1,5 @@
 import 'package:facebilling/core/colors.dart';
 import 'package:flutter/material.dart';
-
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class CustomDropdownField<T> extends StatefulWidget {
@@ -19,8 +15,8 @@ class CustomDropdownField<T> extends StatefulWidget {
   final FocusNode? focusNode;
   final VoidCallback? onEditingComplete;
 
-  // ✅ New: Add button + popup widget
-  final Widget? addPage; // Pass "AddCountryScreen()", "AddStateScreen()" etc.
+  // Add button + popup widget
+  final Widget? addPage;
   final String addTooltip;
 
   const CustomDropdownField({
@@ -47,29 +43,37 @@ class CustomDropdownField<T> extends StatefulWidget {
 class _CustomDropdownFieldState<T> extends State<CustomDropdownField<T>> {
   T? _selectedValue;
   final GlobalKey _dropdownKey = GlobalKey();
+  final TextEditingController _searchController = TextEditingController();
+  List<DropdownMenuItem<T>> _filteredItems = [];
 
   @override
   void initState() {
     super.initState();
     _selectedValue = widget.initialValue;
+    _filteredItems = widget.items;
   }
 
-  void _openDropdown() {
-    GestureDetector? detector;
-    void search(BuildContext? element) {
-      element?.visitChildElements((child) {
-        if (child.widget is GestureDetector) {
-          detector = child.widget as GestureDetector;
-        }
-        search(child);
-      });
+void _filterItems(String query) {
+  setState(() {
+    if (query.isEmpty) {
+      _filteredItems = widget.items;
+    } else {
+      _filteredItems = widget.items
+          .where((item) {
+            final text = (item.child as Text).data?.toLowerCase() ?? '';
+            return text.contains(query.toLowerCase()); // 🔹 FIXED
+          })
+          .toList();
     }
 
-    search(_dropdownKey.currentContext);
-    detector?.onTap?.call();
-  }
-
-  // ✅ Open popup dialog
+    print("Typed: $query");
+    print("Filtered items:");
+    for (var item in _filteredItems) {
+      final text = (item.child as Text).data ?? '';
+      print(text);
+    }
+  });
+}
   void _openPopup() {
     if (widget.addPage != null) {
       showDialog(
@@ -84,7 +88,6 @@ class _CustomDropdownFieldState<T> extends State<CustomDropdownField<T>> {
         ),
       ).then((value) {
         if (value == true) {
-          // ✅ You can trigger a reload of dropdown items here if needed
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text("Added successfully")),
           );
@@ -100,69 +103,74 @@ class _CustomDropdownFieldState<T> extends State<CustomDropdownField<T>> {
       onKeyEvent: (node, event) {
         if (event.logicalKey == LogicalKeyboardKey.enter &&
             event is KeyDownEvent) {
-          _openDropdown();
           return KeyEventResult.handled;
         }
         return KeyEventResult.ignored;
       },
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
         children: [
-          // if (widget.title != null)
-          //   Padding(
-          //     padding: const EdgeInsets.only(bottom: 6),
-          //     child: Text(
-          //       widget.title!,
-          //       style:
-          //           const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-          //     ),
-          //   ),
-          Row(
-            children: [
-              Expanded(
-                child: DropdownButtonFormField<T>(
-                  key: _dropdownKey,
-                  value: _selectedValue,
-                  hint: Text(widget.hintText ?? "Select"),
-                  icon: const Icon(Icons.arrow_drop_down),
-                  decoration: InputDecoration(
-                      labelText: widget.title,
-                    prefixIcon: widget.prefixIcon != null
-                        ? Icon(widget.prefixIcon)
-                        : null,
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8)),
-                  ),
-                  items: widget.items,
-                  validator: widget.isValidate ? widget.validator : null,
-                  onChanged: widget.isEdit
-                      ? null
-                      : (value) {
-                          setState(() => _selectedValue = value);
-                          widget.onChanged?.call(value);
-
-                          if (widget.onEditingComplete != null) {
-                            widget.onEditingComplete!();
-                          }
-                        },
-                ),
-              ),
-
-              // ✅ Add button (if addPage is provided)
-              if (widget.addPage != null) ...[
-                // const SizedBox(width: 8),
-                IconButton(
-                  tooltip: widget.addTooltip,
-                  icon: const Icon(
-                    Icons.add_circle,
-                    color: primary,
-                    size: 30,
-                  ),
-                  onPressed: _openPopup,
-                ),
-              ],
-            ],
+          Expanded(
+            child:DropdownButtonFormField<T>(
+  key: _dropdownKey,
+  value: _selectedValue,
+  hint: Text(widget.hintText ?? "Select"),
+  icon: const Icon(Icons.arrow_drop_down),
+  decoration: InputDecoration(
+    labelText: widget.title,
+    prefixIcon: widget.prefixIcon != null ? Icon(widget.prefixIcon) : null,
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(8),
+    ),
+  ),
+items: [
+  DropdownMenuItem<T>(
+    enabled: false,
+    child: StatefulBuilder(
+      builder: (context, setInnerState) {
+        return SizedBox(
+          width: 400,
+          child: TextField(
+            controller: _searchController,
+            decoration: const InputDecoration(
+              hintText: "Search...",
+              isDense: true,
+              contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+            ),
+            onChanged: (value) {
+              _filterItems(value);
+              setInnerState(() {}); // 🔹 force refresh of dropdown
+            },
           ),
+        );
+      },
+    ),
+  ),
+  ..._filteredItems,
+],
+  validator: widget.isValidate ? widget.validator : null,
+  onChanged: widget.isEdit
+      ? null
+      : (value) {
+          setState(() => _selectedValue = value);
+          widget.onChanged?.call(value);
+
+          if (widget.onEditingComplete != null) {
+            widget.onEditingComplete!();
+          }
+      },
+)
+          ),
+          if (widget.addPage != null) ...[
+            IconButton(
+              tooltip: widget.addTooltip,
+              icon: const Icon(
+                Icons.add_circle,
+                color: primary,
+                size: 30,
+              ),
+              onPressed: _openPopup,
+            ),
+          ],
         ],
       ),
     );

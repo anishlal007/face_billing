@@ -2,10 +2,28 @@
   "configVersion": 2,
   "packages": [
     {
+      "name": "archive",
+      "rootUri": "file:///Users/anishlal/.pub-cache/hosted/pub.dev/archive-4.0.7",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
       "name": "async",
       "rootUri": "file:///Users/anishlal/.pub-cache/hosted/pub.dev/async-2.11.0",
       "packageUri": "lib/",
       "languageVersion": "2.18"
+    },
+    {
+      "name": "barcode",
+      "rootUri": "file:///Users/anishlal/.pub-cache/hosted/pub.dev/barcode-2.2.9",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "bidi",
+      "rootUri": "file:///Users/anishlal/.pub-cache/hosted/pub.dev/bidi-2.0.13",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
     },
     {
       "name": "boolean_selector",
@@ -38,6 +56,12 @@
       "languageVersion": "3.3"
     },
     {
+      "name": "crypto",
+      "rootUri": "file:///Users/anishlal/.pub-cache/hosted/pub.dev/crypto-3.0.6",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
+    },
+    {
       "name": "cupertino_icons",
       "rootUri": "file:///Users/anishlal/.pub-cache/hosted/pub.dev/cupertino_icons-1.0.8",
       "packageUri": "lib/",
@@ -60,6 +84,12 @@
       "rootUri": "file:///Users/anishlal/.pub-cache/hosted/pub.dev/fake_async-1.3.1",
       "packageUri": "lib/",
       "languageVersion": "2.12"
+    },
+    {
+      "name": "ffi",
+      "rootUri": "file:///Users/anishlal/.pub-cache/hosted/pub.dev/ffi-2.1.3",
+      "packageUri": "lib/",
+      "languageVersion": "3.3"
     },
     {
       "name": "file_selector_linux",
@@ -128,6 +158,12 @@
       "languageVersion": "2.12"
     },
     {
+      "name": "image",
+      "rootUri": "file:///Users/anishlal/.pub-cache/hosted/pub.dev/image-4.5.4",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
       "name": "image_picker",
       "rootUri": "file:///Users/anishlal/.pub-cache/hosted/pub.dev/image_picker-1.1.2",
       "packageUri": "lib/",
@@ -174,6 +210,12 @@
       "rootUri": "file:///Users/anishlal/.pub-cache/hosted/pub.dev/image_picker_windows-0.2.1+1",
       "packageUri": "lib/",
       "languageVersion": "2.19"
+    },
+    {
+      "name": "intl",
+      "rootUri": "file:///Users/anishlal/.pub-cache/hosted/pub.dev/intl-0.20.2",
+      "packageUri": "lib/",
+      "languageVersion": "3.3"
     },
     {
       "name": "leak_tracker",
@@ -230,10 +272,52 @@
       "languageVersion": "3.0"
     },
     {
+      "name": "path_parsing",
+      "rootUri": "file:///Users/anishlal/.pub-cache/hosted/pub.dev/path_parsing-1.1.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.3"
+    },
+    {
+      "name": "pdf",
+      "rootUri": "file:///Users/anishlal/.pub-cache/hosted/pub.dev/pdf-3.11.3",
+      "packageUri": "lib/",
+      "languageVersion": "2.19"
+    },
+    {
+      "name": "pdf_widget_wrapper",
+      "rootUri": "file:///Users/anishlal/.pub-cache/hosted/pub.dev/pdf_widget_wrapper-1.0.4",
+      "packageUri": "lib/",
+      "languageVersion": "2.18"
+    },
+    {
+      "name": "petitparser",
+      "rootUri": "file:///Users/anishlal/.pub-cache/hosted/pub.dev/petitparser-6.0.2",
+      "packageUri": "lib/",
+      "languageVersion": "3.2"
+    },
+    {
       "name": "plugin_platform_interface",
       "rootUri": "file:///Users/anishlal/.pub-cache/hosted/pub.dev/plugin_platform_interface-2.1.8",
       "packageUri": "lib/",
       "languageVersion": "3.0"
+    },
+    {
+      "name": "posix",
+      "rootUri": "file:///Users/anishlal/.pub-cache/hosted/pub.dev/posix-6.0.3",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
+      "name": "printing",
+      "rootUri": "file:///Users/anishlal/.pub-cache/hosted/pub.dev/printing-5.14.2",
+      "packageUri": "lib/",
+      "languageVersion": "3.3"
+    },
+    {
+      "name": "qr",
+      "rootUri": "file:///Users/anishlal/.pub-cache/hosted/pub.dev/qr-3.0.2",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
     },
     {
       "name": "sky_engine",
@@ -302,13 +386,19 @@
       "languageVersion": "3.4"
     },
     {
+      "name": "xml",
+      "rootUri": "file:///Users/anishlal/.pub-cache/hosted/pub.dev/xml-6.5.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.2"
+    },
+    {
       "name": "facebilling",
       "rootUri": "../",
       "packageUri": "lib/",
       "languageVersion": "3.5"
     }
   ],
-  "generated": "2025-09-28T16:00:58.631798Z",
+  "generated": "2025-10-02T00:23:05.210578Z",
   "generator": "pub",
   "generatorVersion": "3.5.4",
   "flutterRoot": "file:///Users/anishlal/Documents/FlutterDev/sdk/flutter",

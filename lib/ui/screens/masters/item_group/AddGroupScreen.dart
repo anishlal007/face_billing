@@ -138,6 +138,18 @@ class _AddgroupscreenState extends State<Addgroupscreen> {
               },
               displayString: (country) => country.itemGroupName ?? "",
               onSelected: (country) {
+                if(country !=null){
+                  setState(() {
+                  _itemGroupNameController.text =
+                      country.itemGroupName.toString();
+                  _createdUserController.text =
+                      country.cratedUserCode?.toString() ?? "1001";
+                  _activeStatus = (country.activeStatus ?? 1) == 1;
+                });
+
+                // ✅ Switch form into "Update mode"
+                widget.onSaved(false); 
+                }
                 setState(() {
                   _itemGroupNameController.text =
                       country.itemGroupName.toString();
@@ -149,6 +161,18 @@ class _AddgroupscreenState extends State<Addgroupscreen> {
                 // ✅ Switch form into "Update mode"
                 widget.onSaved(false);
               },
+                onSubmitted: (typedValue) {
+    // ✅ User pressed enter or confirmed text without selecting
+    setState(() {
+      _itemGroupNameController.clear(); // no id since not from API
+      _itemGroupNameController.text = typedValue; 
+      print("_itemGroupNameController.text");// use typed text
+      print(_itemGroupNameController.text);// use typed text
+      _createdUserController.text = "1001";
+      _activeStatus = true;
+    });
+    widget.onSaved(false);
+  },
             ),
 
             const SizedBox(height: 26),
