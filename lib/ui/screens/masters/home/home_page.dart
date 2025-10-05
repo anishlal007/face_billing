@@ -3,6 +3,7 @@ import 'package:facebilling/ui/screens/pages/country_master.dart';
 import 'package:facebilling/ui/screens/pages/purchase_master_page.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/menu_item.dart';
+import '../../../../google_sheet.dart';
 import '../../pages/Unit_master.dart';
 import '../../pages/area_master_page.dart';
 import '../../pages/company_master_page.dart';
@@ -16,6 +17,8 @@ import '../../pages/item_group_master.dart';
 import '../../pages/item_make_master.dart';
 import '../../pages/item_make_master_page.dart';
 import '../../pages/product_master_page.dart';
+import '../../pages/sales_entry_page.dart';
+import '../../pages/sales_order_entry_page.dart';
 import '../../pages/state_master_page.dart';
 import '../../pages/supplier_grpup_master_page.dart';
 import '../../pages/supplier_master_page.dart';
@@ -157,9 +160,24 @@ class _HomePageState extends State<HomePage> {
       page: ReportMasterPage(),
     ),
     MenuItemData(
+      title: "Sales Entry",
+      icon: Icons.report,
+      page: SalesEntryPage(),
+    ),
+    MenuItemData(
+      title: "Sales Order Entry",
+      icon: Icons.report,
+      page: SalesOrderEntryPage(),
+    ),
+    MenuItemData(
       title: "Transactions",
       icon: Icons.swap_horiz,
       page: const TransactionsPage(),
+    ),
+    MenuItemData(
+      title: "Google sheet",
+      icon: Icons.swap_horiz,
+      page:  GoogleSheetUploadPage(),
     ),
   ];
   Widget _getSelectedPage() {
