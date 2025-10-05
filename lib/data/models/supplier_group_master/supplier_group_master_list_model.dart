@@ -28,13 +28,13 @@ class SupplierGroupMasterListModel {
 }
 
 class Info {
-  int? supGroupCode;
+  dynamic supGroupCode;
   String? supGroupName;
   String? cratedUserCode;
   String? createdDate;
   String? updatedUserCode;
   String? updatedDate;
-  int? activeStatus;
+  dynamic activeStatus;
 
   Info(
       {this.supGroupCode,

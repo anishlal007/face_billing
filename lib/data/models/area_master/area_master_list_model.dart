@@ -1,6 +1,6 @@
 class AreaMasterListModel {
   bool? status;
-  String? message;
+  dynamic message;
   List<Info>? info;
 
   AreaMasterListModel({this.status, this.message, this.info});
@@ -28,12 +28,12 @@ class AreaMasterListModel {
 }
 
 class Info {
-  int? areaCode;
-  String? areaId;
-  String? areaName;
-  int? stateCode;
-  int? createdUserCode;
-  int? activeStatus;
+  dynamic areaCode;
+  dynamic areaId;
+  dynamic areaName;
+  dynamic stateCode;
+  dynamic createdUserCode;
+  dynamic activeStatus;
 
   Info(
       {this.areaCode,

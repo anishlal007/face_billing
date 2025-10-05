@@ -27,11 +27,11 @@
 // }
 
 class CountryInfo {
-  int? countryCode;
+  dynamic countryCode;
   String? countryId;
   String? countryName;
-  int? createdUserCode;
-  int? activeStatus;
+  dynamic createdUserCode;
+  dynamic activeStatus;
 
   CountryInfo(
       {this.countryCode,

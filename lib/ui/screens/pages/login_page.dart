@@ -1,18 +1,29 @@
+
+import 'package:facebilling/core/const.dart';
 import 'package:flutter/material.dart';
 
+import '../../../core/colors.dart';
+import '../../../core/preference_helper.dart';
+import '../../../data/services/login_service.dart';
 import '../masters/home/home_page.dart';
 
 // You can define a constant for the main purple color
-const Color kPrimaryColor = Color(0xFF673AB7); // A representative purple
 
-class WebmailLoginScreen extends StatelessWidget {
+class WebmailLoginScreen extends StatefulWidget {
   const WebmailLoginScreen({super.key});
+
+  @override
+  State<WebmailLoginScreen> createState() => _WebmailLoginScreenState();
+}
+
+class _WebmailLoginScreenState extends State<WebmailLoginScreen> {
+
 
   @override
   Widget build(BuildContext context) {
     // LayoutBuilder checks the screen constraints (width)
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: white,
       body: Center(
         child: LayoutBuilder(
           builder: (context, constraints) {
@@ -36,11 +47,11 @@ class WebmailLoginScreen extends StatelessWidget {
       // The main card container for the web version
       constraints: const BoxConstraints(maxWidth: 800, maxHeight: 500),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: const [
           BoxShadow(
-            color: Colors.black12,
+            color:black,
             blurRadius: 20,
             offset: Offset(0, 5),
           ),
@@ -93,101 +104,124 @@ class WebmailLoginScreen extends StatelessWidget {
 // --- COMMON WIDGETS ---
 
 // The stateless widget for the login form elements
-class _WebmailLoginForm extends StatelessWidget {
+class _WebmailLoginForm extends StatefulWidget {
+  const _WebmailLoginForm({super.key});
+
+  @override
+  State<_WebmailLoginForm> createState() => _WebmailLoginFormState();
+}
+
+class _WebmailLoginFormState extends State<_WebmailLoginForm> {
+  final _formKey = GlobalKey<FormState>();
+  final _userIdController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final LoginService _loginService = LoginService();
+  bool _isLoading = false;
+
+  @override
+  void dispose() {
+    _userIdController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _handleLogin() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() => _isLoading = true);
+
+    final response = await _loginService.login(
+      userId: _userIdController.text.trim(),
+      userPassword: _passwordController.text.trim(),
+    );
+
+    setState(() => _isLoading = false);
+
+    if (response.data != null && response.data!.status == true) {
+      // ✅ Save login data and token
+      await SharedPreferenceHelper.setUser(response.data!.user!);
+      await SharedPreferenceHelper.setToken(response.data!.token!);
+      String? token=await SharedPreferenceHelper.getToken();
+      globalToken.value=token;
+      print("globalToken.value");
+      print(globalToken.value);
+
+      // ✅ Navigate to HomePage and remove all previous routes
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const HomePage()),
+        (route) => false,
+      );
+    } else {
+      // ❌ Show error message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(response.error ?? "Invalid credentials")),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Form(
+      key: _formKey,
       child: Column(
-        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          // Welcome Text
+        children: [
           const Text(
             'Welcome To Webmail',
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: kPrimaryColor, // Use the main purple color
+              color: primary,
             ),
           ),
           const SizedBox(height: 30),
 
-          // Email Input Field
           TextFormField(
-            initialValue: 'anish@multiaccess.io', // Pre-filled value
+            controller: _userIdController,
             decoration: const InputDecoration(
               hintText: 'Email',
-              // Hides the default bottom line for a cleaner look as in the image
-              border: UnderlineInputBorder(
-                borderSide: BorderSide(color: Colors.grey),
-              ),
-              focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: kPrimaryColor, width: 2),
-              ),
-              enabledBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: Colors.grey, width: 1),
-              ),
-              contentPadding: EdgeInsets.symmetric(vertical: 10),
+              border: UnderlineInputBorder(),
             ),
-            keyboardType: TextInputType.emailAddress,
+            validator: (value) =>
+                value == null || value.isEmpty ? 'Please enter email' : null,
           ),
           const SizedBox(height: 20),
 
-          // Password Input Field
           TextFormField(
-            initialValue: '••••••••••', // A dummy password placeholder
+            controller: _passwordController,
             obscureText: true,
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               hintText: 'Password',
-              suffixIcon: IconButton(
-                icon: const Icon(Icons.visibility_off, color: Colors.grey),
-                onPressed: () {
-                  // TODO: Implement password visibility toggle
-                },
-              ),
-              border: const UnderlineInputBorder(
-                borderSide: BorderSide(color: Colors.grey),
-              ),
-              focusedBorder: const UnderlineInputBorder(
-                borderSide: BorderSide(color: kPrimaryColor, width: 2),
-              ),
-              enabledBorder: const UnderlineInputBorder(
-                borderSide: BorderSide(color: Colors.grey, width: 1),
-              ),
-              contentPadding: const EdgeInsets.symmetric(vertical: 10),
+              border: UnderlineInputBorder(),
             ),
+            validator: (value) =>
+                value == null || value.isEmpty ? 'Please enter password' : null,
           ),
           const SizedBox(height: 40),
 
-          // Sign In Button
           ElevatedButton(
-            onPressed: () {
-              Navigator.pushAndRemoveUntil(
-  context,
-  MaterialPageRoute(builder: (context) => const HomePage()),
-  (Route<dynamic> route) => false, // remove all previous routes
-);
-              // TODO: Implement login logic
-            },
+            onPressed: _isLoading ? null : _handleLogin,
             style: ElevatedButton.styleFrom(
-              backgroundColor: kPrimaryColor, // Background color
-              foregroundColor: Colors.white, // Text color
+              backgroundColor: primary,
+              foregroundColor: white,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
               padding: const EdgeInsets.symmetric(vertical: 16),
             ),
-            child: const Text(
-              'Sign In',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
+            child: _isLoading
+                ? const CircularProgressIndicator(color: white)
+                : const Text(
+                    'Sign In',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
           ),
         ],
       ),
     );
   }
 }
-
 // Widget for the left purple panel on web/desktop
 class _PurplePanel extends StatelessWidget {
   const _PurplePanel();
@@ -196,7 +230,7 @@ class _PurplePanel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: kPrimaryColor,
+        color: primary,
         borderRadius: BorderRadius.circular(16),
       ),
       child: const Stack(
@@ -208,7 +242,7 @@ class _PurplePanel extends StatelessWidget {
               style: TextStyle(
                 fontSize: 72,
                 fontWeight: FontWeight.w900,
-                color: Colors.white,
+                color: white,
               ),
             ),
           ),
@@ -218,7 +252,7 @@ class _PurplePanel extends StatelessWidget {
             bottom: 20,
             right: 20,
             child: _TermsAndPolicyLinks(
-                textColor: Colors.white), // White text on purple background
+                textColor: white), // White text on purple background
           ),
         ],
       ),
@@ -229,7 +263,7 @@ class _PurplePanel extends StatelessWidget {
 // Widget for the Terms & Privacy Policy links
 class _TermsAndPolicyLinks extends StatelessWidget {
   final Color textColor;
-  const _TermsAndPolicyLinks({this.textColor = kPrimaryColor});
+  const _TermsAndPolicyLinks({this.textColor = primary});
 
   @override
   Widget build(BuildContext context) {

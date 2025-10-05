@@ -1,6 +1,8 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:file_picker/file_picker.dart';
 
 import '../api/api_client.dart';
 import '../api/api_response.dart';
@@ -27,6 +29,56 @@ class ProductService {
       return ApiResponse(error: e.toString());
     }
   }
+Future<ApiResponse<bool>> uploadProductExcelFile() async {
+  try {
+    // Step 1️⃣ — Pick the Excel file
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['xls', 'xlsx'],
+    );
+
+    if (result == null) {
+      return ApiResponse(error: "No file selected");
+    }
+
+    final file = File(result.files.single.path!);
+
+    // Step 2️⃣ — Prepare form data for multipart upload
+    final formData = FormData.fromMap({
+      'file': await MultipartFile.fromFile(
+        file.path,
+        filename: file.path.split('/').last,
+      ),
+    });
+ 
+    final response = await _dio.post(
+      "products/bulk-upload",
+      data: formData,
+      options: Options(
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvYXBpL2xvZ2luIiwiaWF0IjoxNzU5NjYxNzI2LCJleHAiOjE3NTk2NjUzMjYsIm5iZiI6MTc1OTY2MTcyNiwianRpIjoia0pjUDcwdVRlbHpHQTl0MyIsInN1YiI6IjEiLCJwcnYiOiJkYzQ2Y2Q3NzI3NWViZTI1MzQ5MzgxMjNmYTVhMjRiODA1NmRjN2Q5In0.MoLo-k9Z5sdpnqjvsPXg108yLXyS2ZJaZ1Eq3qXR8x0', 
+        },
+        contentType: 'multipart/form-data',
+      ),
+      onSendProgress: (count, total) {
+        print("Uploading: ${(count / total * 100).toStringAsFixed(0)}%");
+      },
+    );
+
+    // Step 4️⃣ — Handle response
+    if (response.statusCode == 200) {
+      return ApiResponse(data: true);
+    } else {
+      return ApiResponse(error: "Upload failed: ${response.statusMessage}");
+    }
+  } catch (e) {
+    print("❌ Upload Error: $e");
+    return ApiResponse(error: e.toString());
+  }
+}
+
+
   Future<ApiResponse<bool>> addProductService(AddProductMasterModel request) async {
     try {
       final response = await _dio.post("products", data: request.toJson());

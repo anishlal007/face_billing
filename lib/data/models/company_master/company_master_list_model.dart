@@ -28,7 +28,7 @@ class CompanyMasterListModel {
 }
 
 class Info {
-  int? coCode;
+  dynamic coCode;
   String? coName;
   String? coShortName;
   String? coAddress1;
@@ -36,11 +36,11 @@ class Info {
   String? coAddress3;
   String? coAddress4;
   String? coAddress5;
-  int? areaCode;
-  int? cityCode;
+  dynamic areaCode;
+  dynamic cityCode;
   String? coPinCode;
-  int? stateCode;
-  int? countryCode;
+  dynamic stateCode;
+  dynamic countryCode;
   String? coMobileNo1;
   String? coMobileNo2;
   String? coPhoneNo1;
@@ -60,7 +60,7 @@ class Info {
   String? coBankAdd2;
   String? coBankAdd3;
   String? coLogo;
-  int? coActiveStatus;
+  dynamic coActiveStatus;
   String? softwareVersion;
   String? softwareInstalledDt;
 

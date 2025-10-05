@@ -6,11 +6,11 @@ class AddCompanyMasterModel {
   String? coAddress3;
   String? coAddress4;
   String? coAddress5;
-  int? areaCode;
-  int? cityCode;
+  dynamic areaCode;
+  dynamic cityCode;
   String? coPinCode;
-  int? stateCode;
-  int? countryCode;
+  dynamic stateCode;
+  dynamic countryCode;
   String? coMobileNo1;
   String? coPhoneNo1;
   String? coMailId;
@@ -25,7 +25,7 @@ class AddCompanyMasterModel {
   String? coBranchName;
   String? coBankAdd1;
   String? coLogo;
-  int? coActiveStatus;
+  dynamic coActiveStatus;
   String? softwareVersion;
   String? softwareInstalledDt;
 

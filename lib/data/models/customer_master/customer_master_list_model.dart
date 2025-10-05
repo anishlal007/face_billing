@@ -28,15 +28,15 @@ class CustomerMasterListModel {
 }
 
 class Info {
-  int? custCode;
+  dynamic custCode;
   String? custId;
   String? custName;
   String? custDOB;
-  int? gender;
-  int? custGroupCode;
-  int? custAreaCode;
-  int? custStateCode;
-  int? custCountryCode;
+  dynamic gender;
+  dynamic custGroupCode;
+  dynamic custAreaCode;
+  dynamic custStateCode;
+  dynamic custCountryCode;
   String? custaddress1;
   String? custAddress2;
   String? custAddress3;
@@ -49,13 +49,13 @@ class Info {
   String? custEmailId;
   String? custPanNo;
   String? custGSTINNo;
-  int? custGSTType;
-  int? taxIsIncluded;
+  dynamic custGSTType;
+  dynamic taxIsIncluded;
   String? custCreatedDate;
-  int? createdUserCode;
+  dynamic createdUserCode;
   String? custUpdatedDate;
-  int? updatedUserCode;
-  int? custActiveStatus;
+  dynamic updatedUserCode;
+  dynamic custActiveStatus;
   Group? group;
   Area? area;
   Country? country;
@@ -172,13 +172,13 @@ class Info {
 }
 
 class Group {
-  int? custGroupCode;
+  dynamic custGroupCode;
   String? custGroupName;
   String? cratedUserCode;
   String? createdDate;
   String? updatedUserCode;
   String? updatedDate;
-  int? activeStatus;
+  dynamic activeStatus;
 
   Group(
       {this.custGroupCode,
@@ -213,12 +213,12 @@ class Group {
 }
 
 class Area {
-  int? areaCode;
+  dynamic areaCode;
   String? areaId;
   String? areaName;
-  int? stateCode;
-  int? createdUserCode;
-  int? activeStatus;
+  dynamic stateCode;
+  dynamic createdUserCode;
+  dynamic activeStatus;
 
   Area(
       {this.areaCode,
@@ -250,11 +250,11 @@ class Area {
 }
 
 class Country {
-  int? countryCode;
+  dynamic countryCode;
   String? countryId;
   String? countryName;
-  int? createdUserCode;
-  int? activeStatus;
+  dynamic createdUserCode;
+  dynamic activeStatus;
 
   Country(
       {this.countryCode,

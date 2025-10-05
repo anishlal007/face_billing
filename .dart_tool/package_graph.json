@@ -16,7 +16,8 @@
         "image_picker",
         "intl",
         "pdf",
-        "printing"
+        "printing",
+        "shared_preferences"
       ],
       "devDependencies": [
         "flutter_lints",
@@ -59,9 +60,47 @@
       ]
     },
     {
+      "name": "shared_preferences",
+      "version": "2.5.3",
+      "dependencies": [
+        "flutter",
+        "shared_preferences_android",
+        "shared_preferences_foundation",
+        "shared_preferences_linux",
+        "shared_preferences_platform_interface",
+        "shared_preferences_web",
+        "shared_preferences_windows"
+      ]
+    },
+    {
       "name": "csv",
       "version": "6.0.0",
       "dependencies": []
+    },
+    {
+      "name": "excel",
+      "version": "4.0.6",
+      "dependencies": [
+        "archive",
+        "collection",
+        "equatable",
+        "xml"
+      ]
+    },
+    {
+      "name": "file_picker",
+      "version": "8.3.7",
+      "dependencies": [
+        "cross_file",
+        "ffi",
+        "flutter",
+        "flutter_plugin_android_lifecycle",
+        "flutter_web_plugins",
+        "path",
+        "plugin_platform_interface",
+        "web",
+        "win32"
+      ]
     },
     {
       "name": "intl",
@@ -311,8 +350,53 @@
       ]
     },
     {
+      "name": "equatable",
+      "version": "2.0.7",
+      "dependencies": [
+        "collection",
+        "meta"
+      ]
+    },
+    {
+      "name": "xml",
+      "version": "6.5.0",
+      "dependencies": [
+        "collection",
+        "meta",
+        "petitparser"
+      ]
+    },
+    {
+      "name": "archive",
+      "version": "3.6.1",
+      "dependencies": [
+        "crypto",
+        "path"
+      ]
+    },
+    {
       "name": "web",
       "version": "1.1.1",
+      "dependencies": []
+    },
+    {
+      "name": "cross_file",
+      "version": "0.3.4+2",
+      "dependencies": [
+        "meta",
+        "web"
+      ]
+    },
+    {
+      "name": "win32",
+      "version": "5.13.0",
+      "dependencies": [
+        "ffi"
+      ]
+    },
+    {
+      "name": "ffi",
+      "version": "2.1.3",
       "dependencies": []
     },
     {
@@ -323,21 +407,10 @@
       ]
     },
     {
-      "name": "pdf_widget_wrapper",
-      "version": "1.0.4",
+      "name": "flutter_plugin_android_lifecycle",
+      "version": "2.0.26",
       "dependencies": [
-        "flutter",
-        "pdf"
-      ]
-    },
-    {
-      "name": "http",
-      "version": "1.5.0",
-      "dependencies": [
-        "async",
-        "http_parser",
-        "meta",
-        "web"
+        "flutter"
       ]
     },
     {
@@ -353,17 +426,30 @@
       ]
     },
     {
-      "name": "ffi",
-      "version": "2.1.3",
-      "dependencies": []
+      "name": "pdf_widget_wrapper",
+      "version": "1.0.4",
+      "dependencies": [
+        "flutter",
+        "pdf"
+      ]
     },
     {
-      "name": "xml",
-      "version": "6.5.0",
+      "name": "image",
+      "version": "4.3.0",
       "dependencies": [
-        "collection",
+        "archive",
         "meta",
-        "petitparser"
+        "xml"
+      ]
+    },
+    {
+      "name": "http",
+      "version": "1.5.0",
+      "dependencies": [
+        "async",
+        "http_parser",
+        "meta",
+        "web"
       ]
     },
     {
@@ -533,14 +619,6 @@
       ]
     },
     {
-      "name": "cross_file",
-      "version": "0.3.4+2",
-      "dependencies": [
-        "meta",
-        "web"
-      ]
-    },
-    {
       "name": "file_selector_macos",
       "version": "0.9.4+2",
       "dependencies": [
@@ -559,67 +637,112 @@
       ]
     },
     {
-      "name": "flutter_plugin_android_lifecycle",
-      "version": "2.0.26",
+      "name": "shared_preferences_windows",
+      "version": "2.4.1",
       "dependencies": [
-        "flutter"
+        "file",
+        "flutter",
+        "path",
+        "path_provider_platform_interface",
+        "path_provider_windows",
+        "shared_preferences_platform_interface"
       ]
     },
     {
-      "name": "excel",
-      "version": "4.0.6",
+      "name": "shared_preferences_platform_interface",
+      "version": "2.4.1",
       "dependencies": [
-        "archive",
-        "collection",
-        "equatable",
-        "xml"
+        "flutter",
+        "plugin_platform_interface"
       ]
     },
     {
-      "name": "archive",
-      "version": "3.6.1",
+      "name": "shared_preferences_linux",
+      "version": "2.4.1",
       "dependencies": [
-        "crypto",
+        "file",
+        "flutter",
+        "path",
+        "path_provider_linux",
+        "path_provider_platform_interface",
+        "shared_preferences_platform_interface"
+      ]
+    },
+    {
+      "name": "shared_preferences_web",
+      "version": "2.4.3",
+      "dependencies": [
+        "flutter",
+        "flutter_web_plugins",
+        "shared_preferences_platform_interface",
+        "web"
+      ]
+    },
+    {
+      "name": "shared_preferences_foundation",
+      "version": "2.5.4",
+      "dependencies": [
+        "flutter",
+        "shared_preferences_platform_interface"
+      ]
+    },
+    {
+      "name": "file",
+      "version": "7.0.1",
+      "dependencies": [
+        "meta",
         "path"
       ]
     },
     {
-      "name": "equatable",
-      "version": "2.0.7",
+      "name": "path_provider_platform_interface",
+      "version": "2.1.2",
       "dependencies": [
-        "collection",
-        "meta"
+        "flutter",
+        "platform",
+        "plugin_platform_interface"
       ]
     },
     {
-      "name": "image",
-      "version": "4.3.0",
+      "name": "platform",
+      "version": "3.1.6",
+      "dependencies": []
+    },
+    {
+      "name": "shared_preferences_android",
+      "version": "2.4.13",
       "dependencies": [
-        "archive",
-        "meta",
-        "xml"
+        "flutter",
+        "shared_preferences_platform_interface"
       ]
     },
     {
-      "name": "file_picker",
-      "version": "8.3.7",
+      "name": "path_provider_linux",
+      "version": "2.2.1",
       "dependencies": [
-        "cross_file",
         "ffi",
         "flutter",
-        "flutter_plugin_android_lifecycle",
-        "flutter_web_plugins",
         "path",
-        "plugin_platform_interface",
-        "web",
-        "win32"
+        "path_provider_platform_interface",
+        "xdg_directories"
       ]
     },
     {
-      "name": "win32",
-      "version": "5.13.0",
+      "name": "xdg_directories",
+      "version": "1.1.0",
       "dependencies": [
-        "ffi"
+        "meta",
+        "path"
+      ]
+    },
+    {
+      "name": "path_provider_windows",
+      "version": "2.3.0",
+      "dependencies": [
+        "ffi",
+        "flutter",
+        "path",
+        "path_provider_platform_interface"
       ]
     }
   ],

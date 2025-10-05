@@ -1,11 +1,11 @@
 class ItemGroupInfo {
-  int? itemGroupCode;
+  dynamic itemGroupCode;
   String? itemGroupName;
   String? cratedUserCode;
   String? createdDate;
   String? updatedUserCode;
   String? updatedDate;
-  int? activeStatus;
+  dynamic activeStatus;
   DateTime? createdAt;
   DateTime? updatedAt;
 

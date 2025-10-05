@@ -43,6 +43,7 @@ dependencies:
   file_picker: ^8.0.0   # to pick file
   excel: ^4.0.2         # to read .xlsx
   csv: ^6.0.0 
+  shared_preferences: ^2.5.3
 
 dev_dependencies:
   flutter_test:

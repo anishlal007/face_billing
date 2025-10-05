@@ -260,7 +260,7 @@ class Info {
 }
 
 class Company {
-  int? coCode;
+  dynamic coCode;
   String? coName;
   String? coShortName;
   String? coAddress1;
@@ -268,11 +268,11 @@ class Company {
   String? coAddress3;
   String? coAddress4;
   String? coAddress5;
-  int? areaCode;
-  int? cityCode;
+  dynamic areaCode;
+  dynamic cityCode;
   String? coPinCode;
-  int? stateCode;
-  int? countryCode;
+  dynamic stateCode;
+  dynamic countryCode;
   String? coMobileNo1;
   String? coMobileNo2;
   String? coPhoneNo1;
@@ -292,7 +292,7 @@ class Company {
   String? coBankAdd2;
   String? coBankAdd3;
   String? coLogo;
-  int? coActiveStatus;
+  dynamic coActiveStatus;
   String? softwareVersion;
   String? softwareInstalledDt;
 
@@ -413,12 +413,12 @@ class Company {
 }
 
 class Areas {
-  int? areaCode;
+  dynamic areaCode;
   String? areaId;
   String? areaName;
-  int? stateCode;
-  int? createdUserCode;
-  int? activeStatus;
+  dynamic stateCode;
+  dynamic createdUserCode;
+  dynamic activeStatus;
 
   Areas(
       {this.areaCode,
@@ -450,11 +450,11 @@ class Areas {
 }
 
 class Countries {
-  int? countryCode;
+  dynamic countryCode;
   String? countryId;
   String? countryName;
-  int? createdUserCode;
-  int? activeStatus;
+  dynamic createdUserCode;
+  dynamic activeStatus;
 
   Countries(
       {this.countryCode,
@@ -483,15 +483,15 @@ class Countries {
 }
 
 class Customers {
-  int? custCode;
+  dynamic custCode;
   String? custId;
   String? custName;
   String? custDOB;
-  int? gender;
-  int? custGroupCode;
-  int? custAreaCode;
-  int? custStateCode;
-  int? custCountryCode;
+  dynamic gender;
+  dynamic custGroupCode;
+  dynamic custAreaCode;
+  dynamic custStateCode;
+  dynamic custCountryCode;
   String? custaddress1;
   String? custAddress2;
   String? custAddress3;
@@ -504,13 +504,13 @@ class Customers {
   String? custEmailId;
   String? custPanNo;
   String? custGSTINNo;
-  int? custGSTType;
-  int? taxIsIncluded;
+  dynamic custGSTType;
+  dynamic taxIsIncluded;
   String? custCreatedDate;
-  int? createdUserCode;
+  dynamic createdUserCode;
   String? custUpdatedDate;
-  int? updatedUserCode;
-  int? custActiveStatus;
+  dynamic updatedUserCode;
+  dynamic custActiveStatus;
 
   Customers(
       {this.custCode,
@@ -608,13 +608,13 @@ class Customers {
 }
 
 class CustomerGroups {
-  int? custGroupCode;
+  dynamic custGroupCode;
   String? custGroupName;
   String? cratedUserCode;
   String? createdDate;
   String? updatedUserCode;
   String? updatedDate;
-  int? activeStatus;
+  dynamic activeStatus;
 
   CustomerGroups(
       {this.custGroupCode,
@@ -649,15 +649,15 @@ class CustomerGroups {
 }
 
 class Doctors {
-  int? doctCode;
+  dynamic doctCode;
   String? doctId;
   String? doctName;
-  int? doctCommPercent;
+  dynamic doctCommPercent;
   String? doctMobileNo;
   String? createdUserCode;
   String? createdDate;
   String? updatedUserCode;
-  int? activeStatus;
+  dynamic activeStatus;
 
   Doctors(
       {this.doctCode,
@@ -701,13 +701,13 @@ class FinanceYears {
   String? finYearCode;
   String? finYearStartDate;
   String? finYearEndDate;
-  int? currentFinYear;
-  int? cessPercentage;
+  dynamic currentFinYear;
+  dynamic cessPercentage;
   String? cratedUserCode;
   String? createdDate;
   String? updatedUserCode;
   String? updatedDate;
-  int? activeStatus;
+  dynamic activeStatus;
 
   FinanceYears(
       {this.finYearCode,
@@ -751,13 +751,13 @@ class FinanceYears {
 }
 
 class Generics {
-  int? genericCode;
+  dynamic genericCode;
   String? genericName;
   String? cratedUserCode;
   String? createdDate;
   String? updatedUserCode;
   String? updatedDate;
-  int? activeStatus;
+  dynamic activeStatus;
 
   Generics(
       {this.genericCode,
@@ -792,16 +792,16 @@ class Generics {
 }
 
 class HsnMasters {
-  int? hsnCode;
+  dynamic hsnCode;
   String? hsnName;
   String? hsnNo;
-  int? gstPercentage;
-  int? cessPercentage;
+  dynamic gstPercentage;
+  dynamic cessPercentage;
   String? cratedUserCode;
   String? createdDate;
   String? updatedUserCode;
   String? updatedDate;
-  int? activeStatus;
+  dynamic activeStatus;
 
   HsnMasters(
       {this.hsnCode,
@@ -845,13 +845,13 @@ class HsnMasters {
 }
 
 class ItemGroups {
-  int? itemGroupCode;
+  dynamic itemGroupCode;
   String? itemGroupName;
   String? cratedUserCode;
   String? createdDate;
   String? updatedUserCode;
   String? updatedDate;
-  int? activeStatus;
+  dynamic activeStatus;
   String? createdAt;
   String? updatedAt;
 
@@ -894,13 +894,13 @@ class ItemGroups {
 }
 
 class ItemLocations {
-  int? itemLocationCode;
+  dynamic itemLocationCode;
   String? itemLocationName;
   String? cratedUserCode;
   String? createdDate;
   String? updatedUserCode;
   String? updatedDate;
-  int? activeStatus;
+  dynamic activeStatus;
 
   ItemLocations(
       {this.itemLocationCode,
@@ -935,13 +935,13 @@ class ItemLocations {
 }
 
 class ItemMakes {
-  int? itemMakeCode;
+  dynamic itemMakeCode;
   String? cratedUserCode;
   String? itemMaketName;
   String? createdDate;
   String? updatedUserCode;
   String? updatedDate;
-  int? activeStatus;
+  dynamic activeStatus;
 
   ItemMakes(
       {this.itemMakeCode,
@@ -976,7 +976,7 @@ class ItemMakes {
 }
 
 class NumberInitialize {
-  int? numCode;
+  dynamic numCode;
   String? coCode;
   String? finYearCode;
   String? custIdPrefix;
@@ -1189,15 +1189,15 @@ class NumberInitialize {
 }
 
 class Salespersons {
-  int? salPersonCode;
+  dynamic salPersonCode;
   String? salPersonId;
   String? salPersonName;
-  int? salPersonCommPercent;
+  dynamic salPersonCommPercent;
   String? salPersonMobileNo;
   String? createdUserCode;
   String? createdDate;
   String? updatedUserCode;
-  int? activeStatus;
+  dynamic activeStatus;
 
   Salespersons(
       {this.salPersonCode,
@@ -1238,13 +1238,13 @@ class Salespersons {
 }
 
 class Suppliers {
-  int? supCode;
+  dynamic supCode;
   String? supId;
   String? supName;
-  int? supGroupCode;
-  int? supAreaCode;
-  int? supStateCode;
-  int? supCountryCode;
+  dynamic supGroupCode;
+  dynamic supAreaCode;
+  dynamic supStateCode;
+  dynamic supCountryCode;
   String? supAddress1;
   Null? supAddress2;
   Null? supAddress3;
@@ -1258,13 +1258,13 @@ class Suppliers {
   String? supLicenseNo;
   String? supPanNo;
   String? supGSTINNo;
-  int? supGSTType;
-  int? taxIsIncluded;
+  dynamic supGSTType;
+  dynamic taxIsIncluded;
   String? supCreatedDate;
-  int? createdUserCode;
+  dynamic createdUserCode;
   String? suptUpdatedDate;
   Null? updatedUserCode;
-  int? supActiveStatus;
+  dynamic supActiveStatus;
 
   Suppliers(
       {this.supCode,
@@ -1359,13 +1359,13 @@ class Suppliers {
 }
 
 class SupplierGroups {
-  int? supGroupCode;
+  dynamic supGroupCode;
   String? supGroupName;
   String? cratedUserCode;
   String? createdDate;
   String? updatedUserCode;
   String? updatedDate;
-  int? activeStatus;
+  dynamic activeStatus;
 
   SupplierGroups(
       {this.supGroupCode,
@@ -1400,16 +1400,16 @@ class SupplierGroups {
 }
 
 class TaxMasters {
-  int? taxCode;
+  dynamic taxCode;
   String? taxId;
   String? taxName;
-  int? taxPercentage;
-  int? taxType;
+  dynamic taxPercentage;
+  dynamic taxType;
   String? cratedUserCode;
   String? createdDate;
   String? updatedUserCode;
   String? updatedDate;
-  int? activeStatus;
+  dynamic activeStatus;
 
   TaxMasters(
       {this.taxCode,
@@ -1453,10 +1453,10 @@ class TaxMasters {
 }
 
 class Units {
-  int? unitCode;
+  dynamic unitCode;
   String? unitId;
   String? unitName;
-  int? activStatus;
+  dynamic activStatus;
 
   Units({this.unitCode, this.unitId, this.unitName, this.activStatus});
 
@@ -1478,12 +1478,12 @@ class Units {
 }
 
 class Users {
-  int? userCode;
+  dynamic userCode;
   String? userId;
   String? userName;
   String? userPassword;
-  int? userType;
-  int? activeStatus;
+  dynamic userType;
+  dynamic activeStatus;
   String? userCreateDate;
   String? userLoginDate;
 
@@ -1523,12 +1523,12 @@ class Users {
 }
 
 class States {
-  int? stateCode;
+  dynamic stateCode;
   String? stateId;
   String? stateName;
-  int? countryCode;
-  int? createdUserCode;
-  int? activeStatus;
+  dynamic countryCode;
+  dynamic createdUserCode;
+  dynamic activeStatus;
 
   States(
       {this.stateCode,

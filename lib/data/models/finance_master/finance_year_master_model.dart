@@ -31,13 +31,13 @@ class Info {
   String? finYearCode;
   String? finYearStartDate;
   String? finYearEndDate;
-  int? currentFinYear;
-  int? cessPercentage;
+  dynamic currentFinYear;
+  dynamic cessPercentage;
   String? cratedUserCode;
   String? createdDate;
   String? updatedUserCode;
   String? updatedDate;
-  int? activeStatus;
+  dynamic activeStatus;
 
   Info(
       {this.finYearCode,

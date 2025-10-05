@@ -28,12 +28,12 @@ class UserMasterListModel {
 }
 
 class Info {
-  int? userCode;
+  dynamic userCode;
   String? userId;
   String? userName;
   String? userPassword;
-  int? userType;
-  int? activeStatus;
+  dynamic userType;
+  dynamic activeStatus;
   String? userCreateDate;
   String? userLoginDate;
 

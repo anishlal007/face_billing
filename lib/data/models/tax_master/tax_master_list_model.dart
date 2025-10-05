@@ -28,16 +28,16 @@ class TaxMasterListModel {
 }
 
 class Info {
-  int? taxCode;
+  dynamic taxCode;
   String? taxId;
   String? taxName;
-  int? taxPercentage;
-  int? taxType;
+  dynamic taxPercentage;
+  dynamic taxType;
   String? cratedUserCode;
   String? createdDate;
   String? updatedUserCode;
   String? updatedDate;
-  int? activeStatus;
+  dynamic activeStatus;
 
   Info(
       {this.taxCode,

@@ -3,6 +3,7 @@ import 'package:facebilling/ui/screens/pages/country_master.dart';
 import 'package:facebilling/ui/screens/pages/purchase_master_page.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/menu_item.dart';
+import '../../../../demo_page.dart';
 import '../../../../google_sheet.dart';
 import '../../pages/Unit_master.dart';
 import '../../pages/area_master_page.dart';
@@ -43,31 +44,36 @@ class _HomePageState extends State<HomePage> {
   bool _isMenuCollapsed = false;
 
   final List<MenuItemData> menuItems = [
+    ///dashboard
     MenuItemData(
       title: "Dashboard",
       icon: Icons.dashboard,
-      page: const DashboardPage(),
+      page: const DashboardPage(title: 'Dashboard',),
     ),
+    ///appointment
     MenuItemData(
-      title: "Masters",
-      icon: Icons.account_balance,
+      title: "Appointment",
+      icon: Icons.dashboard,
+      page: const DemoPage(title: 'Appointment',),
+      
+    ),
+    ///product
+    MenuItemData(
+      title: "Products",
+      icon: Icons.dashboard,
+   //   page: const DemoPage(title: 'Appointment',),
       subItems: [
-        MenuItemData(
-          title: "Country Master",
-          icon: Icons.savings,
-          page: const CountryMasterScreen(),
-        ),
-        MenuItemData(
+         MenuItemData(
+      title: "Product",
+      icon: Icons.production_quantity_limits_rounded,
+      page: const ProductMasterPage(),
+    ),
+           MenuItemData(
           title: "Group Master",
           icon: Icons.group,
           page: const ItemGroupMasterScreen(),
         ),
-        MenuItemData(
-          title: "Unit Master",
-          icon: Icons.ac_unit,
-          page: const UnitMasterScreen(),
-        ),
-        MenuItemData(
+          MenuItemData(
           title: "Item make master",
           icon: Icons.ac_unit,
           page: const ItemMakeMasterPage(),
@@ -77,21 +83,189 @@ class _HomePageState extends State<HomePage> {
           icon: Icons.ac_unit,
           page: const ItemLocationMasterScreen(),
         ),
+          MenuItemData(
+          title: "Generics Master",
+          icon: Icons.money,
+          page: const GenericsMasterPage(),
+        ),
+          MenuItemData(
+          title: "Unit Master",
+          icon: Icons.ac_unit,
+          page: const UnitMasterScreen(),
+        ),
+          MenuItemData(
+          title: "TAX Master",
+          icon: Icons.ac_unit,
+          page: const TaxMasterPage(),
+        ),
+        
+      ]
+      
+    ),
+  //purchase
+    MenuItemData(
+      title: "Purchase",
+      icon: Icons.dashboard,
+     // page: const DemoPage(title: 'Appointment',),
+      subItems: [
+  MenuItemData(
+          title: "Supplier Master",
+          icon: Icons.ac_unit,
+          page: const SupplierMasterPage(),
+        ),
+          MenuItemData(
+      title: "Purchase",
+      icon: Icons.shopping_basket,
+      page: const PurchaseMasterPage(),
+    ),  MenuItemData(
+      title: "Purchase Order",
+      icon: Icons.shopping_basket,
+      page: const DemoPage(title:"Purchase Order" ,),
+    ),  MenuItemData(
+      title: "Purchase Return",
+      icon: Icons.shopping_basket,
+       page: const DemoPage(title:"Purchase Return" ,),
+    ),
+      ]
+    ),
+    ///sales
+     MenuItemData(
+      title: "Sales",
+      icon: Icons.account_balance,
+      subItems: [
+       MenuItemData(
+          title: "Pataint Master",
+          icon: Icons.person,
+          page: const CustomerMasterPage(),
+        ),MenuItemData(
+      title: "Sales POS",
+      icon: Icons.shopping_basket,
+       page: const DemoPage(title:"Sales POS" ,),
+    ),
+    MenuItemData(
+      title: "Sales Order",
+      icon: Icons.shopping_basket,
+       page: const DemoPage(title:"Sales Order" ,),
+    ),
+    MenuItemData(
+      title: "Sales Return",
+      icon: Icons.shopping_basket,
+       page: const DemoPage(title:"Sales Return" ,),
+    ),
+    MenuItemData(
+      title: "Wastage Entry",
+      icon: Icons.shopping_basket,
+       page: const DemoPage(title:"Wastage Entry" ,),
+    ),MenuItemData(
+      title: "Sales Person",
+      icon: Icons.shopping_basket,
+       page: const DemoPage(title:"Sales Person" ,),
+    ), 
+      ]
+      ),
+   ///general master
+    MenuItemData(
+      title: "General Master",
+      icon: Icons.account_balance,
+      subItems: [
+         MenuItemData(
+          title: "Area Master",
+          icon: Icons.ac_unit,
+          page: const AreaMasterPage(),
+        ),
+         MenuItemData(
+          title: "Country Master",
+          icon: Icons.savings,
+          page: const CountryMasterScreen(),
+        ),
+             MenuItemData(
+          title: "Supplier Group Master",
+          icon: Icons.ac_unit,
+          page: const SupplierGrpupMasterPage(),
+        ),
+      
+        MenuItemData(
+          title: "Customer Group Master",
+          icon: Icons.person_3,
+          page: const CustomerGroupMasterPage(),
+        ),
+      ]
+      ),
+
+   ///report
+   MenuItemData(
+      title: "Reports",
+      icon: Icons.report,
+      //page: ReportMasterPage(),
+      subItems: [
+    MenuItemData(
+      title: "Purchase Report",
+      icon: Icons.account_balance,
+       //page: const DemoPage(title:"Expense Entry" ,),
+       subItems: [
+            MenuItemData(
+      title: "Purchase Order Report",
+      icon: Icons.account_balance,
+       page: const DemoPage(title:"Purchase Order Report",),),
+            MenuItemData(
+      title: "Purchase Entry Report",
+      icon: Icons.account_balance,
+       page: const DemoPage(title:"Purchase Emtry Report",),),
+       ]
+       ),
+      ]
+    ),
+   
+     MenuItemData(
+    title: "Reports",
+    icon: Icons.report,
+    subItems: [
+      MenuItemData(
+        title: "Purchase Report",
+        icon: Icons.account_balance,
+        subItems: [
+          MenuItemData(
+            title: "Purchase Order Report",
+            icon: Icons.account_balance,
+            page: const DemoPage(title: "Purchase Order Report"),
+          ),
+        ],
+      ),
+    ],
+  ),
+    
+    MenuItemData(
+      title: "Expense Entry",
+      icon: Icons.account_balance,
+       page: const DemoPage(title:"Expense Entry" ,),),
+    MenuItemData(
+      title: "Account Entry",
+      icon: Icons.account_balance,
+       page: const DemoPage(title:"Account Entry" ,),),
+    MenuItemData(
+      title: "Admin Setup",
+      icon: Icons.account_balance,
+       page: const DemoPage(title:"Admin Setup" ,),),
+  
+    MenuItemData(
+      title: "Masters",
+      icon: Icons.account_balance,
+      subItems: [
+       
+        MenuItemData(
+          title: "Group Master",
+          icon: Icons.group,
+          page: const ItemGroupMasterScreen(),
+        ),
+      
+      
         MenuItemData(
           title: " Hsn Master",
           icon: Icons.ac_unit,
           page: const HnsMasterPage(),
         ),
-        MenuItemData(
-          title: "TAX Master",
-          icon: Icons.ac_unit,
-          page: const TaxMasterPage(),
-        ),
-        MenuItemData(
-          title: "Area Master",
-          icon: Icons.ac_unit,
-          page: const AreaMasterPage(),
-        ),
+      
+      
         MenuItemData(
           title: "State Master",
           icon: Icons.ac_unit,
@@ -112,53 +286,19 @@ class _HomePageState extends State<HomePage> {
           icon: Icons.ac_unit,
           page: const ItemLocationMasterScreen(),
         ),
-        MenuItemData(
-          title: "Supplier Master",
-          icon: Icons.ac_unit,
-          page: const SupplierMasterPage(),
-        ),
-        MenuItemData(
-          title: "Supplier Group Master",
-          icon: Icons.ac_unit,
-          page: const SupplierGrpupMasterPage(),
-        ),
-        MenuItemData(
-          title: "Pataint Master",
-          icon: Icons.person,
-          page: const CustomerMasterPage(),
-        ),
-        MenuItemData(
-          title: "Customer Group Master",
-          icon: Icons.person_3,
-          page: const CustomerGroupMasterPage(),
-        ),
+      
+   
         MenuItemData(
           title: "Finance Year Master",
           icon: Icons.money,
           page: const FinanceYearMaster(),
         ),
-        MenuItemData(
-          title: "Generics Master",
-          icon: Icons.money,
-          page: const GenericsMasterPage(),
-        ),
+      
       ],
     ),
-    MenuItemData(
-      title: "Product",
-      icon: Icons.production_quantity_limits_rounded,
-      page: const ProductMasterPage(),
-    ),
-    MenuItemData(
-      title: "Purchase",
-      icon: Icons.shopping_basket,
-      page: const PurchaseMasterPage(),
-    ),
-    MenuItemData(
-      title: "Reports",
-      icon: Icons.report,
-      page: ReportMasterPage(),
-    ),
+   
+  
+    
     MenuItemData(
       title: "Sales Entry",
       icon: Icons.report,
@@ -180,18 +320,21 @@ class _HomePageState extends State<HomePage> {
       page:  GoogleSheetUploadPage(),
     ),
   ];
-  Widget _getSelectedPage() {
-    final parent = menuItems[_selectedParentIndex];
+Widget _getSelectedPage() {
+  MenuItemData item = menuItems[_selectedParentIndex];
 
-    if (_selectedSubIndex != null &&
-        parent.subItems != null &&
-        _selectedSubIndex! < parent.subItems!.length) {
-      return parent.subItems![_selectedSubIndex!].page ??
-          const Center(child: Text("No page available"));
+  if (_selectedSubIndex != null) {
+    item = item.subItems![_selectedSubIndex!];
+    
+    // Check if there is further subItems and selectedSubIndex2 if you track it
+    if (item.subItems != null && item.subItems!.isNotEmpty) {
+      // If you want to go to the first subItem automatically
+      item = item.subItems!.first;
     }
-
-    return parent.page ?? const Center(child: Text("No page available"));
   }
+
+  return item.page ?? Center(child: Text("Page not set"));
+}
 
   @override
   Widget build(BuildContext context) {
@@ -246,4 +389,6 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
+
+
 }

@@ -28,13 +28,13 @@ class GenericsMasterListModel {
 }
 
 class Info {
-  int? genericCode;
+  dynamic genericCode;
   String? genericName;
   String? cratedUserCode;
   String? createdDate;
   String? updatedUserCode;
   String? updatedDate;
-  int? activeStatus;
+  dynamic activeStatus;
 
   Info(
       {this.genericCode,

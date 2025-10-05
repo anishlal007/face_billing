@@ -28,16 +28,16 @@ class HnsMasterListModel {
 }
 
 class Info {
-  int? hsnCode;
+  dynamic hsnCode;
   String? hsnName;
   String? hsnNo;
-  int? gstPercentage;
-  int? cessPercentage;
+  dynamic gstPercentage;
+  dynamic cessPercentage;
   String? cratedUserCode;
   String? createdDate;
   String? updatedUserCode;
   String? updatedDate;
-  int? activeStatus;
+  dynamic activeStatus;
 
   Info(
       {this.hsnCode,

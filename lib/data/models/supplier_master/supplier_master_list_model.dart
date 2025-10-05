@@ -28,13 +28,13 @@ class SupplierMasterListModel {
 }
 
 class Info {
-  int? supCode;
+  dynamic supCode;
   String? supId;
   String? supName;
-  int? supGroupCode;
-  int? supAreaCode;
-  int? supStateCode;
-  int? supCountryCode;
+  dynamic supGroupCode;
+  dynamic supAreaCode;
+  dynamic supStateCode;
+  dynamic supCountryCode;
   String? supAddress1;
   dynamic supAddress2;
   dynamic supAddress3;
@@ -48,13 +48,13 @@ class Info {
   String? supLicenseNo;
   String? supPanNo;
   String? supGSTINNo;
-  int? supGSTType;
-  int? taxIsIncluded;
+  dynamic supGSTType;
+  dynamic taxIsIncluded;
   String? supCreatedDate;
-  int? createdUserCode;
+  dynamic createdUserCode;
   String? suptUpdatedDate;
   dynamic updatedUserCode;
-  int? supActiveStatus;
+  dynamic supActiveStatus;
 
   Info(
       {this.supCode,

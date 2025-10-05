@@ -28,12 +28,12 @@ class StateMasterListModel {
 }
 
 class Info {
-  int? stateCode;
+  dynamic stateCode;
   String? stateId;
   String? stateName;
-  int? countryCode;
-  int? createdUserCode;
-  int? activeStatus;
+  dynamic countryCode;
+  dynamic createdUserCode;
+  dynamic activeStatus;
 
   Info(
       {this.stateCode,

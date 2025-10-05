@@ -28,13 +28,13 @@ class CustomerGroupMasterModel {
 }
 
 class Info {
-  int? custGroupCode;
+  dynamic custGroupCode;
   String? custGroupName;
   String? cratedUserCode;
   String? createdDate;
   String? updatedUserCode;
   String? updatedDate;
-  int? activeStatus;
+  dynamic activeStatus;
 
   Info(
       {this.custGroupCode,

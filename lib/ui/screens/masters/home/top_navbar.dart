@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/preference_helper.dart';
+import '../../pages/login_page.dart';
+
 class TopNavBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final bool isMenuCollapsed;
@@ -36,12 +39,31 @@ class TopNavBar extends StatelessWidget implements PreferredSizeWidget {
         IconButton(
             onPressed: () {},
             icon: const Icon(Icons.search, color: Colors.black)),
+       
         IconButton(
             onPressed: () {},
             icon: const Icon(Icons.notifications, color: Colors.black)),
         IconButton(
             onPressed: () {},
             icon: const Icon(Icons.settings, color: Colors.black)),
+            IconButton(
+  onPressed: () async {
+    // 1. Clear token and user
+    await SharedPreferenceHelper.clearToken();
+    await SharedPreferenceHelper.clearUser();
+
+    // 2. Update global token if using ValueNotifier
+    // globalToken.value = null; // uncomment if you have global token
+
+    // 3. Navigate to LoginPage and remove all previous routes
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => const WebmailLoginScreen()),
+      (route) => false, // remove all previous routes
+    );
+  },
+  icon: const Icon(Icons.logout, color: Colors.black),
+),
         const Padding(
           padding: EdgeInsets.symmetric(horizontal: 12),
           child: CircleAvatar(

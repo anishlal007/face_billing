@@ -1,9 +1,9 @@
 class AddAreaMasterModel {
   String? areaId;
   String? areaName;
-  int? stateCode;
-  int? createdUserCode;
-  int? activeStatus;
+  dynamic stateCode;
+  dynamic createdUserCode;
+  dynamic activeStatus;
 
   AddAreaMasterModel(
       {this.areaId,

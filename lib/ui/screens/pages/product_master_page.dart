@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/colors.dart';
 
 import '../../../data/models/product/product_master_list_model.dart';
+import '../../../data/services/product_service.dart';
 import '../masters/product_master/add_product_master_page.dart';
 import '../masters/user_master/add_user_master_page.dart';
 import '../masters/user_master/user_master_list_page.dart';
@@ -15,8 +16,13 @@ class ProductMasterPage extends StatefulWidget {
 }
 
 class _ProductMasterPageState extends State<ProductMasterPage> {
+  final ProductService _service = ProductService();
   Info? editingUnit;
   bool refreshList = false;
+ bool isLoading = false;
+  String message = '';
+
+  
 
   void _onSaved(bool success) {
     if (success) {
@@ -60,6 +66,35 @@ class _ProductMasterPageState extends State<ProductMasterPage> {
 
     return Scaffold(
       backgroundColor: lightgray,
+      appBar: AppBar(
+      backgroundColor: white,
+      title: Row(
+        children: [
+          Text("FaceBilling", style: const TextStyle(color: black)),
+          const SizedBox(width: 30),
+          
+        ],
+      ),
+      actions: [
+        ElevatedButton.icon(
+  icon: Icon(Icons.upload_file),
+  label: Text('Upload Excel File'),
+  onPressed: () async {
+    setState(() => isLoading = true);
+
+    final response = await _service.uploadProductExcelFile();
+
+    setState(() {
+      isLoading = false;
+      message = response.data == true
+          ? '✅ Products uploaded successfully!'
+          : '❌ Upload failed: ${response.error}';
+    });
+  },
+),
+
+      ],
+    ),
       body: AddProductMasterPage(
         unitInfo: editingUnit,
         onSaved: _onSaved,
