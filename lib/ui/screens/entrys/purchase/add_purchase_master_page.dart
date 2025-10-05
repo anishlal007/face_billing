@@ -1,5 +1,6 @@
 import 'package:facebilling/core/colors.dart';
 import 'package:facebilling/core/const.dart';
+import 'package:facebilling/data/models/get_serial_no_model.dart' as serialno;
 import 'package:flutter/material.dart';
 
 import '../../../../data/models/get_all_master_list_model.dart' as master;
@@ -9,6 +10,7 @@ import '../../../../data/models/product/product_master_list_model.dart'
 import '../../../../data/models/purchase_model/add_purchase_master_model.dart';
 import '../../../../data/models/purchase_model/purchase_list_model.dart';
 import '../../../../data/services/get_all_master_service.dart';
+import '../../../../data/services/get_serial_no_services.dart';
 import '../../../../data/services/product_service.dart';
 import '../../../../data/services/purchase_master_service.dart';
 import '../../../../data/services/tax_master_service.dart'
@@ -46,6 +48,7 @@ class _AddPurchaseMasterPageState extends State<AddPurchaseMasterPage> {
   final PurchaseMasterService _service = PurchaseMasterService();
   final GetAllMasterService _getAllMasterService = GetAllMasterService();
   final ProductService _productService = ProductService();
+    final GetSerialNoServices _getSerialservice = GetSerialNoServices();
   product.Info? editingUnit;
   bool refreshList = false;
   bool _activeStatus = true;
@@ -61,6 +64,7 @@ class _AddPurchaseMasterPageState extends State<AddPurchaseMasterPage> {
   int? selectedEntryMode;
   int? selectedTaxType;
   int? selectedGstType;
+  serialno.GetSerialNoModel?serialNo;
   void _calculateTotalSalesRate() {
     double total = 0.0;
     for (var item in items) {
@@ -344,6 +348,20 @@ class _AddPurchaseMasterPageState extends State<AddPurchaseMasterPage> {
         _getAllLoading = false;
       });
     }
+       final serialNoResponse = await _getSerialservice.getSerialNo();
+  if (serialNoResponse.isSuccess) {
+    setState(() {
+      serialNo = serialNoResponse.data!; // ✅ assign full model, not .info
+      _purchaseNoController.text=serialNo!.info!.purchaseNextId!;
+      _getAllLoading = false;
+      error = null;
+    });
+  } else {
+    setState(() {
+      error = serialNoResponse.error;
+      _getAllLoading = false;
+    });
+  }
   }
 
   void _onSaved(bool success) {
@@ -637,7 +655,7 @@ class _AddPurchaseMasterPageState extends State<AddPurchaseMasterPage> {
                         hintText: "Purches No",
                         controller: _purchaseNoController,
                         // prefixIcon: Icons.person,
-                        isEdit: false,
+                        isEdit: true,
                         focusNode: _spurchaseNoFocus,
                         textInputAction: TextInputAction.done,
                         onEditingComplete: () => _fieldFocusChange(
@@ -832,7 +850,7 @@ class _AddPurchaseMasterPageState extends State<AddPurchaseMasterPage> {
                         hintText: "Purchase No",
                         controller: _purchaseNoController,
                         // prefixIcon: Icons.person,
-                        isEdit: false,
+                        isEdit: true,
                         focusNode: _purchaseNoFocus,
                         textInputAction: TextInputAction.done,
                         onEditingComplete: () => _fieldFocusChange(

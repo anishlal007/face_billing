@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/colors.dart';
 
 import '../../../data/models/product/product_master_list_model.dart';
+import '../../../data/services/get_serial_no_services.dart';
 import '../../../data/services/product_service.dart';
 import '../masters/product_master/add_product_master_page.dart';
 import '../masters/user_master/add_user_master_page.dart';
@@ -17,6 +18,7 @@ class ProductMasterPage extends StatefulWidget {
 
 class _ProductMasterPageState extends State<ProductMasterPage> {
   final ProductService _service = ProductService();
+  final GetSerialNoServices _getSerialservice = GetSerialNoServices();
   Info? editingUnit;
   bool refreshList = false;
  bool isLoading = false;

@@ -71,7 +71,9 @@ class _DashboardPageState extends State<DashboardPage> {
     ];
 
     return Scaffold(
+      backgroundColor: white,
       appBar: AppBar(
+         backgroundColor: white,
         scrolledUnderElevation: 0,
         title: Text(widget.title),
       ),
@@ -149,7 +151,7 @@ Widget _buildCard(Map<String, dynamic> item) {
         // Length in the center
         Center(
           child: Text(
-            "Length: ${item['length']}",
+            "${item['length']}",
             style: const TextStyle(
               color:black,
               fontSize: 20,

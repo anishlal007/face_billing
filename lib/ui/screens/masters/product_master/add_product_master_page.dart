@@ -12,9 +12,11 @@ import 'package:flutter/material.dart';
 
 import '../../../../data/models/get_all_master_list_model.dart' as master;
 //import '../../../../data/models/tax_master/tax_master_list_model.dart'  as tax;
+import '../../../../data/models/get_serial_no_model.dart'as serialno;
 import '../../../../data/models/product/add_product_request.dart';
 import '../../../../data/models/product/product_master_list_model.dart';
 import '../../../../data/services/get_all_master_service.dart';
+import '../../../../data/services/get_serial_no_services.dart';
 import '../../../../data/services/product_service.dart';
 import '../../../../data/services/tax_master_service.dart'
     show TaxMasterService;
@@ -46,6 +48,7 @@ class _AddProductMasterPageState extends State<AddProductMasterPage> {
   ///services
   final ProductService _service = ProductService();
   final GetAllMasterService _getAllMasterService = GetAllMasterService();
+    final GetSerialNoServices _getSerialservice = GetSerialNoServices();
   int? _taxCode, _itemGroup, _itemUnit, _itemMake, _itemGeneric, _unitCode;
   bool _activeStatus = true;
   bool _ismfgreatured = true;
@@ -66,7 +69,7 @@ class _AddProductMasterPageState extends State<AddProductMasterPage> {
   String? error;
 
   ///model
-
+serialno.GetSerialNoModel?serialNo;
   master.GetAllMasterListModel? getAllMasterListModel;
   late TextEditingController _itemIdController;
   late TextEditingController _itemNameController;
@@ -220,6 +223,22 @@ class _AddProductMasterPageState extends State<AddProductMasterPage> {
         _getAllLoading = false;
       });
     }
+   final serialNoResponse = await _getSerialservice.getSerialNo();
+  if (serialNoResponse.isSuccess) {
+    setState(() {
+      serialNo = serialNoResponse.data!; // ✅ assign full model, not .info
+      _itemIdController.text=serialNo!.info!.productNextId!;
+      _getAllLoading = false;
+      error = null;
+    });
+  } else {
+    setState(() {
+      error = serialNoResponse.error;
+      _getAllLoading = false;
+    });
+  }
+
+
   }
 
   @override
@@ -485,6 +504,7 @@ class _AddProductMasterPageState extends State<AddProductMasterPage> {
                     child: CustomTextField(
                       title: "Item ID",
                       hintText: "Enter Item ID",
+                      isEdit: true,
                       controller: _itemIdController,
                       // prefixIcon: Icons.flag_circle,
                       isValidate: true,

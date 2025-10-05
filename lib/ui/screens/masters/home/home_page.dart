@@ -199,41 +199,173 @@ class _HomePageState extends State<HomePage> {
       //page: ReportMasterPage(),
       subItems: [
     MenuItemData(
-      title: "Purchase Report",
-      icon: Icons.account_balance,
-       //page: const DemoPage(title:"Expense Entry" ,),
-       subItems: [
-            MenuItemData(
       title: "Purchase Order Report",
       icon: Icons.account_balance,
        page: const DemoPage(title:"Purchase Order Report",),),
             MenuItemData(
       title: "Purchase Entry Report",
       icon: Icons.account_balance,
-       page: const DemoPage(title:"Purchase Emtry Report",),),
-       ]
-       ),
+       page: const DemoPage(title:"Purchase Entry Report",),),
+            MenuItemData(
+      title: "Purchase Return Report",
+      icon: Icons.account_balance,
+       page: const DemoPage(title:"Purchase Return Report",),),
+            MenuItemData(
+      title: "Product Moving Report",
+      icon: Icons.account_balance,
+       page: const DemoPage(title:"Product Moving Report",),),
+            MenuItemData(
+      title: "Payable Report",
+      icon: Icons.account_balance,
+       page: const DemoPage(title:"Payable Report",),),
+            MenuItemData(
+      title: "Sales Order Report",
+      icon: Icons.account_balance,
+       page: const DemoPage(title:"Sales Order Report",),),
+            MenuItemData(
+      title: "Sales Report",
+      icon: Icons.account_balance,
+       page: const DemoPage(title:"Sales Report",),),
+            MenuItemData(
+      title: "Customer wise Sales Report",
+      icon: Icons.account_balance,
+       page: const DemoPage(title:"Customer wise Sales Report",),),
+            MenuItemData(
+      title: "Sales Details Report",
+      icon: Icons.account_balance,
+       page: const DemoPage(title:"Sales Details Report",),),
+            MenuItemData(
+      title: "Sales Person Report",
+      icon: Icons.account_balance,
+       page: const DemoPage(title:"Sales Person Report",),),
+            MenuItemData(
+      title: "Collection Report",
+      icon: Icons.account_balance,
+       page: const DemoPage(title:"Colletion Report",),),
+            MenuItemData(
+      title: "Receivable Report",
+      icon: Icons.account_balance,
+       page: const DemoPage(title:"Receivable Report",),),
+            MenuItemData(
+      title: "Sales Retrun Report",
+      icon: Icons.account_balance,
+       page: const DemoPage(title:"Sales Retrun Report",),),
+            MenuItemData(
+      title: "Wastage Report",
+      icon: Icons.account_balance,
+       page: const DemoPage(title:"Wastage Report",),),
+            MenuItemData(
+      title: "Stock Report",
+      icon: Icons.account_balance,
+       page: const DemoPage(title:"Stcok Report",),),
+            MenuItemData(
+      title: "Minimum & Maximum Report",
+      icon: Icons.account_balance,
+       page: const DemoPage(title:"Minimum & Maximum Report",),),
+            MenuItemData(
+      title: "Stock IN/Out Report",
+      icon: Icons.account_balance,
+       page: const DemoPage(title:"Stock IN/Out Report",),),
+            MenuItemData(
+      title: "Batchwise Stock Report",
+      icon: Icons.account_balance,
+       page: const DemoPage(title:"Batchwise Stock Report",),),
+            MenuItemData(
+      title: "Expiry Date Report",
+      icon: Icons.account_balance,
+       page: const DemoPage(title:"Expiry Date Report",),),
+            MenuItemData(
+      title: "Product Report",
+      icon: Icons.account_balance,
+       page: const DemoPage(title:"Product Report",),),
+            MenuItemData(
+      title: "Supplier Report",
+      icon: Icons.account_balance,
+       page: const DemoPage(title:"Supplier Report",),),
+            MenuItemData(
+      title: "Customer Report",
+      icon: Icons.account_balance,
+       page: const DemoPage(title:"Customer Report",),),
+            MenuItemData(
+      title: "Daily Recipts & Payment Report",
+      icon: Icons.account_balance,
+       page: const DemoPage(title:"Daily Recipts & Payment Report",),),
+            MenuItemData(
+      title: "GST Details Report",
+      icon: Icons.account_balance,
+       page: const DemoPage(title:"GST Details Report",),),
+            MenuItemData(
+      title: "GST Purchase Report",
+      icon: Icons.account_balance,
+       page: const DemoPage(title:"GST Purchase Report",),),
+            MenuItemData(
+      title: "GST Sales Report",
+      icon: Icons.account_balance,
+       page: const DemoPage(title:"GST Sales Report",),),
+            MenuItemData(
+      title: "GST R1 Report",
+      icon: Icons.account_balance,
+       page: const DemoPage(title:"GST R1 Report",),),
+            MenuItemData(
+      title: "GST 3B Report",
+      icon: Icons.account_balance,
+       page: const DemoPage(title:"GST 3B Report",),),
+            MenuItemData(
+      title: "Day book Report",
+      icon: Icons.account_balance,
+       page: const DemoPage(title:"Day book Report",),),
+            MenuItemData(
+      title: "Day Summary Report",
+      icon: Icons.account_balance,
+       page: const DemoPage(title:"Day Summary Report",),),
+            MenuItemData(
+      title: "Profit/Loss  Report",
+      icon: Icons.account_balance,
+       page: const DemoPage(title:"Profit/Loss Report",),),
+ 
+            MenuItemData(
+      title: "Daywise Business Report",
+      icon: Icons.account_balance,
+       page: const DemoPage(title:"Daywise Business Report",),),
+                  MenuItemData(
+      title: "Expense Entry Report",
+      icon: Icons.account_balance,
+       page: const DemoPage(title:"Expense Entry Report",),),
       ]
     ),
-   
-     MenuItemData(
-    title: "Reports",
-    icon: Icons.report,
-    subItems: [
+   ///account entr
       MenuItemData(
-        title: "Purchase Report",
-        icon: Icons.account_balance,
-        subItems: [
+      title: "Account Entry",
+      icon: Icons.account_balance,
+       //page: const DemoPage(title:"Expense Entry" ,),
+       subItems: [
           MenuItemData(
-            title: "Purchase Order Report",
-            icon: Icons.account_balance,
-            page: const DemoPage(title: "Purchase Order Report"),
-          ),
-        ],
-      ),
-    ],
-  ),
-    
+      title: "Receipts Entry",
+      icon: Icons.account_balance,
+       page: const DemoPage(title:"Receipts Entry" ,),),
+          MenuItemData(
+      title: "Payments Entry",
+      icon: Icons.account_balance,
+       page: const DemoPage(title:"Payments Entry" ,),),
+          MenuItemData(
+      title: "Journal Entry",
+      icon: Icons.account_balance,
+       page: const DemoPage(title:"Journal Entry" ,),),
+          MenuItemData(
+      title: "Contra Entry",
+      icon: Icons.account_balance,
+       page: const DemoPage(title:"Contra Entry" ,),),
+          MenuItemData(
+      title: "Debit Note Entry",
+      icon: Icons.account_balance,
+       page: const DemoPage(title:"Debit Note Entry" ,),),
+          MenuItemData(
+      title: "Credit Note Entry",
+      icon: Icons.account_balance,
+       page: const DemoPage(title:"Credit Note Entry" ,),),
+       ]
+       ),
+
     MenuItemData(
       title: "Expense Entry",
       icon: Icons.account_balance,
@@ -245,7 +377,22 @@ class _HomePageState extends State<HomePage> {
     MenuItemData(
       title: "Admin Setup",
       icon: Icons.account_balance,
-       page: const DemoPage(title:"Admin Setup" ,),),
+       //page: const DemoPage(title:"Admin Setup" ,),
+       subItems: [
+         MenuItemData(
+      title: "Company Info",
+      icon: Icons.account_balance,
+       page: const DemoPage(title:"Company Info" ,),),
+        MenuItemData(
+      title: "Finance Year Entry",
+      icon: Icons.account_balance,
+       page: const FinanceYearMaster(),),
+        MenuItemData(
+      title: "Number Initialize",
+      icon: Icons.account_balance,
+       page: const DemoPage(title:"Number Initialize" ,),),
+       ]
+       ),
   
     MenuItemData(
       title: "Masters",
@@ -315,10 +462,32 @@ class _HomePageState extends State<HomePage> {
       page: const TransactionsPage(),
     ),
     MenuItemData(
-      title: "Google sheet",
-      icon: Icons.swap_horiz,
-      page:  GoogleSheetUploadPage(),
-    ),
+      title: "User",
+      icon: Icons.account_balance,
+     //  page: const DemoPage(title:"Print Setup" ,),
+     subItems: [
+      MenuItemData(
+      title: "User Creation",
+      icon: Icons.account_balance,
+       page: const DemoPage(title:"User Creation" ,),),
+       MenuItemData(
+      title: "Menu Rights",
+      icon: Icons.account_balance,
+       page: const DemoPage(title:"Menu Rights",),),
+       MenuItemData(
+      title: "Form Rights",
+      icon: Icons.account_balance,
+       page: const DemoPage(title:"Form Rights",),),
+     ]
+       ),
+   MenuItemData(
+      title: "Print Setup",
+      icon: Icons.account_balance,
+       page: const DemoPage(title:"Print Setup" ,),), 
+       MenuItemData(
+      title: "Software Settings",
+      icon: Icons.account_balance,
+       page: const DemoPage(title:"Software Settings" ,),),
   ];
 Widget _getSelectedPage() {
   MenuItemData item = menuItems[_selectedParentIndex];

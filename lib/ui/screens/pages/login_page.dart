@@ -180,11 +180,11 @@ class _WebmailLoginFormState extends State<_WebmailLoginForm> {
           TextFormField(
             controller: _userIdController,
             decoration: const InputDecoration(
-              hintText: 'Email',
+              hintText: 'User Name',
               border: UnderlineInputBorder(),
             ),
             validator: (value) =>
-                value == null || value.isEmpty ? 'Please enter email' : null,
+                value == null || value.isEmpty ? 'Please enter User Name' : null,
           ),
           const SizedBox(height: 20),
 
