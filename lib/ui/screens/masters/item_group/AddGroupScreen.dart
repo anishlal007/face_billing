@@ -226,9 +226,11 @@ print(request.createdUserCode);
             else
               Row(
                 children: [
-                  GradientButton(
-                      text: _isEditMode ? "Update Group" : "Add Group",
-                      onPressed: _submit),
+                  Expanded(
+                    child: GradientButton(
+                        text: _isEditMode ? "Update Group" : "Add Group",
+                        onPressed: _submit),
+                  ),
                 ],
               ),
             if (_message != null) ...[
