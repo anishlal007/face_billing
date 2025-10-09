@@ -89,7 +89,7 @@ class _AddAreaMasterPageState extends State<AddAreaMasterPage> {
     // _createdUserFocus.dispose();
     super.dispose();
   }
-
+dynamic stateCode;
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -100,12 +100,13 @@ class _AddAreaMasterPageState extends State<AddAreaMasterPage> {
   final request = AddAreaMasterModel(
         areaName: _unitNameController.text.trim(),
         areaId: _unitIdController.text.trim(),
-
+stateCode: stateCode,
+createdUserCode: userId.value,
         // current timestamp
         activeStatus: _activeStatus ? 1 : 0,
       );
       print("request");
-      print(request);
+      print(request.toJson());
        if (_isEditMode && widget.unitInfo != null) {
       // EDIT mode
       final response = await _service.updateAreaMaster(
@@ -133,7 +134,7 @@ class _AddAreaMasterPageState extends State<AddAreaMasterPage> {
   void didUpdateWidget(covariant AddAreaMasterPage oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.unitInfo != oldWidget.unitInfo) {
-      _unitIdController.text = widget.unitInfo?.areaCode.toString() ?? "";
+      _unitIdController.text = widget.unitInfo?.areaId.toString() ?? "";
       _unitNameController.text = widget.unitInfo?.areaName ?? "";
       // _createdUserController.text =
       //     widget.countryInfo?.createdUserCode?.toString() ?? userId.value!;
@@ -216,20 +217,20 @@ class _AddAreaMasterPageState extends State<AddAreaMasterPage> {
             //   onChanged: (val) => setState(() => _activeStatus = val),
             // ),
          
-            // CustomTextField(
-            //   title: "Location Code",
-            //   hintText: "Enter Location Code",
-            //   controller: _unitIdController,
-            //   prefixIcon: Icons.flag_circle,
-            //   isValidate: true,
-            //   validator: (value) =>
-            //       value == null || value.isEmpty ? "Enter unit ID" : null,
-            //   focusNode: _unitIdFocus,
-            //   textInputAction: TextInputAction.next,
-            //   onEditingComplete: () {
-            //     FocusScope.of(context).requestFocus(_unitNameFocus);
-            //   },
-            // ),
+            CustomTextField(
+              title: "Area Code",
+              hintText: "Enter Area Code",
+              controller: _unitIdController,
+              prefixIcon: Icons.flag_circle,
+              isValidate: true,
+              validator: (value) =>
+                  value == null || value.isEmpty ? "Enter Area Code" : null,
+              focusNode: _unitIdFocus,
+              textInputAction: TextInputAction.next,
+              onEditingComplete: () {
+                FocusScope.of(context).requestFocus(_unitNameFocus);
+              },
+            ),
             const SizedBox(height: 16),
             // CustomTextField(
             //   title: "Area Name",
@@ -266,7 +267,7 @@ class _AddAreaMasterPageState extends State<AddAreaMasterPage> {
                 final selected = getAllMasterListModel!.info!.states!
                     .firstWhere((c) => c.stateCode == value,
                         orElse: () => master.States());
-
+stateCode=selected.stateCode;
                 print("Selected GST %: ${selected.stateCode}");
                 print("Selected TAX Code: ${selected.stateCode}");
               },

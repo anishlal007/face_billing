@@ -73,8 +73,8 @@ class _AreaMasterListPageState extends State<AreaMasterListPage> {
         return ListCardWidget(
           title: info.areaName ?? "",
           subtitle: "Code: ${info.areaCode.toString() ?? ""}",
-          initials:  "NA",
-          //initials: info.unitId?.substring(0, 2).toUpperCase() ?? "NA",
+          //initials:  "NA",
+          initials: info.areaId?.substring(0, 2).toUpperCase() ?? "NA",
           onEdit: () {
             widget.onEdit(info);
           },
