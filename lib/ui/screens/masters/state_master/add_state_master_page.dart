@@ -2,6 +2,7 @@ import 'package:facebilling/ui/screens/masters/company_master/add_company_master
 import 'package:facebilling/ui/screens/masters/country/AddCountryScreen.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../core/const.dart';
 import '../../../../data/models/country/country_response.dart';
 import '../../../../data/models/state_master/add_state_master_model.dart';
 import '../../../../data/models/state_master/state_master_list_model.dart';
@@ -42,6 +43,7 @@ class _AddStateMasterPageState extends State<AddStateMasterPage> {
   final FocusNode _unitIdFocus = FocusNode();
   final FocusNode _unitNameFocus = FocusNode();
   final FocusNode _countryNameFocus = FocusNode();
+  dynamic?countryCode;
   // final FocusNode _createdUserFocus = FocusNode();
   Country? country;
   bool loading = true;
@@ -97,10 +99,10 @@ class _AddStateMasterPageState extends State<AddStateMasterPage> {
     });
    final request = AddStateModel(
         stateName: _unitNameController.text.trim(),
-        stateId: "0",
-        countryCode: 0,
+        stateId: _unitIdController.text.trim(),
+        countryCode: countryCode,
         // required by API
-        createdUserCode: 1001, // hardcoded or from logged-in user
+        createdUserCode: int.tryParse(userId.value!), // hardcoded or from logged-in user
         // current timestamp
         activeStatus: _activeStatus ? 1 : 0,
       );
@@ -108,12 +110,14 @@ class _AddStateMasterPageState extends State<AddStateMasterPage> {
       print(request.toJson());
            if (_isEditMode && widget.unitInfo != null) {
       // EDIT mode
+      print("EDIT Mode");
       final response = await _service.updateStateMasterr(
         widget.unitInfo!.stateId!,
         request,
       );
       _handleResponse(response.isSuccess, response.error);
     } else {
+      print("add Mode");
       // ADD mode
       final response = await _service.addStateMaster(request);
       _handleResponse(response.isSuccess, response.error);
@@ -133,8 +137,9 @@ class _AddStateMasterPageState extends State<AddStateMasterPage> {
   void didUpdateWidget(covariant AddStateMasterPage oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.unitInfo != oldWidget.unitInfo) {
-      _unitIdController.text = widget.unitInfo?.stateCode.toString() ?? "";
+      _unitIdController.text = widget.unitInfo?.stateId.toString() ?? "";
       _unitNameController.text = widget.unitInfo?.stateName ?? "";
+      countryCode=widget.unitInfo?.countryCode??0;
       // _createdUserController.text =
       //     widget.countryInfo?.createdUserCode?.toString() ?? userId.value!;
       _activeStatus = (widget.unitInfo?.activeStatus ?? 1) == 1;
@@ -156,7 +161,18 @@ class _AddStateMasterPageState extends State<AddStateMasterPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
+                CustomSwitch(
+              value: _activeStatus,
+              title: "Active Status",
+              onChanged: (val) {
+                setState(() {
+                  _activeStatus = val;
+                });
+              },
+            ),
+            const SizedBox(height: 10,),
             SearchDropdownField<Info>(
+              controller: _unitNameController,
               hintText: "Location State",
               prefixIcon: Icons.search,
               fetchItems: (q) async {
@@ -183,18 +199,16 @@ class _AddStateMasterPageState extends State<AddStateMasterPage> {
                 }
            
               },
-                onSubmitted: (typedValue) {
-                setState(() {
-                 // _unitIdController.clear();
-                  _unitNameController.text = _unitNameController.text;
-                  print( _unitNameController.text);
-                  print( _unitNameController.text);
-                  //_createdUserController.text = userId.value!;
-                  _activeStatus = true;
-                  _isEditMode = false; // <-- back to Add mode
-                });
-                widget.onSaved(false);
-              },
+               onSubmitted: (typedValue) {
+  setState(() {
+    _unitNameController.text = typedValue.trim(); // <-- assign typed value
+    print(_unitNameController.text); // should now print what user typed
+    _activeStatus = true;
+    _isEditMode = false;
+      print("_unitNameController.text: ${_unitNameController.text}"); // back to Add mode
+  });
+  widget.onSaved(false);
+},
             ),
 
             const SizedBox(height: 26),
@@ -203,29 +217,21 @@ class _AddStateMasterPageState extends State<AddStateMasterPage> {
             //   title: const Text("Active Status"),
             //   onChanged: (val) => setState(() => _activeStatus = val),
             // ),
-            CustomSwitch(
-              value: _activeStatus,
-              title: "Active Status",
-              onChanged: (val) {
-                setState(() {
-                  _activeStatus = val;
-                });
+        
+            CustomTextField(
+              title: "Location Code",
+              hintText: "Enter Location Code",
+              controller: _unitIdController,
+              prefixIcon: Icons.flag_circle,
+              isValidate: true,
+              validator: (value) =>
+                  value == null || value.isEmpty ? "Enter unit ID" : null,
+              focusNode: _unitIdFocus,
+              textInputAction: TextInputAction.next,
+              onEditingComplete: () {
+                FocusScope.of(context).requestFocus(_unitNameFocus);
               },
             ),
-            // CustomTextField(
-            //   title: "Location Code",
-            //   hintText: "Enter Location Code",
-            //   controller: _unitIdController,
-            //   prefixIcon: Icons.flag_circle,
-            //   isValidate: true,
-            //   validator: (value) =>
-            //       value == null || value.isEmpty ? "Enter unit ID" : null,
-            //   focusNode: _unitIdFocus,
-            //   textInputAction: TextInputAction.next,
-            //   onEditingComplete: () {
-            //     FocusScope.of(context).requestFocus(_unitNameFocus);
-            //   },
-            // ),
             const SizedBox(height: 16),
             // CustomTextField(
             //   title: "Location State",
@@ -257,12 +263,13 @@ class _AddStateMasterPageState extends State<AddStateMasterPage> {
   initialValue: null, // must be null or one of the codes
   onChanged: (code) {
     print("Selected CountryCode: $code");
-
+countryCode=code;
     final selected = country?.info?.firstWhere(
       (c) => c?.countryCode == code,
     );
 
     print("Country Name: ${selected?.countryName}");
+    print("Country code: $countryCode}");
   },
   isValidate: true,
   validator: (value) {
@@ -278,20 +285,6 @@ class _AddStateMasterPageState extends State<AddStateMasterPage> {
   ),
   addTooltip: "Add Country",
 ),
-           // CustomTextField(
-            //   title: "Country Name",
-            //   hintText: "Enter Country Name",
-            //   controller: _unitNameController,
-            //   prefixIcon: Icons.flag,
-            //   isValidate: true,
-            //   validator: (value) =>
-            //       value == null || value.isEmpty ? "Enter Country Name" : null,
-            //   focusNode: _unitNameFocus,
-            //   textInputAction: TextInputAction.next,
-            //   onEditingComplete: () {
-            //     // FocusScope.of(context).requestFocus(_createdUserFocus);
-            //   },
-            // ),
             const SizedBox(height: 16),
             // SwitchListTile(
             //   value: _activeStatus,

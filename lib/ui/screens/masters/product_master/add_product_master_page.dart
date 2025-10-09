@@ -73,6 +73,7 @@ bool _isItemIdEditable = false;
   int? priceTakenFrom = 0;
   int? selectedExpiryType;
   String? error;
+  String? serialError;
 
   master.ItemGroups? _selectedItemGroup;
   master.ItemMakes? _selectItemMake;
@@ -227,37 +228,102 @@ serialno.GetSerialNoModel?serialNo;
 
     _activeStatus = (widget.unitInfo?.createdUserCode ?? 1) == 1;
   }
+Future<void> _loadList() async {
+  setState(() {
+    _getAllLoading = true;
+    error = null; // separate error for master list
+    serialError = null;     // separate error for serial number
+  });
 
-  Future<void> _loadList() async {
-  final response = await _getAllMasterService.getAllMasterService();
-  if (response.isSuccess) {
+  // 1️⃣ Load master list
+  try {
+    final response = await _getAllMasterService.getAllMasterService();
+    if (response.isSuccess && response.data != null) {
+      setState(() {
+        getAllMasterListModel = response.data!;
+        error = null;
+      });
+    } else {
+      setState(() {
+        getAllMasterListModel = null;
+        error = response.error ?? "Failed to load master list";
+      });
+    }
+  } catch (e) {
     setState(() {
-      getAllMasterListModel = response.data!;
-      _getAllLoading = false;
-      error = null;
-    });
-  } else {
-    setState(() {
-      error = response.error;
-      _getAllLoading = false;
+      getAllMasterListModel = null;
+      error = "Error fetching master list: $e";
     });
   }
 
-  final serialNoResponse = await _getSerialservice.getSerialNo();
-  if (serialNoResponse.isSuccess) {
+  // 2️⃣ Load serial number
+  try {
+    final serialNoResponse = await _getSerialservice.getSerialNo();
+    if (serialNoResponse.isSuccess) {
+      final serialData = serialNoResponse.data;
+      if (serialData != null && serialData.info != null) {
+        setState(() {
+          serialNo = serialData;
+          _itemIdController.text = serialNo!.info!.productNextId ?? "";
+          serialError = null;
+        });
+      } else {
+        setState(() {
+          serialNo = null;
+          _itemIdController.clear();
+          serialError = "Number initialization record not found";
+        });
+      }
+    } else {
+      setState(() {
+        serialNo = null;
+        _itemIdController.clear();
+        serialError = serialNoResponse.error ?? "Failed to fetch serial number";
+      });
+    }
+  } catch (e) {
     setState(() {
-      serialNo = serialNoResponse.data!;
-      _itemIdController.text = serialNo!.info!.productNextId!;
-      _getAllLoading = false;
-      error = null;
-    });
-  } else {
-    setState(() {
-      error = serialNoResponse.error;
-      _getAllLoading = false;
+      serialNo = null;
+      _itemIdController.clear();
+      serialError = "Error fetching serial number: $e";
     });
   }
+
+  setState(() {
+    _getAllLoading = false;
+  });
 }
+
+//   Future<void> _loadList() async {
+//   final response = await _getAllMasterService.getAllMasterService();
+//   if (response.isSuccess) {
+//     setState(() {
+//       getAllMasterListModel = response.data!;
+//       _getAllLoading = false;
+//       error = null;
+//     });
+//   } else {
+//     setState(() {
+//       error = response.error;
+//       _getAllLoading = false;
+//     });
+//   }
+
+//   final serialNoResponse = await _getSerialservice.getSerialNo();
+//   if (serialNoResponse.isSuccess) {
+//     setState(() {
+//       serialNo = serialNoResponse.data!;
+//       _itemIdController.text = serialNo!.info!.productNextId!;
+//       _getAllLoading = false;
+//       error = null;
+//     });
+//   } else {
+//     setState(() {
+//       error = serialNoResponse.error;
+//       _getAllLoading = false;
+//     });
+//   }
+// }
 
 
   @override
@@ -438,6 +504,7 @@ serialno.GetSerialNoModel?serialNo;
     
     if (_getAllLoading) return const Center(child: CircularProgressIndicator());
     if (error != null) return Center(child: Text("Error: $error"));
+
 
     final isEdit = widget.unitInfo != null;
 

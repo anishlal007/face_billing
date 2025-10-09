@@ -69,9 +69,9 @@ class _StateMasterListPageState extends State<StateMasterListPage> {
         final info = infos[index]!;
         return ListCardWidget(
           title: info.stateName ?? "",
-          subtitle: "Code: ${info.stateCode.toString() ?? ""}",
-          initials:  "NA",
-          //initials: info.unitId?.substring(0, 2).toUpperCase() ?? "NA",
+          subtitle: "Code: ${info.stateId.toString() ?? ""}",
+          //initials:  "NA",
+          initials: info.stateId?.substring(0, 2).toUpperCase() ?? "NA",
           onEdit: () {
             widget.onEdit(info);
           },

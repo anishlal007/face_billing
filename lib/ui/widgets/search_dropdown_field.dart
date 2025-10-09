@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-// Type definitions for flexibility
 typedef FetchCallback<T extends Object> = Future<List<T>> Function(String query);
 typedef DisplayString<T extends Object> = String Function(T option);
 typedef OnSelected<T extends Object> = void Function(T selected);
@@ -35,6 +34,7 @@ class _SearchDropdownFieldState<T extends Object> extends State<SearchDropdownFi
   bool _loading = false;
   late TextEditingController _controller;
   late final VoidCallback _listener;
+  final LayerLink _layerLink = LayerLink();
 
   @override
   void initState() {
@@ -57,109 +57,85 @@ class _SearchDropdownFieldState<T extends Object> extends State<SearchDropdownFi
       return;
     }
 
-    if (mounted) setState(() => _loading = true);
-    final results = await widget.fetchItems(query);
+    setState(() => _loading = true);
 
-    if (mounted) {
-      setState(() {
-        _options = results;
-        _loading = false;
-      });
+    try {
+      final results = await widget.fetchItems(query);
+      if (mounted) setState(() => _options = results);
+    } catch (e) {
+      if (mounted) setState(() => _options = []);
+      print("Error fetching suggestions: $e");
+    } finally {
+      if (mounted) setState(() => _loading = false);
     }
-  } 
-
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Autocomplete<T>(
-      displayStringForOption: widget.displayString,
-      optionsBuilder: (textEditingValue) {
-        return _options; // synchronous
-      },
-      fieldViewBuilder: (context, textEditingController, focusNode, onFieldSubmitted) {
-        // Sync controller with our external one
-        textEditingController.text = _controller.text;
-        textEditingController.selection = _controller.selection; 
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (widget.hintText != null)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 0),
-              child: Text(
-                widget.hintText!,
-                style: const TextStyle(
-                  fontSize: 12,
-                  // fontWeight: FontWeight.w500,
-                  color: Colors.black87,
-                ),
+    return CompositedTransformTarget(
+      link: _layerLink,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SizedBox(
+            height: 36,
+            child: TextField(
+              controller: _controller,
+              style: const TextStyle(fontSize: 12, height: 1.0, color: Colors.black),
+              decoration: InputDecoration(
+                hintText: widget.hintText,
+                prefixIcon: Icon(widget.prefixIcon, size: 18),
+                suffixIcon: _loading
+                    ? const Padding(
+                        padding: EdgeInsets.all(10),
+                        child: SizedBox(
+                          width: 12,
+                          height: 12,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                      )
+                    : null,
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(4)),
+                contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 8),
               ),
-            ),
-            SizedBox(
-              height: 30,
-              child: TextField(
-                controller: _controller,
-                style: TextStyle(fontSize: 12.0, height: 1.0, color: Colors.black),
-                focusNode: focusNode,
-                onSubmitted: (value) {
-                  widget.onSubmitted?.call(value);
-                  onFieldSubmitted();
-                },
-                onChanged: (value) {
-                  widget.onSubmitted?.call(value);
-print(value);
-                },
-                decoration: InputDecoration(
-                  hintText: widget.hintText,
-                  prefixIcon: Icon(widget.prefixIcon, size: 20,),
-                  suffixIcon: _loading
-                      ? const Padding(
-                          padding: EdgeInsets.all(12),
-                          child: SizedBox(
-                            width: 10,
-                            height: 10,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          ),
-                        )
-                      : null,
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                ),
-              ),
-            ),
-          ],
-        );
-      },
-      optionsViewBuilder: (context, onSelected, options) {
-        return Align(
-          alignment: Alignment.topLeft,
-          child: Material(
-            elevation: 4,
-            borderRadius: BorderRadius.circular(8),
-            child: ListView.builder(
-              shrinkWrap: true,
-              itemCount: options.length,
-              itemBuilder: (context, index) {
-                final option = options.elementAt(index);
-                return ListTile(
-                  title: Text(widget.displayString(option)),
-                  onTap: () {
-                    _controller.text = widget.displayString(option);
-                    onSelected(option);
-                    widget.onSelected(option);
-                  },
-                );
-              },
+              onChanged: (value) => _fetchSuggestions(value),
+              onSubmitted: widget.onSubmitted,
             ),
           ),
-        );
-      },
-      onSelected: (value) {
-        _controller.text = widget.displayString(value);
-        widget.onSelected(value);
-      },
+          // Dropdown overlay
+          if (_options.isNotEmpty)
+            CompositedTransformFollower(
+              link: _layerLink,
+              showWhenUnlinked: false,
+              offset: const Offset(0, 36), // height of the TextField
+              child: Material(
+                elevation: 4,
+                borderRadius: BorderRadius.circular(8),
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxHeight: 200),
+                  child: ListView.builder(
+                    padding: EdgeInsets.zero,
+                    shrinkWrap: true,
+                    itemCount: _options.length,
+                    itemBuilder: (context, index) {
+                      final option = _options[index];
+                      return ListTile(
+                        dense: true,
+                        title: Text(widget.displayString(option),
+                            style: const TextStyle(fontSize: 13)),
+                        onTap: () {
+                          _controller.text = widget.displayString(option);
+                          widget.onSelected(option);
+                          setState(() => _options = []);
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
     );
   }
 }
-

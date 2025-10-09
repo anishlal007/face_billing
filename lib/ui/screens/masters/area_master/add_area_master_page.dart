@@ -156,7 +156,16 @@ class _AddAreaMasterPageState extends State<AddAreaMasterPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            
+               CustomSwitch(
+              value: _activeStatus,
+              title: "Active Status",
+              onChanged: (val) {
+                setState(() {
+                  _activeStatus = val;
+                });
+              },
+            ),
+            const SizedBox(height: 20,),
             SearchDropdownField<Info>(
               controller: _unitNameController,
               hintText: "Area Name",
@@ -206,15 +215,7 @@ class _AddAreaMasterPageState extends State<AddAreaMasterPage> {
             //   title: const Text("Active Status"),
             //   onChanged: (val) => setState(() => _activeStatus = val),
             // ),
-            CustomSwitch(
-              value: _activeStatus,
-              title: "Active Status",
-              onChanged: (val) {
-                setState(() {
-                  _activeStatus = val;
-                });
-              },
-            ),
+         
             // CustomTextField(
             //   title: "Location Code",
             //   hintText: "Enter Location Code",

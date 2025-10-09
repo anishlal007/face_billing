@@ -119,7 +119,7 @@ class _SearchableDropdownState<T> extends State<SearchableDropdown<T>> {
         child: CompositedTransformFollower(
           link: _layerLink,
           showWhenUnlinked: false,
-          offset: Offset(0, size.height + 5),
+         // offset: Offset(0, size.height + 5),
           child: Material(
             elevation: 4,
             borderRadius: BorderRadius.circular(4),
