@@ -4,6 +4,7 @@ import 'package:facebilling/data/models/get_serial_no_model.dart' as serialno;
 import 'package:facebilling/ui/screens/masters/customer_master/add_customer_master_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 
 import '../../../../data/models/get_all_master_list_model.dart' as master;
 //import '../../../../data/models/tax_master/tax_master_list_model.dart'  as tax;
@@ -11,11 +12,12 @@ import '../../../../data/models/product/product_master_list_model.dart'
     as product;
 import '../../../../data/models/purchase_model/add_purchase_master_model.dart';
 import '../../../../data/models/purchase_model/purchase_list_model.dart';
-import '../../../../data/models/sales/add_sales_req_model.dart';
+import '../../../../data/models/sales/add_sales_req_model.dart' as detail;
 import '../../../../data/services/get_all_master_service.dart';
 import '../../../../data/services/get_serial_no_services.dart';
 import '../../../../data/services/product_service.dart';
 import '../../../../data/services/purchase_master_service.dart';
+import '../../../../data/services/sales_master_service.dart';
 import '../../../../data/services/tax_master_service.dart'
     show TaxMasterService;
 import '../../../widgets/custom_dropdown_text_field.dart';
@@ -49,7 +51,7 @@ class _AddSalesEntryMasterPageState extends State<AddSalesEntryMasterPage> {
   final _formKey = GlobalKey<FormState>();
 
   ///services
-  final PurchaseMasterService _service = PurchaseMasterService();
+  final SalesMasterService _service = SalesMasterService();
   final GetAllMasterService _getAllMasterService = GetAllMasterService();
   final ProductService _productService = ProductService();
   final GetSerialNoServices _getSerialservice = GetSerialNoServices();
@@ -81,20 +83,32 @@ class _AddSalesEntryMasterPageState extends State<AddSalesEntryMasterPage> {
     }
   }
 
-  void _calculateTotalSalesRate() {
-    double total = 0.0;
-    for (var item in items) {
-      total += (item.salesRate ?? 0).toDouble();
+void _calculateTotalSalesRate() {
+  double total = 0.0;
+  for (var item in items) {
+    double rate = 0.0;
+
+    if (item.salesRate != null) {
+      // Safely parse string or number
+      if (item.salesRate is String) {
+        rate = double.tryParse(item.salesRate) ?? 0.0;
+      } else if (item.salesRate is num) {
+        rate = (item.salesRate as num).toDouble();
+      }
     }
-    setState(() {
-      _totalSalesRate = total;
-      print("_totalSalesRate");
-      print(_totalSalesRate);
-// Suppose GST = 18% and Sales Rate = 1000
-      _setGSTValues("18%", _totalSalesRate);
-      _calculateInvoiceFromTotalSalesRate(_totalSalesRate);
-    });
+
+    total += rate;
   }
+
+  setState(() {
+    _totalSalesRate = total;
+    print("_totalSalesRate: $_totalSalesRate");
+
+    // Suppose GST = 18% and Sales Rate = 1000
+    _setGSTValues("18%", _totalSalesRate);
+    _calculateInvoiceFromTotalSalesRate(_totalSalesRate);
+  });
+}
 
   void _setGSTValues(String gstRate, double totalSalesRate) {
     final gstPercent = double.tryParse(gstRate.replaceAll('%', '')) ?? 0;
@@ -197,6 +211,18 @@ class _AddSalesEntryMasterPageState extends State<AddSalesEntryMasterPage> {
 
   // final TextEditingController itemCodeController = TextEditingController();
   // final TextEditingController itemNameController = TextEditingController();
+///this screen 
+  final TextEditingController _salesOrderDateController = TextEditingController();
+  final TextEditingController _basedOnEntryDateController = TextEditingController();
+  final TextEditingController _basedOnEntryNoController = TextEditingController();
+    final TextEditingController taxTypeController = TextEditingController();
+  
+///this screen focus node
+/// 
+ final FocusNode _salesOrderDateFocus = FocusNode();
+ final FocusNode _basedOnEntryDateFocus = FocusNode();
+ final FocusNode _basedOnEntryNoFocus = FocusNode();
+
 
   final TextEditingController batchNoController = TextEditingController();
   final TextEditingController expiryController = TextEditingController();
@@ -485,7 +511,7 @@ print(error);
   ];
 
   List<ItemRowControllers> controllers = [ItemRowControllers()];
-  List<Items> itemsList = []; // Empty list
+  List<detail.Details> itemsList = []; // Empty list
   // will fill from API
   void loadItemsFromApi() async {
     final response = await _productService.getProductServiceSearch("");
@@ -522,64 +548,62 @@ print(error);
       // String? userPassword;
       // int? userType;
       // int? activeStatus;
-      final req=AddSalesReqModel(
-        
-      );
-      final request = AddPurchaseMasterModel(
-// Basic info
-        // purchaseDate: _salesDateController.text.trim(),
-        // invoiceNo: _invoiceNoController.text.trim(),
-        // invoiceDate: _invoiceDateController.text.trim(),
-        // purchaseOrderNo: _purchaseOrderNoController.text.trim(),
-        // purchaseOrderDate: _purchaseOrderDateController.text.trim(),
-        // supName: _supplierNameController.text.trim(),
-        supCode: int.tryParse(_supplierNameController.text) ?? 0,
+    
+final request =detail. AddSalesReqModel(
+   salesNo: salesNoController.text.trim(),
+  salesDate: _salesDateController.text.trim(),
+  salesOrderNo:orderNoController.text.trim(),
+  salesOrderDate: _salesOrderDateController.text.trim(),
+  receiptType: 1,
+  custCode: 1,
+  salesTaxableAmount: 2000,
+  salesGstAmount: _gstValueController.text.trim(),
+  sGSTAmount: int.tryParse(_sgstAmtController.text) ?? 0,
+  cGSTAmount: int.tryParse(_cgstAmtController.text) ?? 0,
+  iGSTAmount: int.tryParse(_igstAmtController.text) ?? 0,
+  salesNetAmount: int.tryParse(_netAmountController.text)??0,
+  subTotalBeforeDiscount: 2000,
+  salesEntryType: 1,
+  salesEntryMode: 1,
+  createdUserCode: int.tryParse(userId.value!),
+   createdDateTime: DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now()),
+  computerName: "computerName",
+  finYearCode: "FY25",
+  coCode: 1,
+  salesAccCode: 1,
+  latitude: "11.001",
+  longtitude: "77.001",
+  basedOnEntry: 1,
+  basedOnEntryNo: "INV-1001",
+  basedOnEntryDate: "2025-10-09",
+  cashAmount: 2240,
+  creditAmount: 0,
+  chequeAmount: 0,
+  cardAmount: 0,
+  freeAmount: 0,
+  walletAmount: 0,
+  roundOffAmount: 3.33,
+  receivedAmount: 3.33,
+  advanceReceivedAmount: 0,
+  advanceReceiptNo: "1",
+  updatedUserCode: "1",
+  salesDiscoutPercentage: 0,
+  cashDiscountPercentage: 0,
+  cashDiscountValue: 2,
+  salesDiscountValue: 5,
+  frieghtChargesAddWithTotal: 0,
+  frieghtChargesAddWithoutTotal: 0,
+  taxType: "1",
+  details: itemsList,
 
-        // Payment & purchase types
-        paymentType: selectedPaymentType, // from dropdown (0,1,2)
-        purchaseEntryType: selectedEntryType, // from dropdown (0,1,2)
-        purchaseEntryMode: selectedEntryMode, // from dropdown (1,2)
-        taxType: selectedTaxType, // from dropdown (0,1)
-        supGstType: selectedGstType, // from dropdown (0,1,2)
+  // List of item details
 
-        // Amounts
-        purchaseTaxableAmount: int.tryParse(_gstValueController.text) ?? 0,
-        purchaseGstAmount: int.tryParse(_gstValueController.text) ?? 0,
-        purchaseNetAmount: int.tryParse(_netAmountController.text) ?? 0,
-        subTotalBeforeDiscount:
-            int.tryParse(_subTotalValueController.text) ?? 0,
-        sGSTAmount: int.tryParse(_sgstAmtController.text) ?? 0,
-        cGSTAmount: int.tryParse(_cgstAmtController.text) ?? 0,
-        iGSTAmount: int.tryParse(_igstAmtController.text) ?? 0,
-        roundOffAmount: double.tryParse(_roundOffController.text) ?? 0.0,
-        frieghtChargesAddWithTotal:
-            int.tryParse(_frightChargesController.text) ?? 0,
+);
 
-        // Discounts
-        purchaseDiscoutPercentage: int.tryParse(_discountController.text) ?? 0,
-        purchaseDiscountValue: int.tryParse(_discountController.text) ?? 0,
-        cashDiscountPercentage: int.tryParse(_discountController.text) ?? 0,
-        cashDiscountValue: int.tryParse(_cashDiscountValueController.text) ?? 0,
-
-        // Other details
-        paidAmount: int.tryParse(_paidAmountController.text) ?? 0,
-        supDueDays: int.tryParse(_supDueDaysController.text) ?? 0,
-        createUserCode: int.tryParse(userId.value!),
-        createDateTime: DateTime.now().toIso8601String(),
-        computerName: "computerName",
-        vehicleNo: _vehicleNoController.text.trim(),
-        finYearCode: _finYearCodeController.text.trim(),
-        coCode: 0,
-        purchaseNotes: "",
-        purchaseAccCode: 0,
-
-        // Items list
-        items: itemsList, // List<Items> you've populated earlier
-      );
 // Print the full request as JSON
-      print("AddPurchaseMasterModel request:");
+      print("Add sales entry request:");
       print(request.toJson());
-      final response = await _service.addPurchaseMaster(request);
+      final response = await _service.addSalesMaster(request);
       _handleResponse(response.isSuccess, response.error);
     } else {
       // EDIT mode
@@ -632,11 +656,11 @@ print(error);
         purchaseAccCode: 0,
 
         // Items list
-        items: itemsList, // List<Items> you've populated earlier
+      //  items: itemsList, // List<Items> you've populated earlier
       );
-      print("updated");
+      print("updated sales entry");
       print(updated);
-      final response = await _service.updatePurchaseMaster(
+      final response = await _service.updateSalesMaster(
         widget.unitInfo!.purchaseAccCode!,
         updated,
       );
@@ -669,7 +693,20 @@ print(error);
     current.unfocus();
     FocusScope.of(context).requestFocus(next);
   }
+Future<void> _pickDate(TextEditingController controller) async {
+  DateTime? pickedDate = await showDatePicker(
+    context: context,
+    initialDate: DateTime.now(), // default date
+    firstDate: DateTime(2000),   // earliest date allowed
+    lastDate: DateTime(2100),    // latest date allowed
+  );
 
+  if (pickedDate != null) {
+    setState(() {
+      controller.text = DateFormat('yyyy-MM-dd').format(pickedDate);
+    });
+  }
+}
   @override
   Widget build(BuildContext context) {
     if (_getAllLoading) return const Center(child: CircularProgressIndicator());
@@ -780,17 +817,101 @@ print(error);
                       ),
                       SizedBox(
                         width: constraints.maxWidth / columns - 20,
-                        child: CustomTextField(
-                          title: "Sales Date",
-                          controller: _salesDateController,
-                          prefixIcon: Icons.calendar_month,
-                          isEdit: true,
-                          focusNode: _salesDateFocus,
-                          textInputAction: TextInputAction.done,
-                          onEditingComplete: () => _fieldFocusChange(
-                              context, _salesDateFocus, _salesPersonFocus),
+                        child: GestureDetector(
+                          onTap: (){
+                            _pickDate(_salesDateController);
+                          },
+                          child: CustomTextField(
+                            title: "Sales Date",
+                            controller: _salesDateController,
+                            prefixIcon: Icons.calendar_month,
+                            isEdit: true,
+                            focusNode: _salesDateFocus,
+                            textInputAction: TextInputAction.done,
+                            onEditingComplete: () => _fieldFocusChange(
+                                context, _salesDateFocus, _salesOrderDateFocus),
+                          ),
                         ),
                       ),
+                      SizedBox(
+                      width: constraints.maxWidth / columns - 20,
+                      child: CustomTextField(
+                        title: "Tax Type",
+                        controller: taxTypeController,
+                        // prefixIcon: Icons.person,
+                        isEdit: true,
+                        focusNode: _invoiceDateFocus,
+                        textInputAction: TextInputAction.done,
+                        onEditingComplete: () => _fieldFocusChange(
+                            context, _invoiceDateFocus, _gstTypeFocus),
+                      ),
+                    ),
+                      SizedBox(
+                        width: constraints.maxWidth / columns - 20,
+                        child: GestureDetector(
+                          onTap: (){
+                            _pickDate(_salesOrderDateController);
+                          },
+                          child: CustomTextField(
+                            title: "Sales Order Date",
+                            controller: _salesOrderDateController,
+                            prefixIcon: Icons.calendar_month,
+                            isEdit: true,
+                            focusNode: _salesOrderDateFocus,
+                            textInputAction: TextInputAction.done,
+                            onEditingComplete: () => _fieldFocusChange(
+                                context, _salesDateFocus, _basedOnEntryDateFocus),
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        width: constraints.maxWidth / columns - 20,
+                        child: GestureDetector(
+                          onTap: (){
+                            _pickDate(_basedOnEntryDateController);
+                          },
+                          child: CustomTextField(
+                            title: "Based on Entry Date",
+                            controller: _basedOnEntryDateController,
+                            prefixIcon: Icons.calendar_month,
+                            isEdit: true,
+                            focusNode: _basedOnEntryDateFocus,
+                            textInputAction: TextInputAction.done,
+                            onEditingComplete: () => _fieldFocusChange(
+                                context, _basedOnEntryDateFocus, _basedOnEntryNoFocus),
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        width: constraints.maxWidth / columns - 20,
+                        child: CustomTextField(
+                          title: "Based on Entry No",
+                          controller: _basedOnEntryNoController,
+                          prefixIcon: Icons.calendar_month,
+                          isEdit: false,
+                          focusNode: _basedOnEntryNoFocus,
+                          textInputAction: TextInputAction.done,
+                          onEditingComplete: () => _fieldFocusChange(
+                              context, _basedOnEntryNoFocus, _salesPersonFocus),
+                        ),
+                      ),
+                       SizedBox(
+                      width: constraints.maxWidth / columns - 20,
+                      child: CustomDropdownField<int>(
+                        title: "Purchase Entry Type",
+                        hintText: "Select Entry Type",
+                        items: const [
+                          DropdownMenuItem(value: 0, child: Text("Opening")),
+                          DropdownMenuItem(value: 1, child: Text("Entry")),
+                          DropdownMenuItem(value: 2, child: Text("Order")),
+                        ],
+                        initialValue: selectedEntryType,
+                        onChanged: (val) {
+                          setState(() => selectedEntryType = val);
+                          print("Selected EntryType: $val");
+                        },
+                      ),
+                    ),
                       SizedBox(
                         width: constraints.maxWidth / columns - 20,
                         child: CustomTextField(
@@ -811,8 +932,8 @@ print(error);
                       SizedBox(
                         width: constraints.maxWidth / columns - 20,
                         child: CustomTextField(
-                          title: "Order No",
-                          hintText: "Order No",
+                          title: "Sales Order No",
+                          hintText: "Sales Order No",
                           controller: orderNoController,
                           prefixIcon: Icons.person,
                           isEdit: false,
@@ -827,7 +948,7 @@ print(error);
                       const SizedBox(
                         height: 20,
                       ),
-      
+      ///product tabel
                       SizedBox(
                         width: double.infinity,
                         child: DataTable(
@@ -1306,65 +1427,119 @@ print(error);
                                                     item.gstPercentage.toString();
                                                 _calculateTotalSalesRate();
                                                 // Convert Info to Items
-                                                final newItem = Items(
-                                                  itemCode: p.itemCode,
-                                                  itemID: p.itemID ?? '',
-                                                  itemName: p.itemName ?? '',
-                                                  itemGroupCode:
-                                                      p.itemGroupCode ?? 0,
-                                                  itemMakeCode:
-                                                      p.itemMakeCode ?? 0,
-                                                  itemGenericCode:
-                                                      p.itemGenericCode ?? 0,
-                                                  barCodeId: '',
-                                                  batchNo: p.batchNoRequired
-                                                          ?.toString() ??
-                                                      '',
-                                                  mFGDate: '',
-                                                  expiryDate:
-                                                      p.expiryDateFormat ?? '',
-                                                  hsnCode: int.tryParse(
-                                                          p.hSNCode ?? '0') ??
-                                                      0,
-                                                  gstPercentage:
-                                                      p.gstPercentage ?? 0,
-                                                  itemQuantity:
-                                                      p.maximumStockQty ?? 0,
-                                                  freeQuantity: 0,
-                                                  itemUnitCode:
-                                                      p.itemUnitCode ?? 0,
-                                                  subQuantity: 0,
-                                                  subQtyUnitCode: 0,
-                                                  subQtyPurchaseRate: 0,
-                                                  itemPurchaseRate:
-                                                      p.purchaseRate ?? 0,
-                                                  purchaseRateBeforeTax: 0.0,
-                                                  itemDiscountPercentage: 0,
-                                                  itemDiscountValue: 0,
-                                                  itemGstValue: 0,
-                                                  itemValue: 0,
-                                                  actualPurchaseRate: 0.0,
-                                                  itemSaleRate: p.salesRate ?? 0,
-                                                  itemMRPRate: p.mRPRate ?? 0,
-                                                  itemSGSTPercentage: 0,
-                                                  itemCGSTPercentage: 0,
-                                                  itemIGSTPercentage: 0,
-                                                  itemSGSTAmount: 0,
-                                                  itemCGSTAmount: 0,
-                                                  itemIGSTAmount: 0,
-                                                  purchaseEntryMode: 0,
-                                                  purchaseEntryType: 0,
-                                                  createdUserCode:
-                                                      p.createdUserCode ?? 0,
-                                                  createdDate: p.createdDate ??
-                                                      DateTime.now()
-                                                          .toIso8601String(),
-                                                  updatedUserCode: null,
-                                                  updatedDate: null,
-                                                  coCode: 0,
-                                                  computerName: '',
-                                                  finYearCode: '',
-                                                  stockRequiredEffect: 0,
+                                                final newItem =detail. Details(
+                                                  itemCode: p.itemCode ?? 0,
+  itemID: p.itemID ?? 0,
+  itemNotes:  '',
+  itemGroupCode: p.itemGroupCode ?? 0,
+  itemMakeCode: p.itemMakeCode ?? 0,
+  itemGenericCode: p.itemGenericCode ?? 0,
+  barCodeId: 'BC001',
+  itemName: p.itemName ?? '',
+  batchNo: 'B001',
+  mFGDate: '2025-01-01',
+  expiryDate: p.expiryDateFormat ?? '2026-01-01',
+  hsnCode: int.tryParse(p.hSNCode ?? '0') ?? 0,
+  gstPercentage: double.tryParse(p.gstPercentage?.toString() ?? '0') ?? 0,
+  itemQuantity: int.tryParse(p.maximumStockQty?.toString() ?? '0') ?? 0,
+  freeQuantity: 0,
+  itemUnitCode: p.itemUnitCode ?? 0,
+  subQuantity:  0,
+  subQtyUnitCode: 0,
+  subQtySalesRate:  0.0,
+  decimalDigits:  2,
+  itemSaleRate: double.tryParse(p.salesRate?.toString() ?? '0') ?? 0,
+  salesRateBeforeTax:  0.0,
+  itemDiscountPercentage: p.itemDiscountPercentage ?? 0,
+  itemDiscountValue: p.itemDiscountValue ?? 0,
+  itemGstValue: 0,
+  itemValue:  0,
+  actualSalesRate:  0,
+  itemMRPRate: double.tryParse(p.mRPRate?.toString() ?? '0') ?? 0,
+  itemPurchaseRate: double.tryParse(p.purchaseRate?.toString() ?? '0') ?? 0,
+  actualPurchaseRate: 0,
+  purchaseNo: 'P001',
+  purchaseFinyearCode:  1,
+  purchaseEntryMode:  0,
+  itemSGSTPercentage:  0,
+  itemCGSTPercentage: 0,
+  itemIGSTPercentage:  0,
+  itemSGSTAmount: 0,
+  itemCGSTAmount: 0,
+  itemIGSTAmount:  0,
+  salesEntryMode:  1,
+  salesEntryType: 1,
+  createdUserCode: p.createdUserCode ?? 0,
+  createdDate: p.createdDate ?? DateTime.now().toIso8601String(),
+  updatedUserCode: p.updatedUserCode ?? '1',
+  updatedDate: p.updatedDate ?? DateTime.now().toIso8601String(),
+  coCode:1,
+  computerName: 'SERVER01',
+  finYearCode:  'FY25',
+  stockRequiredEffect:  0,
+  itemProfitPercentage:  0,
+  itemProfitValue:  0,
+  itemRowOrderNo:  0,
+  purchaseSupCode:  0,
+  salesPersonCode:  0,
+                                                //   itemCode: p.itemCode,
+                                                //   itemID: p.itemID ?? '',
+                                                //   itemName: p.itemName ?? '',
+                                                //   itemGroupCode:
+                                                //       p.itemGroupCode ?? 0,
+                                                //   itemMakeCode:
+                                                //       p.itemMakeCode ?? 0,
+                                                //   itemGenericCode:
+                                                //       p.itemGenericCode ?? 0,
+                                                //   barCodeId: '',
+                                                 
+                                                //   mFGDate: '',
+                                                //   expiryDate:
+                                                //       p.expiryDateFormat ?? '',
+                                                //   hsnCode: int.tryParse(
+                                                //           p.hSNCode ?? '0') ??
+                                                //       0,
+                                                //   gstPercentage:
+                                                //       p.gstPercentage ?? 0,
+                                                //   itemQuantity:
+                                                //       p.maximumStockQty ?? 0,
+                                                //   freeQuantity: 0,
+                                                //   itemUnitCode:
+                                                //       p.itemUnitCode ?? 0,
+                                                //   subQuantity: 0,
+                                                //   subQtyUnitCode: 0,
+                                                //  // subQtyPurchaseRate: 0,
+                                                //   itemPurchaseRate:
+                                                //       p.purchaseRate ?? 0,
+                                                //   salesRateBeforeTax: 0.0,
+                                                //   itemDiscountPercentage: 0,
+                                                //   itemDiscountValue: 0,
+                                                //   itemGstValue: 0,
+                                                //   itemValue: 0,
+                                                //   actualPurchaseRate: 0.0,
+                                                //   itemSaleRate: p.salesRate ?? 0,
+                                                //   itemMRPRate: p.mRPRate ?? 0,
+                                                //   itemSGSTPercentage: 0,
+                                                //   itemCGSTPercentage: 0,
+                                                //   itemIGSTPercentage: 0,
+                                                //   itemSGSTAmount: 0,
+                                                //   itemCGSTAmount: 0,
+                                                //   itemIGSTAmount: 0,
+                                                //   purchaseEntryMode: 0,
+                                                //   purchaseNo: "P001",
+                                                //   salesEntryMode: 1,
+                                                //   //purchaseEntryType: 0,
+                                                //   createdUserCode:
+                                                //       p.createdUserCode ?? 0,
+                                                //   createdDate: p.createdDate ??
+                                                //       DateTime.now()
+                                                //           .toIso8601String(),
+                                                //   updatedUserCode: null,
+                                                //   updatedDate: null,
+                                                //   coCode: 0,
+                                                //   computerName: 'SERVER01',
+                                                //   finYearCode: 'FY25',
+                                                //   stockRequiredEffect: 0,
                                                 );
       
                                                 // Add to itemsList

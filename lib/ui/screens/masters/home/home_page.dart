@@ -19,6 +19,7 @@ import '../../pages/item_make_master.dart';
 import '../../pages/item_make_master_page.dart';
 import '../../pages/product_master_page.dart';
 import '../../pages/sales_entry_page.dart';
+import '../../pages/sales_master_page.dart';
 import '../../pages/sales_order_entry_page.dart';
 import '../../pages/state_master_page.dart';
 import '../../pages/supplier_grpup_master_page.dart';
@@ -456,6 +457,11 @@ class _HomePageState extends State<HomePage> {
       title: "Sales Entry",
       icon: Icons.report,
       page: SalesEntryPage(),
+    ),
+    MenuItemData(
+      title: "Sales List",
+      icon: Icons.report,
+      page: SalesMasterPage(),
     ),
     MenuItemData(
       title: "Sales Order Entry",

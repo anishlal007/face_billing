@@ -35,6 +35,7 @@ class _SearchDropdownFieldState<T extends Object> extends State<SearchDropdownFi
   late TextEditingController _controller;
   late final VoidCallback _listener;
   final LayerLink _layerLink = LayerLink();
+  late FocusNode _focusNode;
 
   @override
   void initState() {
@@ -42,12 +43,21 @@ class _SearchDropdownFieldState<T extends Object> extends State<SearchDropdownFi
     _controller = widget.controller ?? TextEditingController();
     _listener = () => _fetchSuggestions(_controller.text);
     _controller.addListener(_listener);
+
+    _focusNode = FocusNode();
+    _focusNode.addListener(() {
+      if (!_focusNode.hasFocus) {
+        // Close dropdown when focus is lost
+        setState(() => _options = []);
+      }
+    });
   }
 
   @override
   void dispose() {
     _controller.removeListener(_listener);
     if (widget.controller == null) _controller.dispose();
+    _focusNode.dispose();
     super.dispose();
   }
 
@@ -75,12 +85,23 @@ class _SearchDropdownFieldState<T extends Object> extends State<SearchDropdownFi
     return CompositedTransformTarget(
       link: _layerLink,
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
+          // Hint text
+          Padding(
+            padding: const EdgeInsets.only(bottom: 0),
+            child: Text(
+              widget.hintText,
+              style: const TextStyle(fontSize: 12, color: Colors.black),
+            ),
+          ),
+          // TextField
           SizedBox(
-            height: 36,
+            height: 30,
             child: TextField(
               controller: _controller,
+              focusNode: _focusNode,
               style: const TextStyle(fontSize: 12, height: 1.0, color: Colors.black),
               decoration: InputDecoration(
                 hintText: widget.hintText,

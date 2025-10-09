@@ -1,48 +1,50 @@
+import '../purchase_model/add_purchase_master_model.dart';
+
 class AddSalesReqModel {
-  String? salesNo;
-  String? salesDate;
-  String? salesOrderNo;
-  String? salesOrderDate;
-  int? receiptType;
-  int? custCode;
-  int? salesTaxableAmount;
-  int? salesGstAmount;
-  double? sGSTAmount;
-  double? iGSTAmount;
-  double? cGSTAmount;
-  int? salesNetAmount;
-  int? subTotalBeforeDiscount;
-  int? salesEntryType;
-  int? salesEntryMode;
-  int? createdUserCode;
-  String? createdDateTime;
-  String? computerName;
-  String? finYearCode;
-  int? coCode;
-  int? salesAccCode;
-  String? latitude;
-  String? longtitude;
-  int? basedOnEntry;
-  String? basedOnEntryNo;
-  String? basedOnEntryDate;
-  int? cashAmount;
-  int? creditAmount;
-  int? chequeAmount;
-  int? cardAmount;
-  int? freeAmount;
-  int? walletAmount;
-  double? roundOffAmount;
-  double? receivedAmount;
-  int? advanceReceivedAmount;
-  String? advanceReceiptNo;
-  String? updatedUserCode;
-  int? salesDiscoutPercentage;
-  int? cashDiscountPercentage;
-  int? cashDiscountValue;
-  int? salesDiscountValue;
-  int? frieghtChargesAddWithTotal;
-  int? frieghtChargesAddWithoutTotal;
-  String? taxType;
+  dynamic salesNo;
+  dynamic salesDate;
+  dynamic salesOrderNo;
+  dynamic salesOrderDate;
+  dynamic receiptType;
+  dynamic custCode;
+  dynamic salesTaxableAmount;
+  dynamic salesGstAmount;
+  dynamic sGSTAmount;
+  dynamic iGSTAmount;
+  dynamic cGSTAmount;
+  dynamic salesNetAmount;
+  dynamic subTotalBeforeDiscount;
+  dynamic salesEntryType;
+  dynamic salesEntryMode;
+  dynamic createdUserCode;
+  dynamic createdDateTime;
+  dynamic computerName;
+  dynamic finYearCode;
+  dynamic coCode;
+  dynamic salesAccCode;
+  dynamic latitude;
+  dynamic longtitude;
+  dynamic basedOnEntry;
+  dynamic basedOnEntryNo;
+  dynamic basedOnEntryDate;
+  dynamic cashAmount;
+  dynamic creditAmount;
+  dynamic chequeAmount;
+  dynamic cardAmount;
+  dynamic freeAmount;
+  dynamic walletAmount;
+  dynamic roundOffAmount;
+  dynamic receivedAmount;
+  dynamic advanceReceivedAmount;
+  dynamic advanceReceiptNo;
+  dynamic updatedUserCode;
+  dynamic salesDiscoutPercentage;
+  dynamic cashDiscountPercentage;
+  dynamic cashDiscountValue;
+  dynamic salesDiscountValue;
+  dynamic frieghtChargesAddWithTotal;
+  dynamic frieghtChargesAddWithoutTotal;
+  dynamic taxType;
   List<Details>? details;
 
   AddSalesReqModel(
@@ -199,60 +201,60 @@ class AddSalesReqModel {
 }
 
 class Details {
-  int? itemCode;
-  int? itemID;
-  String? itemNotes;
-  int? itemGroupCode;
-  int? itemMakeCode;
-  int? itemGenericCode;
-  String? barCodeId;
-  String? itemName;
-  String? batchNo;
-  String? mFGDate;
-  String? expiryDate;
-  String? hsnCode;
-  int? gstPercentage;
-  int? itemQuantity;
-  int? freeQuantity;
-  int? itemUnitCode;
-  int? subQuantity;
-  int? subQtyUnitCode;
-  int? subQtySalesRate;
-  int? decimalDigits;
-  int? itemSalesRate;
-  double? salesRateBeforeTax;
-  int? itemDiscountPercentage;
-  int? itemDiscountValue;
-  int? itemGstValue;
-  int? itemValue;
-  int? actualSalesRate;
-  int? itemMRPRate;
-  int? itemPurchaseRate;
-  int? actualPurchaseRate;
-  String? purchaseNo;
-  int? purchaseFinyearCode;
-  int? purchaseEntryMode;
-  int? itemSGSTPercentage;
-  int? itemCGSTPercentage;
-  int? itemIGSTPercentage;
-  int? itemSGSTAmount;
-  int? itemCGSTAmount;
-  int? itemIGSTAmount;
-  int? salesEntryMode;
-  int? salesEntryType;
-  int? createdUserCode;
-  String? createdDate;
-  String? updatedUserCode;
-  String? updatedDate;
-  String? coCode;
-  String? computerName;
-  String? finYearCode;
-  int? stockRequiredEffect;
-  int? itemProfitPercentage;
-  int? itemProfitValue;
-  int? itemRowOrderNo;
-  int? purchaseSupCode;
-  int? salesPersonCode;
+  dynamic itemCode;
+  dynamic itemID;
+  dynamic itemNotes;
+  dynamic itemGroupCode;
+  dynamic itemMakeCode;
+  dynamic itemGenericCode;
+  dynamic barCodeId;
+  dynamic itemName;
+  dynamic batchNo;
+  dynamic mFGDate;
+  dynamic expiryDate;
+  dynamic hsnCode;
+  dynamic gstPercentage;
+  dynamic itemQuantity;
+  dynamic freeQuantity;
+  dynamic itemUnitCode;
+  dynamic subQuantity;
+  dynamic subQtyUnitCode;
+  dynamic subQtySalesRate;
+  dynamic decimalDigits;
+  dynamic itemSaleRate;
+  dynamic salesRateBeforeTax;
+  dynamic itemDiscountPercentage;
+  dynamic itemDiscountValue;
+  dynamic itemGstValue;
+  dynamic itemValue;
+  dynamic actualSalesRate;
+  dynamic itemMRPRate;
+  dynamic itemPurchaseRate;
+  dynamic actualPurchaseRate;
+  dynamic purchaseNo;
+  dynamic purchaseFinyearCode;
+  dynamic purchaseEntryMode;
+  dynamic itemSGSTPercentage;
+  dynamic itemCGSTPercentage;
+  dynamic itemIGSTPercentage;
+  dynamic itemSGSTAmount;
+  dynamic itemCGSTAmount;
+  dynamic itemIGSTAmount;
+  dynamic salesEntryMode;
+  dynamic salesEntryType;
+  dynamic createdUserCode;
+  dynamic createdDate;
+  dynamic updatedUserCode;
+  dynamic updatedDate;
+  dynamic coCode;
+  dynamic computerName;
+  dynamic finYearCode;
+  dynamic stockRequiredEffect;
+  dynamic itemProfitPercentage;
+  dynamic itemProfitValue;
+  dynamic itemRowOrderNo;
+  dynamic purchaseSupCode;
+  dynamic salesPersonCode;
 
   Details(
       {this.itemCode,
@@ -275,7 +277,7 @@ class Details {
       this.subQtyUnitCode,
       this.subQtySalesRate,
       this.decimalDigits,
-      this.itemSalesRate,
+      this.itemSaleRate,
       this.salesRateBeforeTax,
       this.itemDiscountPercentage,
       this.itemDiscountValue,
@@ -331,7 +333,7 @@ class Details {
     subQtyUnitCode = json['SubQtyUnitCode'];
     subQtySalesRate = json['SubQtySalesRate'];
     decimalDigits = json['DecimalDigits'];
-    itemSalesRate = json['ItemSalesRate'];
+    itemSaleRate = json['ItemSaleRate'];
     salesRateBeforeTax = json['SalesRateBeforeTax'];
     itemDiscountPercentage = json['ItemDiscountPercentage'];
     itemDiscountValue = json['ItemDiscountValue'];
@@ -389,7 +391,7 @@ class Details {
     data['SubQtyUnitCode'] = this.subQtyUnitCode;
     data['SubQtySalesRate'] = this.subQtySalesRate;
     data['DecimalDigits'] = this.decimalDigits;
-    data['ItemSalesRate'] = this.itemSalesRate;
+    data['ItemSaleRate'] = this.itemSaleRate;
     data['SalesRateBeforeTax'] = this.salesRateBeforeTax;
     data['ItemDiscountPercentage'] = this.itemDiscountPercentage;
     data['ItemDiscountValue'] = this.itemDiscountValue;

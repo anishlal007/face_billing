@@ -494,6 +494,7 @@ print(serialError);
       });
     }
   }
+ 
   List<ItemRowControllers> controllers = [ItemRowControllers()];
   List<Items> itemsList = []; // Empty list
   // will fill from API
@@ -990,6 +991,7 @@ Widget build(BuildContext context) {
                     ),
 
                     // PurchaseEntryType : 0=Opening,1=Entry,2=Order
+                    
                     SizedBox(
                       width: constraints.maxWidth / columns - 20,
                       child: CustomDropdownField<int>(

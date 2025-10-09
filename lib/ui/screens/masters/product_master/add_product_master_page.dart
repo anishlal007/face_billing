@@ -604,36 +604,7 @@ void _handleResponse(bool isSuccess, String? error) {
                   //     widget.onSaved(false);
                   //   },
                   // ),
-                  SizedBox(
-                    width: constraints.maxWidth,
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Text("Product Status"),
-                            SizedBox(
-                              width: 10,
-                            ),
-                            CustomSwitch(
-                              value: _activeStatus,
-                              title: "Active Status",
-                              onChanged: (val) {
-                                setState(() {
-                                  _activeStatus = val;
-                                });
-                              },
-                            ),
-                          ],
-                        ),
-                        const SizedBox(
-                          width: 20,
-                        ),
-                      ],
-                    ),
-                  ),
+                  
                    SizedBox(
   width: constraints.maxWidth / columns - 90,
   child: Column(
@@ -697,6 +668,7 @@ void _handleResponse(bool isSuccess, String? error) {
                       child: SearchDropdownField<Info>(
                         controller: _itemNameController,
                       hintText: "Item Name",
+                      // title:  "Item Name",
                       prefixIcon: Icons.search,
                       fetchItems: (q) async {
                         final response = await _service.getProductServiceSearch(q);
@@ -1023,13 +995,13 @@ void _handleResponse(bool isSuccess, String? error) {
       int formalDigit = 1;
 
       if (conversion >= 1 && conversion <= 9) {
-        formalDigit = 0;
-      } else if (conversion >= 10 && conversion <= 99) {
         formalDigit = 1;
-      } else if (conversion >= 100 && conversion <= 999) {
+      } else if (conversion >= 10 && conversion <= 99) {
         formalDigit = 2;
+      } else if (conversion >= 100 && conversion <= 999) {
+        formalDigit = 3;
       } else {
-        formalDigit = 4; // default fallback
+        formalDigit = 0; // default fallback
       }
 
       setState(() {
@@ -1599,17 +1571,47 @@ SizedBox(
                     ],
                   ),
                   SizedBox(
-                    width: constraints.maxWidth / columns - 20,
-                    child: CustomTextField(
-                      title: "Create User",
-                      controller: _createdUserController,
-                      // prefixIcon: Icons.person,
-                      isEdit: true,
-                      focusNode: _createUserFocus,
-                      textInputAction: TextInputAction.done,
-                      onEditingComplete: _submit,
+                    // width: constraints.maxWidth,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text("Product Status"),
+                            SizedBox(
+                              width: 10,
+                            ),
+                            CustomSwitch(
+                              value: _activeStatus,
+                              title: "Active Status",
+                              onChanged: (val) {
+                                setState(() {
+                                  _activeStatus = val;
+                                });
+                              },
+                            ),
+                          ],
+                        ),
+                        const SizedBox(
+                          width: 20,
+                        ),
+                      ],
                     ),
                   ),
+                  // SizedBox(
+                  //   width: constraints.maxWidth / columns - 20,
+                  //   child: CustomTextField(
+                  //     title: "Create User",
+                  //     controller: _createdUserController,
+                  //     // prefixIcon: Icons.person,
+                  //     isEdit: true,
+                  //     focusNode: _createUserFocus,
+                  //     textInputAction: TextInputAction.done,
+                  //     onEditingComplete: _submit,
+                  //   ),
+                  // ),
                   const SizedBox(height: 16),
                   if (_loading)
                     const CircularProgressIndicator()

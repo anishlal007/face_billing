@@ -68,36 +68,36 @@ class _ProductMasterPageState extends State<ProductMasterPage> {
 
     return Scaffold(
       backgroundColor: lightgray,
-      appBar: AppBar(
-        scrolledUnderElevation: 0.0,
-      backgroundColor: white,
-      title: Row(
-        children: [
-          // Text("FaceBilling", style: const TextStyle(color: black)),
-          // const SizedBox(width: 30),
+//       appBar: AppBar(
+//         scrolledUnderElevation: 0.0,
+//       backgroundColor: white,
+//       title: Row(
+//         children: [
+//           // Text("FaceBilling", style: const TextStyle(color: black)),
+//           // const SizedBox(width: 30),
           
-        ],
-      ),
-      actions: [
-        ElevatedButton.icon(
-  icon: Icon(Icons.upload_file),
-  label: Text('Upload Excel File'),
-  onPressed: () async {
-    setState(() => isLoading = true);
+//         ],
+//       ),
+//       actions: [
+//         ElevatedButton.icon(
+//   icon: Icon(Icons.upload_file),
+//   label: Text('Upload Excel File'),
+//   onPressed: () async {
+//     setState(() => isLoading = true);
 
-    final response = await _service.uploadProductExcelFile();
+//     final response = await _service.uploadProductExcelFile();
 
-    setState(() {
-      isLoading = false;
-      message = response.data == true
-          ? '✅ Products uploaded successfully!'
-          : '❌ Upload failed: ${response.error}';
-    });
-  },
-),
+//     setState(() {
+//       isLoading = false;
+//       message = response.data == true
+//           ? '✅ Products uploaded successfully!'
+//           : '❌ Upload failed: ${response.error}';
+//     });
+//   },
+// ),
 
-      ],
-    ),
+//       ],
+//     ),
       body: AddProductMasterPage(
         unitInfo: editingUnit,
         onSaved: _onSaved,

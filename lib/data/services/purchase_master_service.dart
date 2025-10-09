@@ -33,7 +33,7 @@ class PurchaseMasterService {
   Future<ApiResponse<bool>> addPurchaseMaster(
       AddPurchaseMasterModel request) async {
     try {
-      final response = await _dio.post("purchase", data: request.toJson());
+      final response = await _dio.post("sales/add", data: request.toJson());
       print("Sending JSON: ${jsonEncode(request.toJson())}");
       if (response.statusCode == 200 || response.statusCode == 201) {
         return ApiResponse(data: true);
