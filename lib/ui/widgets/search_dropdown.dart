@@ -1,6 +1,5 @@
 import 'package:facebilling/core/colors.dart';
 import 'package:flutter/material.dart';
-
 class SearchableDropdown<T> extends StatefulWidget {
   final List<T> items;
   final String Function(T) itemLabel;
@@ -8,9 +7,10 @@ class SearchableDropdown<T> extends StatefulWidget {
   final String hintText;
   final Widget? addPage;
   final String addTooltip;
-  final FocusNode? focusNode; // Add focus node
-  final VoidCallback?
-      onEditingComplete; // callback when user selects item or presses enter
+  final FocusNode? focusNode;
+  final VoidCallback? onEditingComplete;
+  final TextEditingController? controller; // ✅ new
+  final T? initialValue; // ✅ new
 
   const SearchableDropdown({
     super.key,
@@ -22,7 +22,11 @@ class SearchableDropdown<T> extends StatefulWidget {
     this.addTooltip = "Add new",
     this.focusNode,
     this.onEditingComplete,
+    this.controller,
+    this.initialValue,
   });
+ 
+
 
   @override
   State<SearchableDropdown<T>> createState() => _SearchableDropdownState<T>();
@@ -35,7 +39,6 @@ class _SearchableDropdownState<T> extends State<SearchableDropdown<T>> {
   OverlayEntry? _overlayEntry;
   List<T> _filteredItems = [];
   bool _isOpen = false;
-
   T? _selectedItem;
 
   FocusNode get _effectiveFocusNode => widget.focusNode ?? _internalFocusNode;
@@ -44,6 +47,9 @@ class _SearchableDropdownState<T> extends State<SearchableDropdown<T>> {
   void initState() {
     super.initState();
     _filteredItems = widget.items;
+     if (widget.initialValue != null) {
+      _selectedItem = widget.initialValue;
+    }
   }
 
   void _openDropdown() {
@@ -55,7 +61,16 @@ class _SearchableDropdownState<T> extends State<SearchableDropdown<T>> {
       _effectiveFocusNode.requestFocus();
     });
   }
-
+ @override
+  void didUpdateWidget(covariant SearchableDropdown<T> oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.initialValue != oldWidget.initialValue) {
+      setState(() {
+        _selectedItem = widget.initialValue;
+      });
+    }
+  }
+  
   void _closeDropdown() {
     _overlayEntry?.remove();
     _overlayEntry = null;
@@ -64,7 +79,6 @@ class _SearchableDropdownState<T> extends State<SearchableDropdown<T>> {
       _searchController.clear();
       _filteredItems = widget.items;
     });
-
     _effectiveFocusNode.unfocus();
   }
 
@@ -73,8 +87,7 @@ class _SearchableDropdownState<T> extends State<SearchableDropdown<T>> {
       showDialog(
         context: context,
         builder: (context) => Dialog(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 500, maxHeight: 600),
             child: widget.addPage!,
@@ -109,18 +122,21 @@ class _SearchableDropdownState<T> extends State<SearchableDropdown<T>> {
           offset: Offset(0, size.height + 5),
           child: Material(
             elevation: 4,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(4),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                // 🔹 Compact search bar
                 TextField(
                   controller: _searchController,
                   focusNode: _effectiveFocusNode,
+                  style: const TextStyle(fontSize: 12.0, height: 1.0, color: black),
                   decoration: InputDecoration(
                     hintText: "Search...",
-                    contentPadding: const EdgeInsets.all(8),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
+                    isDense: true,
+                    contentPadding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
+                    border: const OutlineInputBorder(
+                      borderSide: BorderSide(color: black),
                     ),
                   ),
                   onChanged: (value) {
@@ -155,7 +171,12 @@ class _SearchableDropdownState<T> extends State<SearchableDropdown<T>> {
                           shrinkWrap: true,
                           children: _filteredItems.map((e) {
                             return ListTile(
-                              title: Text(widget.itemLabel(e)),
+                              dense: true,
+                              visualDensity: VisualDensity.compact,
+                              title: Text(
+                                widget.itemLabel(e),
+                                style: const TextStyle(fontSize: 12),
+                              ),
                               onTap: () {
                                 setState(() {
                                   _selectedItem = e;
@@ -180,48 +201,66 @@ class _SearchableDropdownState<T> extends State<SearchableDropdown<T>> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        border:
-            Border.all(color: const Color.fromARGB(76, 0, 0, 0), width: 1.2),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: CompositedTransformTarget(
-              link: _layerLink,
-              child: GestureDetector(
-                onTap: _isOpen ? _closeDropdown : _openDropdown,
-                child: InputDecorator(
-                  decoration: InputDecoration(
-                    hintText: widget.hintText,
-                    // border: OutlineInputBorder(
-                    //   borderRadius: BorderRadius.circular(12),
-                    // ),
-                    border: InputBorder.none,
-                    // suffixIcon: const Icon(Icons.arrow_drop_down),
-                  ),
-                  child: Text(
-                    _selectedItem != null
-                        ? widget.itemLabel(_selectedItem!)
-                        : widget.hintText,
-                  ),
-                ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (widget.hintText != null)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 0),
+            child: Text(
+              widget.hintText!,
+              style: const TextStyle(
+                fontSize: 12,
+                color: black,
               ),
             ),
           ),
-          if (widget.addPage != null) ...[
-            const SizedBox(width: 8),
-            IconButton(
-              icon: const Icon(Icons.add_circle, color: primary, size: 30),
-              tooltip: widget.addTooltip,
-              onPressed: _openAddPopup,
-            ),
-          ],
-        ],
-      ),
+        SizedBox(
+          height: 30, // ✅ same as CustomTextField
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(
+                child: CompositedTransformTarget(
+                  link: _layerLink,
+                  child: GestureDetector(
+                    onTap: _isOpen ? _closeDropdown : _openDropdown,
+                    child: InputDecorator(
+                      decoration: InputDecoration(
+                        hintText: widget.hintText,
+                        hintStyle: const TextStyle(fontSize: 12, color: black),
+                        contentPadding:
+                            const EdgeInsets.symmetric(vertical: 0.0, horizontal: 12.0),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(2),
+                          borderSide:
+                              const BorderSide(color: Color.fromARGB(76, 0, 0, 0), width: 1.2),
+                        ),
+                        suffixIcon: const Icon(Icons.arrow_drop_down, size: 18),
+                      ),
+                      child: Text(
+                        _selectedItem != null
+                            ? widget.itemLabel(_selectedItem!)
+                            : widget.hintText,
+                        style: const TextStyle(fontSize: 12, color: black),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+        
+              // 🔹 Add (+) button
+              if (widget.addPage != null)
+                IconButton(
+                  icon: const Icon(Icons.add_circle, color: Color(0xFF0B2046), size: 20),
+                  tooltip: widget.addTooltip,
+                  onPressed: _openAddPopup,
+                ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

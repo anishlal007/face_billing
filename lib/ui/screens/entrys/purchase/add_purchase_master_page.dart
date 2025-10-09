@@ -2,6 +2,8 @@ import 'package:facebilling/core/colors.dart';
 import 'package:facebilling/core/const.dart';
 import 'package:facebilling/data/models/get_serial_no_model.dart' as serialno;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 
 import '../../../../data/models/get_all_master_list_model.dart' as master;
 //import '../../../../data/models/tax_master/tax_master_list_model.dart'  as tax;
@@ -43,7 +45,7 @@ class AddPurchaseMasterPage extends StatefulWidget {
 
 class _AddPurchaseMasterPageState extends State<AddPurchaseMasterPage> {
   final _formKey = GlobalKey<FormState>();
-
+final FocusNode _keyboardFocusNode = FocusNode();
   ///services
   final PurchaseMasterService _service = PurchaseMasterService();
   final GetAllMasterService _getAllMasterService = GetAllMasterService();
@@ -55,20 +57,21 @@ class _AddPurchaseMasterPageState extends State<AddPurchaseMasterPage> {
   bool _loading = false;
   String? _message;
   bool _getAllLoading = true;
+  bool _getSerialNoLoading = true;
   int? _highlightedIndex; // null = nothing highlighted
   final FocusNode _subTableFocus = FocusNode(); // focus for keyboard
   ///sales rate calculation
   double _totalSalesRate = 0.0;
   int? selectedPaymentType;
   int? selectedEntryType;
-  int? selectedEntryMode;
+  int? selectedEntryMode = 1;
   int? selectedTaxType;
   int? selectedGstType;
   serialno.GetSerialNoModel?serialNo;
   void _calculateTotalSalesRate() {
     double total = 0.0;
     for (var item in items) {
-      total += (item.salesRate ?? 0).toDouble();
+    total += double.parse (item.salesRate ?? 0).toDouble();
     }
     setState(() {
       _totalSalesRate = total;
@@ -187,6 +190,7 @@ class _AddPurchaseMasterPageState extends State<AddPurchaseMasterPage> {
   final TextEditingController mrpController = TextEditingController();
   final TextEditingController salesRateController = TextEditingController();
   final TextEditingController gstController = TextEditingController();
+  final TextEditingController taxTypeController = TextEditingController();
 
   late TextEditingController _supCodeController;
   late TextEditingController _purchaseTaxableAmountController;
@@ -246,6 +250,9 @@ class _AddPurchaseMasterPageState extends State<AddPurchaseMasterPage> {
     Future.delayed(Duration(milliseconds: 300), () {
       FocusScope.of(context).requestFocus(_spurchaseNoFocus);
     });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+    _keyboardFocusNode.requestFocus();
+  });
     _loadList();
     //_itemIdController = TextEditingController(text: widget.unitInfo?.purchaseAccCode.toString() ?? "");
 
@@ -253,8 +260,11 @@ class _AddPurchaseMasterPageState extends State<AddPurchaseMasterPage> {
         TextEditingController(text: widget.unitInfo?.supName ?? "");
     _supplierInvoicNoController =
         TextEditingController(text: widget.unitInfo?.invoiceNo ?? "");
-    _invoiceDateController = TextEditingController(
-        text: widget.unitInfo?.invoiceDate ?? DateTime.now().toIso8601String());
+  _invoiceDateController = TextEditingController(
+  text: widget.unitInfo?.invoiceDate != null
+      ? DateFormat('dd-MM-yyyy').format(DateTime.parse(widget.unitInfo!.invoiceDate!))
+      : DateFormat('dd-MM-yyyy').format(DateTime.now()),
+);
     _gstTypeController =
         TextEditingController(text: widget.unitInfo?.taxType.toString() ?? "");
     _invoiceAmtController = TextEditingController(
@@ -264,7 +274,7 @@ class _AddPurchaseMasterPageState extends State<AddPurchaseMasterPage> {
     _purchaseDateController = TextEditingController(
       text: widget.unitInfo?.purchaseDate?.isNotEmpty == true
           ? widget.unitInfo!.purchaseDate
-          : DateTime.now().toString().split(' ')[0], // YYYY-MM-DD format
+          :DateFormat('dd-MM-yyyy').format(DateTime.now()), // YYYY-MM-DD format
     );
     _paymentModeController = TextEditingController(
         text: widget.unitInfo?.paymentType.toString() ?? "");
@@ -319,51 +329,65 @@ class _AddPurchaseMasterPageState extends State<AddPurchaseMasterPage> {
     _totalGstAmtFocus = FocusNode();
     _qtyTotalFocus = FocusNode();
   }
-
+String? serialError;
   Future<void> _loadList() async {
-    final response = await _getAllMasterService.getAllMasterService();
-    if (response.isSuccess) {
-      setState(() {
-        getAllMasterListModel = response.data!;
-        _getAllLoading = false;
-        error = null;
-      });
-    } else {
-      setState(() {
-        error = response.error;
-        _getAllLoading = false;
-      });
-    }
-    final productResponse = await _productService.getSProductService();
-    if (productResponse.isSuccess) {
-      setState(() {
-        productMasterListModel = productResponse.data!;
-        items = productMasterListModel!.info!;
-        _getAllLoading = false;
-        error = null;
-      });
-    } else {
-      setState(() {
-        error = response.error;
-        _getAllLoading = false;
-      });
-    }
-       final serialNoResponse = await _getSerialservice.getSerialNo();
-  if (serialNoResponse.isSuccess) {
     setState(() {
-      serialNo = serialNoResponse.data!; // ✅ assign full model, not .info
-      _purchaseNoController.text=serialNo!.info!.purchaseNextId!;
-      _getAllLoading = false;
+      _getAllLoading = true;
       error = null;
     });
-  } else {
-    setState(() {
-      error = serialNoResponse.error;
-      _getAllLoading = false;
-    });
-  }
+
+    try {
+      // 🔹 Load master data
+      final response = await _getAllMasterService.getAllMasterService();
+      if (response.isSuccess) {
+        getAllMasterListModel = response.data!;
+      } else {
+        throw Exception(response.error);
+      }
+
+      // 🔹 Load product list
+      final productResponse = await _productService.getSProductService();
+      if (productResponse.isSuccess) {
+        productMasterListModel = productResponse.data!;
+        items = productMasterListModel!.info!;
+      } else {
+        throw Exception(productResponse.error);
+      }
+
+      // 🔹 Load serial no. separately
+      await _loadSerialNo();
+    } catch (e) {
+      setState(() {
+        error = e.toString();
+      });
+    } finally {
+      setState(() {
+        _getAllLoading = false;
+      });
+    }
   }
 
+Future<void> _loadSerialNo() async {
+  try {
+    final serialNoResponse = await _getSerialservice.getSerialNo();
+    if (serialNoResponse.isSuccess) {
+      setState(() {
+        serialNo = serialNoResponse.data!;
+        _purchaseNoController.text = serialNo?.info?.purchaseNextId ?? "";
+        serialError = null; // ✅ clear if success
+      });
+    } else {
+      setState(() {
+        serialError = serialNoResponse.error ?? "Serial number not found.";
+      });
+    }
+  } catch (e) {
+    setState(() {
+      serialError = e.toString();
+    });
+  }
+}
+ 
   void _onSaved(bool success) {
     if (success) {
       setState(() {
@@ -433,13 +457,28 @@ class _AddPurchaseMasterPageState extends State<AddPurchaseMasterPage> {
       // netValue: 0,           // Net Value
       salesRate: 0, // Sale Rate
       gstPercentage: 0, // GST %
+      finYearCode : "2025-26",
       // gstPercentage: 0,           // GST Value
       // supName: '',           // Supplier Name
       //purchaseAccCode: null, // Purchase Account Code
       // add other fields in your model as needed
     ),
   ];
+ 
+  Future<void> _pickDate() async {
+    DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(), // default date
+      firstDate: DateTime(2000), // earliest date allowed
+      lastDate: DateTime(2100),  // latest date allowed
+    );
 
+    if (pickedDate != null) {
+      setState(() {
+        _invoiceDateController.text = DateFormat('dd-MM-yyyy').format(pickedDate);
+      });
+    }
+  }
   List<ItemRowControllers> controllers = [ItemRowControllers()];
   List<Items> itemsList = []; // Empty list
   // will fill from API
@@ -470,6 +509,37 @@ class _AddPurchaseMasterPageState extends State<AddPurchaseMasterPage> {
       _loading = true;
       _message = null;
     });
+final filledItems = itemsList.map((item) {
+  // finYearCode
+  if (item.finYearCode == null || item.finYearCode!.isEmpty) {
+    item.finYearCode = _finYearCodeController.text.trim().isNotEmpty
+        ? _finYearCodeController.text.trim()
+        : "2025-26";
+  }
+
+  // ExpiryDate
+  if (item.expiryDate == null || item.expiryDate!.isEmpty) {
+    // Set default or nullable value
+    item.expiryDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
+  } else {
+    try {
+      // Ensure valid date format
+      final parsedDate = DateTime.parse(item.expiryDate!);
+      item.expiryDate = DateFormat('yyyy-MM-dd').format(parsedDate);
+    } catch (e) {
+      // fallback if parsing fails
+      item.expiryDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
+    }
+  }
+
+  return item;
+}).toList();
+
+final purchaseDate = _purchaseDateController.text.trim();
+final invoiceDate = _invoiceDateController.text.trim();
+
+final formattedPurchaseDate = DateFormat('dd-MM-yyyy').parse(purchaseDate);
+final formattedInvoiceDate = DateFormat('dd-MM-yyyy').parse(invoiceDate);
 
     if (widget.unitInfo == null) {
       // ADD mode
@@ -480,20 +550,21 @@ class _AddPurchaseMasterPageState extends State<AddPurchaseMasterPage> {
       // int? activeStatus;
       final request = AddPurchaseMasterModel(
 // Basic info
-        // purchaseDate: _purchaseDateController.text.trim(),
-        // invoiceNo: _invoiceNoController.text.trim(),
-        // invoiceDate: _invoiceDateController.text.trim(),
-        // purchaseOrderNo: _purchaseOrderNoController.text.trim(),
-        // purchaseOrderDate: _purchaseOrderDateController.text.trim(),
-        // supName: _supplierNameController.text.trim(),
+        
+        invoiceNo: _supplierInvoicNoController.text.trim(),
+   purchaseDate: DateFormat('yyyy-MM-dd').format(formattedPurchaseDate),
+  invoiceDate: DateFormat('yyyy-MM-dd').format(formattedInvoiceDate),
+        purchaseOrderNo: _purchaseNoController.text.trim(),
+        purchaseOrderDate:  DateFormat('yyyy-MM-dd').format(formattedPurchaseDate),
+        supName: _supplierNameController.text.trim(),
         supCode: int.tryParse(_supplierNameController.text) ?? 0,
 
         // Payment & purchase types
         paymentType: selectedPaymentType, // from dropdown (0,1,2)
         purchaseEntryType: selectedEntryType, // from dropdown (0,1,2)
         purchaseEntryMode: selectedEntryMode, // from dropdown (1,2)
-        taxType: selectedTaxType, // from dropdown (0,1)
-        supGstType: selectedGstType, // from dropdown (0,1,2)
+        taxType: selectedTaxType??0, // from dropdown (0,1)
+        supGstType: selectedGstType??0, // from dropdown (0,1,2)
 
         // Amounts
         purchaseTaxableAmount: int.tryParse(_gstValueController.text) ?? 0,
@@ -506,37 +577,84 @@ class _AddPurchaseMasterPageState extends State<AddPurchaseMasterPage> {
         iGSTAmount: int.tryParse(_igstAmtController.text) ?? 0,
         roundOffAmount: double.tryParse(_roundOffController.text) ?? 0.0,
         frieghtChargesAddWithTotal:
-            int.tryParse(_frightChargesController.text) ?? 0,
+            int.tryParse(_frightChargesController.text) ?? 10,
 
         // Discounts
         purchaseDiscoutPercentage: int.tryParse(_discountController.text) ?? 0,
         purchaseDiscountValue: int.tryParse(_discountController.text) ?? 0,
         cashDiscountPercentage: int.tryParse(_discountController.text) ?? 0,
         cashDiscountValue: int.tryParse(_cashDiscountValueController.text) ?? 0,
-
+        frieghtChargesAddWithoutTotal:0,
         // Other details
         paidAmount: int.tryParse(_paidAmountController.text) ?? 0,
         supDueDays: int.tryParse(_supDueDaysController.text) ?? 0,
-        createUserCode: int.tryParse(loadData.userCode),
-        createDateTime: DateTime.now().toIso8601String(),
+        createUserCode: int.tryParse(userId.value!),
+        createDateTime: DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now()),
         computerName: "computerName",
-        vehicleNo: _vehicleNoController.text.trim(),
-        finYearCode: _finYearCodeController.text.trim(),
+        vehicleNo: "00",
+        finYearCode: _finYearCodeController.text.trim().isNotEmpty
+    ? _finYearCodeController.text.trim()
+    : "2025-26", 
         coCode: 0,
         purchaseNotes: "",
         purchaseAccCode: 0,
+       
 
         // Items list
-        items: itemsList, // List<Items> you've populated earlier
+      // Ensure all items have a valid finYearCode
+
+ items: filledItems,// List<Items> you've populated earlier
       );
+
 // Print the full request as JSON
       print("AddPurchaseMasterModel request:");
       print(request.toJson());
       final response = await _service.addPurchaseMaster(request);
+      
       _handleResponse(response.isSuccess, response.error);
+        if (response.isSuccess) {
+    // Clear all text fields
+    _supplierInvoicNoController.clear();
+    _purchaseNoController.clear();
+    _purchaseDateController.clear();
+    _invoiceDateController.clear();
+    _supplierNameController.clear();
+    _gstValueController.clear();
+    _netAmountController.clear();
+    _subTotalValueController.clear();
+    _sgstAmtController.clear();
+    _cgstAmtController.clear();
+    _igstAmtController.clear();
+    _roundOffController.clear();
+    _frightChargesController.clear();
+    _discountController.clear();
+    _cashDiscountValueController.clear();
+    _paidAmountController.clear();
+    _supDueDaysController.clear();
+    _vehicleNoController.clear();
+    _finYearCodeController.clear();
+
+    // Clear items list
+    setState(() {
+      itemsList.clear();
+    });
+
+    // Optionally, reset dropdowns
+    selectedPaymentType = 0;
+    selectedEntryType = 0;
+    selectedEntryMode = 1;
+    selectedTaxType = 0;
+    selectedGstType = 0;
+  }
+
+  setState(() {
+    _loading = false;
+  });
     } else {
       // EDIT mode
       final updated = AddPurchaseMasterModel(
+         purchaseDate: DateFormat('yyyy-MM-dd').format(formattedPurchaseDate),
+  invoiceDate: DateFormat('yyyy-MM-dd').format(formattedInvoiceDate),
         // Basic info
         // purchaseDate: _purchaseDateController.text.trim(),
         // invoiceNo: _invoiceNoController.text.trim(),
@@ -575,17 +693,20 @@ class _AddPurchaseMasterPageState extends State<AddPurchaseMasterPage> {
         // Other details
         paidAmount: int.tryParse(_paidAmountController.text) ?? 0,
         supDueDays: int.tryParse(_supDueDaysController.text) ?? 0,
-        createUserCode: int.tryParse(loadData.userCode),
-        createDateTime: DateTime.now().toIso8601String(),
+        createUserCode: int.tryParse(userId.value!),
+      createDateTime: DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now()),
         computerName: "computerName",
         vehicleNo: _vehicleNoController.text.trim(),
-        finYearCode: _finYearCodeController.text.trim(),
+        finYearCode: _finYearCodeController.text.trim().isNotEmpty
+    ? _finYearCodeController.text.trim()
+    : "2025-26", // example default
         coCode: 0,
         purchaseNotes: "",
         purchaseAccCode: 0,
 
         // Items list
-        items: itemsList, // List<Items> you've populated earlier
+        
+     items: filledItems, // List<Items> you've populated earlier
       );
       print("updated");
       print(updated);
@@ -612,7 +733,7 @@ class _AddPurchaseMasterPageState extends State<AddPurchaseMasterPage> {
       //  _itemIdController.text = widget.unitInfo?.purchaseAccCode.toString() ?? "";
       _supplierNameController.text = widget.unitInfo?.purchaseNo ?? "";
       // _createdUserController.text =
-      //     widget.countryInfo?.createdUserCode?.toString() ?? "1001";
+      //     widget.countryInfo?.createdUserCode?.toString() ?? userId.value!;
       // _activeStatus = (widget.unitInfo?.custActiveStatus ?? 1) == 1;
     }
   }
@@ -623,15 +744,99 @@ class _AddPurchaseMasterPageState extends State<AddPurchaseMasterPage> {
     FocusScope.of(context).requestFocus(next);
   }
 
+void _showAddProductPopup(BuildContext context) {
+  showDialog(
+    context: context,
+    barrierDismissible: false, // Prevent accidental closing
+    builder: (BuildContext context) {
+      final screenSize = MediaQuery.of(context).size;
+      final dialogWidth = screenSize.width * 0.7;
+      final dialogHeight = screenSize.height * 0.9;
+
+      return Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        insetPadding: EdgeInsets.symmetric(
+          horizontal: screenSize.width * 0.15,
+          vertical: screenSize.height * 0.2,
+        ),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: dialogWidth,
+            maxHeight: dialogHeight,
+          ),
+          child: Scaffold(
+            backgroundColor:  white,
+            appBar: AppBar(
+              title: const Text("Add Product"),
+              backgroundColor: const Color(0xFF0B2046),
+              foregroundColor:  white,
+              centerTitle: true,
+              automaticallyImplyLeading: false,
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.close, color:  white),
+                  onPressed: () => Navigator.pop(context),
+                ),
+              ],
+            ),
+            body: AddProductMasterPage(
+              onSaved: (bool success) {
+                if (success) {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Product added successfully")),
+                  );
+                  setState(() {
+                    // 🔹 Optionally reload your table data
+                    // _fetchProducts();
+                  });
+                }
+              },
+            ),
+          ),
+        ),
+      );
+    },
+  );
+}
+
   @override
-  Widget build(BuildContext context) {
-    if (_getAllLoading) return const Center(child: CircularProgressIndicator());
-    if (error != null) return Center(child: Text("Error: $error"));
+Widget build(BuildContext context) {
+  if (_getAllLoading) return const Center(child: CircularProgressIndicator());
+  if (error != null) return Center(child: Text("Error: $error"));
 
-    final isEdit = widget.unitInfo != null;
+  final isEdit = widget.unitInfo != null;
 
-    return Scaffold(
-        backgroundColor: white,
+  return RawKeyboardListener(
+    focusNode: _keyboardFocusNode,
+    autofocus: true,
+    onKey: (RawKeyEvent event) {
+      if (event is RawKeyDownEvent) {
+        final isShiftPressed = event.isShiftPressed;
+        final keyLabel = event.logicalKey.keyLabel.toLowerCase();
+
+        if (isShiftPressed && keyLabel == 'm') {
+          setState(() {
+            selectedEntryMode = (selectedEntryMode == 1) ? 2 : 1;
+          });
+
+          debugPrint("🟢 Entry Mode changed to: $selectedEntryMode");
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text("Entry Mode switched to: $selectedEntryMode"),
+              duration: const Duration(seconds: 1),
+            ),
+          );
+        }
+      }
+    },
+
+    // ✅ your existing UI starts here
+    child: Scaffold(
+        backgroundColor: selectedEntryMode == 1 ? white : lightblue,
         body: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(16.0),
@@ -648,6 +853,42 @@ class _AddPurchaseMasterPageState extends State<AddPurchaseMasterPage> {
                   spacing: 16,
                   runSpacing: 16,
                   children: [
+                      SizedBox(
+                      width: constraints.maxWidth / columns - 20,
+                      child: SearchableDropdown<master.Suppliers>(
+                        hintText: "Supplier Name",
+                        items: getAllMasterListModel!.info!.suppliers!,
+                        itemLabel: (supplier) => supplier.supName ?? "",
+                        onChanged: (supplier) {
+                          if (supplier != null) {
+                            _supplierNameController.text =
+                                supplier.supCode.toString();
+                            print("Selected Code: ${supplier.supCode}");
+                            print("Selected Name: ${supplier.supName}");
+                            print("Selected GSt type: ${supplier.supGSTType}");
+                            
+                             // TaxType: 0=Exclusive, 1=Inclusive
+                            if(supplier.taxIsIncluded==1){
+                              selectedTaxType=1;
+                              selectedGstType=1;
+ taxTypeController.text="Inclusive";
+                            }else{
+                              selectedTaxType=0;
+                               selectedGstType=0;
+ taxTypeController.text='Exclusive';
+                            }
+                            //_gstTypeController
+                           if(supplier.supGSTType==1){
+                            _gstTypeController.text="";
+                           }else{
+                            _gstTypeController.text="";
+                           }
+                           
+                          }
+                        },
+                      ),
+                    ),
+                   
                     SizedBox(
                       width: constraints.maxWidth / columns - 20,
                       child: CustomTextField(
@@ -676,38 +917,7 @@ class _AddPurchaseMasterPageState extends State<AddPurchaseMasterPage> {
                             context, _supNameFocus, _invoiceDateFocus),
                       ),
                     ),
-                    SizedBox(
-                      width: constraints.maxWidth / columns - 20,
-                      child: SearchableDropdown<master.Suppliers>(
-                        hintText: "Select Supplier",
-                        items: getAllMasterListModel!.info!.suppliers!,
-                        itemLabel: (supplier) => supplier.supName ?? "",
-                        onChanged: (supplier) {
-                          if (supplier != null) {
-                            _supplierNameController.text =
-                                supplier.supCode.toString();
-                            print("Selected Code: ${supplier.supCode}");
-                            print("Selected Name: ${supplier.supName}");
-                          }
-                        },
-                      ),
-                    ),
-                    SizedBox(
-                      width: constraints.maxWidth / columns - 20,
-                      child: SearchableDropdown<master.Suppliers>(
-                        hintText: "Supplier Name",
-                        items: getAllMasterListModel!.info!.suppliers!,
-                        itemLabel: (supplier) => supplier.supName ?? "",
-                        onChanged: (supplier) {
-                          if (supplier != null) {
-                            _supplierNameController.text =
-                                supplier.supCode.toString();
-                            print("Selected Code: ${supplier.supCode}");
-                            print("Selected Name: ${supplier.supName}");
-                          }
-                        },
-                      ),
-                    ),
+                   
                     SizedBox(
                       width: constraints.maxWidth / columns - 20,
                       child: CustomDropdownField<int>(
@@ -746,69 +956,55 @@ class _AddPurchaseMasterPageState extends State<AddPurchaseMasterPage> {
                     ),
 
                     // PurchaseEntryMode: 1=Mode1,2=Mode2
-                    SizedBox(
-                      width: constraints.maxWidth / columns - 20,
-                      child: CustomDropdownField<int>(
-                        title: "Purchase Entry Mode",
-                        hintText: "Select Mode",
-                        items: const [
-                          DropdownMenuItem(value: 1, child: Text("Mode1")),
-                          DropdownMenuItem(value: 2, child: Text("Mode2")),
-                        ],
-                        initialValue: selectedEntryMode,
-                        onChanged: (val) {
-                          setState(() => selectedEntryMode = val);
-                          print("Selected EntryMode: $val");
-                        },
-                      ),
-                    ),
+                    // SizedBox(
+                    //   width: constraints.maxWidth / columns - 20,
+                    //   child: CustomDropdownField<int>(
+                    //     title: "Purchase Entry Mode",
+                    //     hintText: "Select Mode",
+                    //     items: const [
+                    //       DropdownMenuItem(value: 1, child: Text("Mode1")),
+                    //       DropdownMenuItem(value: 2, child: Text("Mode2")),
+                    //     ],
+                    //     initialValue: selectedEntryMode,
+                    //     onChanged: (val) {
+                    //       setState(() => selectedEntryMode = val);
+                    //       print("Selected EntryMode: $val");
+                    //     },
+                    //   ),
+                    // ),
 
                     // TaxType: 0=Exclusive, 1=Inclusive
                     SizedBox(
                       width: constraints.maxWidth / columns - 20,
-                      child: CustomDropdownField<int>(
-                        title: "Tax Type",
-                        hintText: "Select Tax Type",
-                        items: const [
-                          DropdownMenuItem(value: 0, child: Text("Exclusive")),
-                          DropdownMenuItem(value: 1, child: Text("Inclusive")),
-                        ],
-                        initialValue: selectedTaxType,
-                        onChanged: (val) {
-                          setState(() => selectedTaxType = val);
-                          print("Selected TaxType: $val");
-                        },
-                      ),
-                    ),
-                    SizedBox(
-                      width: constraints.maxWidth / columns - 20,
-                      child: CustomDropdownField<int>(
-                        title: "Supplier GST Type",
-                        hintText: "Select GST Type",
-                        items: const [
-                          DropdownMenuItem(value: 0, child: Text("No GST")),
-                          DropdownMenuItem(value: 1, child: Text("SGST")),
-                          DropdownMenuItem(value: 2, child: Text("IGST")),
-                        ],
-                        initialValue: selectedGstType,
-                        onChanged: (val) {
-                          setState(() => selectedGstType = val);
-                          print("Selected SupGstType: $val");
-                        },
-                      ),
-                    ),
-
-                    SizedBox(
-                      width: constraints.maxWidth / columns - 20,
                       child: CustomTextField(
-                        title: "Invoice Date",
-                        controller: _invoiceDateController,
+                        title: "Tax Type",
+                        controller: taxTypeController,
                         // prefixIcon: Icons.person,
                         isEdit: true,
                         focusNode: _invoiceDateFocus,
                         textInputAction: TextInputAction.done,
                         onEditingComplete: () => _fieldFocusChange(
                             context, _invoiceDateFocus, _gstTypeFocus),
+                      ),
+                    ),
+                  
+                
+                    SizedBox(
+                      width: constraints.maxWidth / columns - 20,
+                      child: GestureDetector(
+                        onTap: (){
+                          _pickDate();
+                        },
+                        child: CustomTextField(
+                          title: "Invoice Date",
+                          controller: _invoiceDateController,
+                          // prefixIcon: Icons.person,
+                          isEdit: true,
+                          focusNode: _invoiceDateFocus,
+                          textInputAction: TextInputAction.done,
+                          onEditingComplete: () => _fieldFocusChange(
+                              context, _invoiceDateFocus, _gstTypeFocus),
+                        ),
                       ),
                     ),
                     const Divider(),
@@ -818,17 +1014,18 @@ class _AddPurchaseMasterPageState extends State<AddPurchaseMasterPage> {
                     SizedBox(
                       width: constraints.maxWidth / columns - 20,
                       child: CustomTextField(
-                        title: "GST Type",
-                        hintText: "GST Type",
+                        title: " Supplier GST Type",
+                        hintText: "Supplier GST Type",
                         controller: _gstTypeController,
                         // prefixIcon: Icons.person,
-                        isEdit: false,
+                        isEdit: true,
                         focusNode: _gstTypeFocus,
                         textInputAction: TextInputAction.done,
                         onEditingComplete: () => _fieldFocusChange(
                             context, _gstTypeFocus, _invoiceAmtFocus),
                       ),
                     ),
+                  
                     SizedBox(
                       width: constraints.maxWidth / columns - 20,
                       child: CustomTextField(
@@ -871,33 +1068,33 @@ class _AddPurchaseMasterPageState extends State<AddPurchaseMasterPage> {
                       ),
                     ),
 
-                    SizedBox(
-                      width: constraints.maxWidth / columns - 20,
-                      child: CustomTextField(
-                        title: "Based On",
-                        hintText: "Based On",
-                        controller: _basedOnController,
-                        // prefixIcon: Icons.person,
-                        isEdit: false,
-                        focusNode: _basedOnFocus,
-                        textInputAction: TextInputAction.done,
-                        onEditingComplete: () => _fieldFocusChange(
-                            context, _purchaseDateFocus, _accountNameFocus),
-                      ),
-                    ),
-                    SizedBox(
-                      width: constraints.maxWidth / columns - 20,
-                      child: CustomTextField(
-                        title: "Amount Name",
-                        hintText: "Amount Name",
-                        controller: _accountNameController,
-                        // prefixIcon: Icons.person,
-                        isEdit: false,
-                        focusNode: _accountNameFocus,
-                        textInputAction: TextInputAction.done,
-                        onEditingComplete: _submit,
-                      ),
-                    ),
+                    // SizedBox(
+                    //   width: constraints.maxWidth / columns - 20,
+                    //   child: CustomTextField(
+                    //     title: "Based On",
+                    //     hintText: "Based On",
+                    //     controller: _basedOnController,
+                    //     // prefixIcon: Icons.person,
+                    //     isEdit: false,
+                    //     focusNode: _basedOnFocus,
+                    //     textInputAction: TextInputAction.done,
+                    //     onEditingComplete: () => _fieldFocusChange(
+                    //         context, _purchaseDateFocus, _accountNameFocus),
+                    //   ),
+                    // ),
+                    // SizedBox(
+                    //   width: constraints.maxWidth / columns - 20,
+                    //   child: CustomTextField(
+                    //     title: "Amount Name",
+                    //     hintText: "Amount Name",
+                    //     controller: _accountNameController,
+                    //     // prefixIcon: Icons.person,
+                    //     isEdit: false,
+                    //     focusNode: _accountNameFocus,
+                    //     textInputAction: TextInputAction.done,
+                    //     onEditingComplete: _submit,
+                    //   ),
+                    // ),
 
                     // const SizedBox(height: 26),
 
@@ -908,6 +1105,8 @@ class _AddPurchaseMasterPageState extends State<AddPurchaseMasterPage> {
                     SizedBox(
                       width: double.infinity,
                       child: DataTable(
+                         headingRowHeight: 30, // <-- Reduce header height
+    dataRowHeight: 40,  
                         showCheckboxColumn: false,
                         border: TableBorder.all(color: primary),
                         columnSpacing: 30,
@@ -933,7 +1132,8 @@ class _AddPurchaseMasterPageState extends State<AddPurchaseMasterPage> {
                                   icon: Icon(Icons.add_circle_outline_rounded,
                                       color: white, size: 20),
                                   onPressed: () {
-                                    _showAddEditBottomSheet(editingUnit);
+                                    _showAddProductPopup(context);
+                                    // _showAddEditBottomSheet(editingUnit);
 
                                     //_showAddProductPopup(context);
                                   },
@@ -964,7 +1164,7 @@ class _AddPurchaseMasterPageState extends State<AddPurchaseMasterPage> {
                           )),
                           const DataColumn(
                               label: Text(
-                            "FreeQty",
+                            "Qty",
                             style: TextStyle(color: white),
                           )),
                           const DataColumn(
@@ -1259,6 +1459,8 @@ class _AddPurchaseMasterPageState extends State<AddPurchaseMasterPage> {
                             scrollDirection: Axis.vertical,
                             child: _searchResults.isNotEmpty
                                 ? DataTable(
+                                     headingRowHeight: 30, // <-- Reduce header height
+    dataRowHeight: 40, 
                                     showCheckboxColumn: false,
                                     border: TableBorder.all(color: lightgray),
                                     headingRowColor:
@@ -1346,6 +1548,7 @@ class _AddPurchaseMasterPageState extends State<AddPurchaseMasterPage> {
                                                   p.batchNoRequired ?? 0;
                                               item.expiryDateFormat =
                                                   p.expiryDateFormat ?? '';
+
                                               item.hSNCode = p.hSNCode ?? '';
                                               item.maximumStockQty =
                                                   p.maximumStockQty ?? 0;
@@ -1384,6 +1587,7 @@ class _AddPurchaseMasterPageState extends State<AddPurchaseMasterPage> {
                                               _calculateTotalSalesRate();
                                               // Convert Info to Items
                                               final newItem = Items(
+                                                
                                                 itemCode: p.itemCode,
                                                 itemID: p.itemID ?? '',
                                                 itemName: p.itemName ?? '',
@@ -1397,14 +1601,17 @@ class _AddPurchaseMasterPageState extends State<AddPurchaseMasterPage> {
                                                 batchNo: p.batchNoRequired
                                                         ?.toString() ??
                                                     '',
-                                                mFGDate: '',
-                                                expiryDate:
-                                                    p.expiryDateFormat ?? '',
+                                                      mFGDate: "2025-10-01",
+  expiryDate: "2025-10-07",
+                                              //  mFGDate: '2025-10-01',
+                                              //   expiryDate:
+                                              //       p.expiryDateFormat ?? '',
                                                 hsnCode: int.tryParse(
                                                         p.hSNCode ?? '0') ??
                                                     0,
                                                 gstPercentage:
                                                     p.gstPercentage ?? 0,
+                                                    
                                                 itemQuantity:
                                                     p.maximumStockQty ?? 0,
                                                 freeQuantity: 0,
@@ -1433,15 +1640,17 @@ class _AddPurchaseMasterPageState extends State<AddPurchaseMasterPage> {
                                                 purchaseEntryType: 0,
                                                 createdUserCode:
                                                     p.createdUserCode ?? 0,
-                                                createdDate: p.createdDate ??
-                                                    DateTime.now()
-                                                        .toIso8601String(),
-                                                updatedUserCode: null,
-                                                updatedDate: null,
+                                                    createdDate: "2025-09-24 00:23:30",
+                                                // createdDate: p.createdDate ??
+                                                //     DateTime.now()
+                                                //         .toIso8601String(),
+                                               updatedUserCode: int.tryParse(userId.value ?? '0'),
+ updatedDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
                                                 coCode: 0,
-                                                computerName: '',
+                                                computerName: 'computername',
                                                 finYearCode: '',
                                                 stockRequiredEffect: 0,
+                                                 frieghtChargesAddWithoutTotal: 0,
                                               );
 
                                               // Add to itemsList
@@ -1794,10 +2003,10 @@ class _AddPurchaseMasterPageState extends State<AddPurchaseMasterPage> {
               ),
             ),
           ],
-        ));
-  }
-
-  void _showEditPopup(BuildContext context, int index) {
+        )),
+  );
+}
+void _showEditPopup(BuildContext context, int index) {
     final controller = controllers[index]; // get row’s controllers
 
     showDialog(
@@ -1877,12 +2086,12 @@ class _AddPurchaseMasterPageState extends State<AddPurchaseMasterPage> {
                             _buildTextField("Discount Value",
                                 controller.discountValueController,
                                 keyboardType: TextInputType.number),
-                            _buildTextField(
-                                "GST %", controller.gstPercentageController,
-                                keyboardType: TextInputType.number),
-                            _buildTextField(
-                                "GST Value", controller.gstValueController,
-                                keyboardType: TextInputType.number),
+                            // _buildTextField(
+                            //     "GST %", controller.gstPercentageController,
+                            //     keyboardType: TextInputType.number),
+                            // _buildTextField(
+                            //     "GST Value", controller.gstValueController,
+                            //     keyboardType: TextInputType.number),
                             _buildTextField("Taxable Value",
                                 controller.taxableValueController,
                                 keyboardType: TextInputType.number),

@@ -2,6 +2,7 @@ import 'package:facebilling/data/models/area_master/area_master_list_model.dart'
 import 'package:facebilling/ui/screens/masters/state_master/add_state_master_page.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../core/const.dart';
 import '../../../../data/models/area_master/add_area_master_model.dart';
 import '../../../../data/services/area_master_service.dart';
 import '../../../../data/services/get_all_master_service.dart';
@@ -57,7 +58,7 @@ class _AddAreaMasterPageState extends State<AddAreaMasterPage> {
     _unitNameController =
         TextEditingController(text: widget.unitInfo?.areaName ?? "");
     // _createdUserController = TextEditingController(
-    //     text: widget.countryInfo?.createdUserCode?.toString() ?? "1001");
+    //     text: widget.countryInfo?.createdUserCode?.toString() ?? userId.value!);
     _activeStatus = (widget.unitInfo?.activeStatus ?? 1) == 1;
      _isEditMode = widget.unitInfo != null;
   }
@@ -135,7 +136,7 @@ class _AddAreaMasterPageState extends State<AddAreaMasterPage> {
       _unitIdController.text = widget.unitInfo?.areaCode.toString() ?? "";
       _unitNameController.text = widget.unitInfo?.areaName ?? "";
       // _createdUserController.text =
-      //     widget.countryInfo?.createdUserCode?.toString() ?? "1001";
+      //     widget.countryInfo?.createdUserCode?.toString() ?? userId.value!;
       _activeStatus = (widget.unitInfo?.activeStatus ?? 1) == 1;
           _isEditMode = widget.unitInfo != null;
     }
@@ -174,7 +175,7 @@ class _AddAreaMasterPageState extends State<AddAreaMasterPage> {
                   _unitIdController.text = country.areaCode.toString() ?? "";
                   _unitNameController.text = country.areaName ?? "";
                   // _createdUserController.text =
-                  //     country.createdUserCode?.toString() ?? "1001";
+                  //     country.createdUserCode?.toString() ?? userId.value!;
                   _activeStatus = (country.activeStatus ?? 1) == 1;
                   _isEditMode = true;
                 });
@@ -191,7 +192,7 @@ class _AddAreaMasterPageState extends State<AddAreaMasterPage> {
       _unitNameController.text = typedValue; 
       print("_countryNameController.text");// use typed text
       print(_unitNameController.text);// use typed text
-      _createdUserController.text = "1001";
+      _createdUserController.text = userId.value!;
       _activeStatus = true;
             _isEditMode = false;
     });

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class CustomTextField extends StatefulWidget {
   final String? title;
@@ -11,6 +13,7 @@ class CustomTextField extends StatefulWidget {
   final FocusNode? focusNode;
   final TextInputAction textInputAction;
   final VoidCallback? onEditingComplete;
+  final ValueChanged<String>? onChanged; // ✅ new callback
   final bool isPassword;
   final bool isNumeric;
   final bool isValidate;
@@ -28,6 +31,7 @@ class CustomTextField extends StatefulWidget {
     this.focusNode,
     this.textInputAction = TextInputAction.next,
     this.onEditingComplete,
+    this.onChanged, // ✅ added
     this.isPassword = false,
     this.isNumeric = false,
     this.isValidate = false,
@@ -59,72 +63,71 @@ class _CustomTextFieldState extends State<CustomTextField> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      // height: 50,
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        border:
-            Border.all(color: const Color.fromARGB(76, 0, 0, 0), width: 1.2),
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // if (widget.title != null)
-          //   Padding(
-          //     padding: const EdgeInsets.only(bottom: 6),
-          //     child: Text(
-          //       widget.title!,
-          //       style: const TextStyle(
-          //         fontSize: 14,
-          //         fontWeight: FontWeight.w500,
-          //         color: Colors.black87,
-          //       ),
-          //     ),
-          //   ),
-          TextField(
-            style: TextStyle(fontSize: 12.0, height: 1.0, color: Colors.black),
-            controller: widget.controller,
-            focusNode: widget.focusNode,
-            textInputAction: widget.textInputAction,
-            onEditingComplete: widget.onEditingComplete,
-            obscureText: widget.isPassword ? _obscureText : false,
-            keyboardType:
-                widget.isNumeric ? TextInputType.number : TextInputType.text,
-            enabled: !widget.isEdit,
-            onChanged: widget.isEdit ? null : _validate,
-            autofocus: widget.autoFocus,
+          if (widget.title != null)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 0),
+              child: Text(
+                widget.title!,
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: Colors.black87,
+                ),
+              ),
+            ),
+          SizedBox(
+            height: 30,
+            child: TextField(
+              style:
+                  const TextStyle(fontSize: 12.0, height: 1.0, color: Colors.black),
+              controller: widget.controller,
+              focusNode: widget.focusNode,
+              textInputAction: widget.textInputAction,
+              onEditingComplete: widget.onEditingComplete,
+              obscureText: widget.isPassword ? _obscureText : false,
+              keyboardType:
+                  widget.isNumeric ? TextInputType.number : TextInputType.text,
+              enabled: !widget.isEdit,
+              autofocus: widget.autoFocus,
 
-            // ✅ Only allow numbers if isNumeric = true
-            inputFormatters: widget.isNumeric
-                ? [FilteringTextInputFormatter.digitsOnly]
-                : [],
+              // ✅ Combined onChanged functionality
+              onChanged: (value) {
+                if (widget.isValidate) _validate(value);
+                if (widget.onChanged != null) widget.onChanged!(value);
+              },
 
-            decoration: InputDecoration(
-              // labelText: widget.title,
-              hintText: widget.hintText,
-              // prefixIcon:
-              //     widget.prefixIcon != null ? Icon(widget.prefixIcon) : null,
-              suffixIcon: widget.isPassword
-                  ? IconButton(
-                      icon: Icon(_obscureText
-                          ? Icons.visibility
-                          : Icons.visibility_off),
-                      onPressed: widget.isEdit
-                          ? null
-                          : () {
-                              setState(() {
-                                _obscureText = !_obscureText;
-                              });
-                            },
-                    )
-                  : (widget.suffixIcon != null
-                      ? Icon(widget.suffixIcon)
-                      : null),
-              errorText: _errorText,
-              // border: OutlineInputBorder(
-              //   borderRadius: BorderRadius.circular(8),
-              // ),
-              border: InputBorder.none,
+              // ✅ Allow only numbers if numeric
+              inputFormatters: widget.isNumeric
+                  ? [FilteringTextInputFormatter.digitsOnly]
+                  : [],
+
+              decoration: InputDecoration(
+                hintText: widget.hintText,
+                suffixIcon: widget.isPassword
+                    ? IconButton(
+                        icon: Icon(_obscureText
+                            ? Icons.visibility
+                            : Icons.visibility_off),
+                        onPressed: widget.isEdit
+                            ? null
+                            : () {
+                                setState(() {
+                                  _obscureText = !_obscureText;
+                                });
+                              },
+                      )
+                    : (widget.suffixIcon != null
+                        ? Icon(widget.suffixIcon)
+                        : null),
+                errorText: _errorText,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(2),
+                ),
+                contentPadding:
+                    const EdgeInsets.symmetric(vertical: 16.0, horizontal: 12.0),
+              ),
             ),
           ),
         ],

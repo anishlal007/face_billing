@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/const.dart';
 import '../../../../data/models/country/country_response.dart';
 import '../../../../data/models/state_master/add_state_master_model.dart';
 import '../../../../data/models/get_all_master_list_model.dart' as master;
@@ -131,7 +132,7 @@ Country? country;
     _suppPanNoController = TextEditingController(
         text: widget.unitInfo?.supPanNo?.toString() ?? "");
     _createdUserController = TextEditingController(
-        text: widget.unitInfo?.createdUserCode?.toString() ?? "1001");
+        text: widget.unitInfo?.createdUserCode?.toString() ?? userId.value!);
 
   }
 
@@ -188,7 +189,7 @@ final request = AddSupplierMasterModel(
   supPanNo: _suppPanNoController.text.toString(),         // PAN No
   supGSTType: 1,                  // GST Type (e.g., 1=Registered, 2=Unregistered)
   taxIsIncluded: _isTaxInclusive?1:0,               // Tax Included? (1=yes, 0=no)
-  createdUserCode: "1001",        // Created By User Code
+  createdUserCode: userId.value!,        // Created By User Code
   supActiveStatus: _activeStatus?1:0             // Active (1=Active, 0=Inactive)
 );
 print("request");
@@ -213,7 +214,7 @@ print(request);
      supPanNo: _suppPanNoController.text.toString(),         // PAN No
      supGSTType: _taxCode,                  // GST Type (e.g., 1=Registered, 2=Unregistered)
      taxIsIncluded: _isTaxInclusive?1:0,               // Tax Included? (1=yes, 0=no)
-     createdUserCode: "1001",        // Created By User Code
+     createdUserCode: userId.value!,        // Created By User Code
      supActiveStatus: _activeStatus?1:0             // Active (1=Active, 0=Inactive)
  );
      print("updated");
@@ -247,7 +248,7 @@ print(request);
       _unitIdController.text = widget.unitInfo?.supCode.toString() ?? "";
       _unitNameController.text = widget.unitInfo?.supName ?? "";
       // _createdUserController.text =
-      //     widget.countryInfo?.createdUserCode?.toString() ?? "1001";
+      //     widget.countryInfo?.createdUserCode?.toString() ?? userId.value!;
       _activeStatus = (widget.unitInfo?.supActiveStatus ?? 1) == 1;
     }
   }
@@ -298,7 +299,7 @@ print(request);
                             country.itemCode.toString() ?? "";
                         _itemNameController.text = country.itemName ?? "";*/
                         // _createdUserController.text =
-                        //     country.createdUserCode?.toString() ?? "1001";
+                        //     country.createdUserCode?.toString() ?? userId.value!;
                         // _activeStatus = (country.custActiveStatus ?? 1) == 1;
                       });
 

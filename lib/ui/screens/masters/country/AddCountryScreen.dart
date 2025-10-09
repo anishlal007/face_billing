@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:facebilling/core/const.dart';
 import '../../../../data/models/country/add_country_request.dart';
 import '../../../../data/models/country/country_response.dart';
 import '../../../../data/services/country_service.dart';
@@ -51,7 +51,7 @@ class _AddCountryScreenState extends State<AddCountryScreen> {
     _countryNameController =
         TextEditingController(text: widget.countryInfo?.countryName ?? "");
     _createdUserController = TextEditingController(
-        text: widget.countryInfo?.createdUserCode?.toString() ?? "1001");
+        text: widget.countryInfo?.createdUserCode?.toString() ?? userId.value!);
     _activeStatus = (widget.countryInfo?.activeStatus ?? 1) == 1;
 
     // Set edit mode if editing existing country
@@ -119,7 +119,7 @@ void didUpdateWidget(covariant AddCountryScreen oldWidget) {
     _countryIdController.text = widget.countryInfo?.countryId ?? "";
     _countryNameController.text = widget.countryInfo?.countryName ?? "";
     _createdUserController.text =
-        widget.countryInfo?.createdUserCode?.toString() ?? "1001";
+        widget.countryInfo?.createdUserCode?.toString() ?? userId.value!;
     _activeStatus = (widget.countryInfo?.activeStatus ?? 1) == 1;
     _isEditMode = widget.countryInfo != null; // update button too
   }
@@ -172,7 +172,7 @@ void didUpdateWidget(covariant AddCountryScreen oldWidget) {
                     _countryIdController.text = country.countryId ?? "";
                     _countryNameController.text = country.countryName ?? "";
                     _createdUserController.text =
-                        country.createdUserCode?.toString() ?? "1001";
+                        country.createdUserCode?.toString() ?? userId.value!;
                     _activeStatus = (country.activeStatus ?? 1) == 1;
                     _isEditMode = true; // <-- update button text
                   });
@@ -183,7 +183,7 @@ void didUpdateWidget(covariant AddCountryScreen oldWidget) {
                 setState(() {
                   _countryIdController.clear();
                   _countryNameController.text = typedValue;
-                  _createdUserController.text = "1001";
+                  _createdUserController.text = userId.value!;
                   _activeStatus = true;
                   _isEditMode = false; // <-- back to Add mode
                 });

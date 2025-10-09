@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:facebilling/core/const.dart';
 import '../../../../data/models/get_all_master_list_model.dart' as master;
 import '../../../../data/models/customer_master/add_customer_master_model.dart';
 import '../../../../data/models/customer_master/customer_master_list_model.dart';
@@ -105,7 +105,7 @@ class _AddCustomerMasterPageState extends State<AddCustomerMasterPage> {
     _unitNameController =
         TextEditingController(text: widget.unitInfo?.custName ?? "");
     // _createdUserController = TextEditingController(
-    //     text: widget.countryInfo?.createdUserCode?.toString() ?? "1001");
+    //     text: widget.countryInfo?.createdUserCode?.toString() ?? userId.value!);
     _activeStatus = (widget.unitInfo?.custActiveStatus ?? 1) == 1;
 
     _loadList();
@@ -126,7 +126,7 @@ class _AddCustomerMasterPageState extends State<AddCustomerMasterPage> {
     _customerDobController =
         TextEditingController(text: widget.unitInfo?.custDOB?.toString() ?? "");
     _createdUserController = TextEditingController(
-        text: widget.unitInfo?.createdUserCode?.toString() ?? "1001");
+        text: widget.unitInfo?.createdUserCode?.toString() ?? userId.value!);
   }
 
   Future<void> _loadList() async {
@@ -253,7 +253,7 @@ class _AddCustomerMasterPageState extends State<AddCustomerMasterPage> {
       _unitIdController.text = widget.unitInfo?.custCode.toString() ?? "";
       _unitNameController.text = widget.unitInfo?.custName ?? "";
       // _createdUserController.text =
-      //     widget.countryInfo?.createdUserCode?.toString() ?? "1001";
+      //     widget.countryInfo?.createdUserCode?.toString() ?? userId.value!;
       _activeStatus = (widget.unitInfo?.custActiveStatus ?? 1) == 1;
     }
   }
@@ -304,7 +304,7 @@ class _AddCustomerMasterPageState extends State<AddCustomerMasterPage> {
                             country.itemCode.toString() ?? "";
                         _itemNameController.text = country.itemName ?? "";*/
                         // _createdUserController.text =
-                        //     country.createdUserCode?.toString() ?? "1001";
+                        //     country.createdUserCode?.toString() ?? userId.value!;
                         // _activeStatus = (country.custActiveStatus ?? 1) == 1;
                       });
 

@@ -1,4 +1,5 @@
 class AddProductMasterModel {
+  dynamic idtype;
   dynamic itemID;
   dynamic itemName;
   dynamic itemType;
@@ -32,7 +33,9 @@ class AddProductMasterModel {
   dynamic updatedUserCode;
 
   AddProductMasterModel(
-      {this.itemID,
+      {
+        this.idtype,
+      this.itemID,
       this.itemName,
       this.itemType,
       this.itemGroupCode,
@@ -65,6 +68,7 @@ class AddProductMasterModel {
       this.updatedUserCode});
 
   AddProductMasterModel.fromJson(Map<String, dynamic> json) {
+    idtype = json['Idtype'];
     itemID = json['ItemID'];
     itemName = json['ItemName'];
     itemType = json['ItemType'];
@@ -100,6 +104,7 @@ class AddProductMasterModel {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['Idtype'] = this.idtype;
     data['ItemID'] = this.itemID;
     data['ItemName'] = this.itemName;
     data['ItemType'] = this.itemType;

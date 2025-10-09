@@ -49,22 +49,10 @@ Future<ApiResponse<bool>> uploadProductExcelFile() async {
         file.path,
         filename: file.path.split('/').last,
       ),
-    });
- 
-    final response = await _dio.post(
-      "products/bulk-upload",
-      data: formData,
-      options: Options(
-        headers: {
-          'Accept': 'application/json',
-          'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvYXBpL2xvZ2luIiwiaWF0IjoxNzU5NjYxNzI2LCJleHAiOjE3NTk2NjUzMjYsIm5iZiI6MTc1OTY2MTcyNiwianRpIjoia0pjUDcwdVRlbHpHQTl0MyIsInN1YiI6IjEiLCJwcnYiOiJkYzQ2Y2Q3NzI3NWViZTI1MzQ5MzgxMjNmYTVhMjRiODA1NmRjN2Q5In0.MoLo-k9Z5sdpnqjvsPXg108yLXyS2ZJaZ1Eq3qXR8x0', 
-        },
-        contentType: 'multipart/form-data',
-      ),
-      onSendProgress: (count, total) {
+    }); 
+ final response = await _dio.post("products/bulk-upload", data: formData,onSendProgress: (count, total) {
         print("Uploading: ${(count / total * 100).toStringAsFixed(0)}%");
-      },
-    );
+      },); 
 
     // Step 4️⃣ — Handle response
     if (response.statusCode == 200) {
@@ -81,8 +69,7 @@ Future<ApiResponse<bool>> uploadProductExcelFile() async {
 
   Future<ApiResponse<bool>> addProductService(AddProductMasterModel request) async {
     try {
-      final response = await _dio.post("products", data: request.toJson());
-print("Sending JSON: ${jsonEncode(request.toJson())}");
+      final response = await _dio.post("products", data: request.toJson()); 
       if (response.statusCode == 200 || response.statusCode == 201) {
         return ApiResponse(data: true);
       } else {

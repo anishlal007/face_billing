@@ -204,16 +204,18 @@ class Items {
   dynamic purchaseEntryType;
   dynamic createdUserCode;
   String? createdDate;
-  Null? updatedUserCode;
-  Null? updatedDate;
+  dynamic updatedUserCode;
+  dynamic updatedDate;
   dynamic coCode;
   String? computerName;
   String? finYearCode;
   dynamic stockRequiredEffect;
+  dynamic frieghtChargesAddWithoutTotal;
 
   Items(
       {this.itemCode,
       this.itemID,
+      this.frieghtChargesAddWithoutTotal,
       this.itemName,
       this.itemGroupCode,
       this.itemMakeCode,
@@ -259,6 +261,7 @@ class Items {
   Items.fromJson(Map<String, dynamic> json) {
     itemCode = json['ItemCode'];
     itemID = json['ItemID'];
+    frieghtChargesAddWithoutTotal = json['FrieghtChargesAddWithoutTotal'];
     itemName = json['ItemName'];
     itemGroupCode = json['ItemGroupCode'];
     itemMakeCode = json['ItemMakeCode'];
@@ -305,6 +308,7 @@ class Items {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['ItemCode'] = this.itemCode;
+    data['FrieghtChargesAddWithoutTotal'] = this.frieghtChargesAddWithoutTotal;
     data['ItemID'] = this.itemID;
     data['ItemName'] = this.itemName;
     data['ItemGroupCode'] = this.itemGroupCode;

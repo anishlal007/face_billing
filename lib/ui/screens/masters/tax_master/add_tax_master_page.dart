@@ -4,6 +4,7 @@ import 'package:facebilling/data/services/unit_service.dart';
 import 'package:flutter/material.dart';
 
 
+import '../../../../core/const.dart';
 import '../../../../data/models/tax_master/tax_master_list_model.dart';
 import '../../../../data/models/unit/add_location_master_req.dart';
 import '../../../../data/models/unit/add_tax_unit_model.dart';
@@ -54,7 +55,7 @@ bool _isEditMode = false;
     _taxPercentageController =
         TextEditingController(text: widget.unitInfo?.taxPercentage.toString() ?? "");
     // _createdUserController = TextEditingController(
-    //     text: widget.countryInfo?.createdUserCode?.toString() ?? "1001");
+    //     text: widget.countryInfo?.createdUserCode?.toString() ?? userId.value!);
     _activeStatus = (widget.unitInfo?.activeStatus ?? 1) == 1;
        _isEditMode = widget.unitInfo != null;
   }
@@ -84,7 +85,7 @@ final request = AddTaxModelReq(
   taxName: _unitNameController.text.trim(),   // ❌ not in model
   cratedUserCode: DateTime.now().toIso8601String(),    // ✅ but should be user ID, not DateTime
   createdDate: DateTime.now().toIso8601String(),       // ✅ correct
-  updatedUserCode: 1001,                               // ✅ int
+  updatedUserCode: userId.value!,                               // ✅ int
   updatedDate: DateTime.now().toIso8601String(),       // ✅ correct
   activeStatus: _activeStatus ? 1 : 0,                 // ✅ correct
 );
@@ -120,7 +121,7 @@ print(request);
       _unitNameController.text = widget.unitInfo?.taxName ?? "";
         _taxPercentageController.text = widget.unitInfo?.taxPercentage ?.toString() ?? "";
       // _createdUserController.text =
-      //     widget.countryInfo?.createdUserCode?.toString() ?? "1001";
+      //     widget.countryInfo?.createdUserCode?.toString() ?? userId.value!;
       _activeStatus = (widget.unitInfo?.activeStatus ?? 1) == 1;
             _isEditMode = widget.unitInfo != null;
     }
@@ -152,7 +153,7 @@ print(request);
               displayString: (unit) => unit.taxName ?? "",
               onSelected: (country) {
                 if(country != null){
-   setState(() {
+                  setState(() {
                   _unitIdController.text = country.taxCode.toString() ?? "";
                   _unitNameController.text = country.taxName ?? "";
                   _taxPercentageController.text = country.taxPercentage ?.toString() ?? "";
@@ -170,7 +171,7 @@ print(request);
                   _unitIdController.clear();
                   _unitNameController.text = typedValue;
                   _taxPercentageController.text = _taxPercentageController.text ;
-                  //_createdUserController.text = "1001";
+                  //_createdUserController.text = userId.value!;
                   _activeStatus = true;
                   _isEditMode = false; // <-- back to Add mode
                 }); 

@@ -1,6 +1,6 @@
 class ProductMasterListModel {
   bool? status;
-  String? message;
+  dynamic message;
   List<Info>? info;
 
   ProductMasterListModel({this.status, this.message, this.info});
@@ -29,15 +29,15 @@ class ProductMasterListModel {
 
 class Info {
   dynamic itemCode;
-  String? itemID;
-  String? itemName;
+  dynamic itemID;
+  dynamic itemName;
   dynamic itemType;
   dynamic itemGroupCode;
   dynamic itemMakeCode;
   dynamic itemGenericCode;
   dynamic batchNoRequired;
-  String? expiryDateRequired;
-  String? expiryDateFormat;
+  dynamic expiryDateRequired;
+  dynamic expiryDateFormat;
   dynamic mFGDateRequired;
   dynamic narcoticItem;
   dynamic nonScheduleItem;
@@ -51,26 +51,27 @@ class Info {
   dynamic maximumStockQty;
   dynamic reOrderLevel;
   dynamic reOrderQty;
-  String? hSNCode;
+  dynamic hSNCode;
   dynamic gstPercentage;
   dynamic priceTakenFrom;
   dynamic purchaseRate;
-  double? purchaseRateWTax;
+  dynamic purchaseRateWTax;
   dynamic salesRate;
   dynamic mRPRate;
   dynamic itemDiscountRequired;
-  double? itemDiscountPercentage;
-  double? itemDiscountValue;
-  String? itemImage;
-  String? createdDate;
+  dynamic itemDiscountPercentage;
+  dynamic itemDiscountValue;
+  dynamic itemImage;
+  dynamic createdDate;
   dynamic createdUserCode;
-  String? updatedDate;
+  dynamic updatedDate;
   dynamic updatedUserCode;
   Null? itemRackNo;
   Null? itemSelfNo;
   Null? itemBoxNo;
   Null? group;
   Null? make;
+   String? finYearCode;
 
   Info(
       {this.itemCode,
@@ -81,6 +82,7 @@ class Info {
       this.itemMakeCode,
       this.itemGenericCode,
       this.batchNoRequired,
+      this.finYearCode,
       this.expiryDateRequired,
       this.expiryDateFormat,
       this.mFGDateRequired,
@@ -151,6 +153,7 @@ class Info {
     itemDiscountRequired = json['ItemDiscountRequired'];
     itemDiscountPercentage = json['ItemDiscountPercentage'];
     itemDiscountValue = json['ItemDiscountValue'];
+    finYearCode = json['FinYearCode'];
     itemImage = json['ItemImage'];
     createdDate = json['CreatedDate'];
     createdUserCode = json['CreatedUserCode'];
@@ -181,6 +184,7 @@ class Info {
     data['ScheduledH1Item'] = this.scheduledH1Item;
     data['ItemUnitCode'] = this.itemUnitCode;
     data['SubUnitCode'] = this.subUnitCode;
+    data['FinYearCode'] = this.finYearCode;
     data['SubQty'] = this.subQty;
     data['SubQtyFormalDigits'] = this.subQtyFormalDigits;
     data['StockRequired'] = this.stockRequired;

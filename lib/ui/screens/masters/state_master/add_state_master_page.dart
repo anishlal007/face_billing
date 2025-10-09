@@ -136,7 +136,7 @@ class _AddStateMasterPageState extends State<AddStateMasterPage> {
       _unitIdController.text = widget.unitInfo?.stateCode.toString() ?? "";
       _unitNameController.text = widget.unitInfo?.stateName ?? "";
       // _createdUserController.text =
-      //     widget.countryInfo?.createdUserCode?.toString() ?? "1001";
+      //     widget.countryInfo?.createdUserCode?.toString() ?? userId.value!;
       _activeStatus = (widget.unitInfo?.activeStatus ?? 1) == 1;
     _isEditMode = widget.unitInfo != null;
     }
@@ -173,7 +173,7 @@ class _AddStateMasterPageState extends State<AddStateMasterPage> {
                   _unitIdController.text = country.stateCode.toString() ?? "";
                   _unitNameController.text = country.stateName ?? "";
                   // _createdUserController.text =
-                  //     country.createdUserCode?.toString() ?? "1001";
+                  //     country.createdUserCode?.toString() ?? userId.value!;
                   _activeStatus = (country.activeStatus ?? 1) == 1;
                 });
 
@@ -189,7 +189,7 @@ class _AddStateMasterPageState extends State<AddStateMasterPage> {
                   _unitNameController.text = _unitNameController.text;
                   print( _unitNameController.text);
                   print( _unitNameController.text);
-                  //_createdUserController.text = "1001";
+                  //_createdUserController.text = userId.value!;
                   _activeStatus = true;
                   _isEditMode = false; // <-- back to Add mode
                 });

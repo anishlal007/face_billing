@@ -19,6 +19,7 @@ class TopNavBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     final isMobile = MediaQuery.of(context).size.width < 800;
     return AppBar(
+      scrolledUnderElevation: 0.0,
       backgroundColor: Colors.white,
       title: Row(
         children: [
@@ -32,7 +33,9 @@ class TopNavBar extends StatelessWidget implements PreferredSizeWidget {
                   ),
                   onPressed: onToggleMenu,
                 )
-              : SizedBox()
+              : SizedBox(),
+const SizedBox(width: 100,),
+               Text(title, style: const TextStyle(color: Colors.black)),
         ],
       ),
       actions: [

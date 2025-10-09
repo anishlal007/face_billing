@@ -550,7 +550,7 @@ class _AddSalesEntryMasterPageState extends State<AddSalesEntryMasterPage> {
         // Other details
         paidAmount: int.tryParse(_paidAmountController.text) ?? 0,
         supDueDays: int.tryParse(_supDueDaysController.text) ?? 0,
-        createUserCode: int.tryParse(loadData.userCode),
+        createUserCode: int.tryParse(userId.value!),
         createDateTime: DateTime.now().toIso8601String(),
         computerName: "computerName",
         vehicleNo: _vehicleNoController.text.trim(),
@@ -608,7 +608,7 @@ class _AddSalesEntryMasterPageState extends State<AddSalesEntryMasterPage> {
         // Other details
         paidAmount: int.tryParse(_paidAmountController.text) ?? 0,
         supDueDays: int.tryParse(_supDueDaysController.text) ?? 0,
-        createUserCode: int.tryParse(loadData.userCode),
+        createUserCode: int.tryParse(userId.value!),
         createDateTime: DateTime.now().toIso8601String(),
         computerName: "computerName",
         vehicleNo: _vehicleNoController.text.trim(),
@@ -645,7 +645,7 @@ class _AddSalesEntryMasterPageState extends State<AddSalesEntryMasterPage> {
       //  _itemIdController.text = widget.unitInfo?.purchaseAccCode.toString() ?? "";
       _supplierNameController.text = widget.unitInfo?.purchaseNo ?? "";
       // _createdUserController.text =
-      //     widget.countryInfo?.createdUserCode?.toString() ?? "1001";
+      //     widget.countryInfo?.createdUserCode?.toString() ?? userId.value!;
       // _activeStatus = (widget.unitInfo?.custActiveStatus ?? 1) == 1;
     }
   }

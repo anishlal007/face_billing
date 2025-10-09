@@ -50,7 +50,7 @@ class _AddFinanceYearMasterPageState extends State<AddFinanceYearMasterPage> {
     _unitNameController =
         TextEditingController(text: widget.unitInfo?.finYearStartDate ?? "");
     // _createdUserController = TextEditingController(
-    //     text: widget.countryInfo?.createdUserCode?.toString() ?? "1001");
+    //     text: widget.countryInfo?.createdUserCode?.toString() ?? userId.value!);
     _activeStatus = (widget.unitInfo?.activeStatus ?? 1) == 1;
      _isEditMode = widget.unitInfo != null;
   }
@@ -75,8 +75,8 @@ class _AddFinanceYearMasterPageState extends State<AddFinanceYearMasterPage> {
     });
      final request = AddFinanceYearMasterModel(
   finYearStartDate: _unitNameController.text.trim(),
-  cratedUserCode:loadData.userCode,
-  updatedUserCode:loadData.userCode,
+  cratedUserCode:userId.value!,
+  updatedUserCode:userId.value!,
     // current timestamp
   activeStatus: _activeStatus ? 1 : 0,
 );
@@ -112,7 +112,7 @@ print(request.toJson());
       _unitIdController.text = widget.unitInfo?.finYearStartDate.toString() ?? "";
       _unitNameController.text = widget.unitInfo?.finYearCode ?? "";
       // _createdUserController.text =
-      //     widget.countryInfo?.createdUserCode?.toString() ?? "1001";
+      //     widget.countryInfo?.createdUserCode?.toString() ?? userId.value!;
       _activeStatus = (widget.unitInfo?.activeStatus ?? 1) == 1;
            _isEditMode = widget.unitInfo != null;
     }
@@ -149,7 +149,7 @@ print(request.toJson());
                   _unitIdController.text = country.finYearCode.toString() ?? "";
                   _unitNameController.text = country.finYearStartDate ?? "";
                   // _createdUserController.text =
-                  //     country.createdUserCode?.toString() ?? "1001";
+                  //     country.createdUserCode?.toString() ?? userId.value!;
                   _activeStatus = (country.activeStatus ?? 1) == 1;
                       _isEditMode = true;
                 });
@@ -163,7 +163,7 @@ print(request.toJson());
                 setState(() {
                  // _unitIdController.clear();
                   _unitNameController.text = typedValue;
-                  //_createdUserController.text = "1001";
+                  //_createdUserController.text = userId.value!;
                   _activeStatus = true;
                   _isEditMode = false; // <-- back to Add mode
                 });

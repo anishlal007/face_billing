@@ -1,3 +1,4 @@
+import 'package:facebilling/core/const.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../data/models/country/country_response.dart';
@@ -79,7 +80,7 @@ Country? country;
 final request = AddSupplierGroupMasterModel(
   supGroupName :_unitNameController.text.trim(),
  cratedUserCode: DateTime.now().toIso8601String(),     // required by API
-  updatedUserCode: "1001", 
+  updatedUserCode: userId.value!, 
   activeStatus: _activeStatus ? 1 : 0,           // Active (1=Active, 0=Inactive)
 );
 print("request");
@@ -114,7 +115,7 @@ print(request.toJson());
       _unitIdController.text = widget.unitInfo?.supGroupCode.toString() ?? "";
       _unitNameController.text = widget.unitInfo?.supGroupName ?? "";
       // _createdUserController.text =
-      //     widget.countryInfo?.createdUserCode?.toString() ?? "1001";
+      //     widget.countryInfo?.createdUserCode?.toString() ?? userId.value!;
       _activeStatus = (widget.unitInfo?.activeStatus ?? 1) == 1;
        _isEditMode = widget.unitInfo != null;
     }
@@ -151,7 +152,7 @@ print(request.toJson());
                   _unitIdController.text = country.supGroupCode.toString() ?? "";
                   _unitNameController.text = country.supGroupName ?? "";
                   // _createdUserController.text =
-                  //     country.createdUserCode?.toString() ?? "1001";
+                  //     country.createdUserCode?.toString() ?? userId.value!;
                   _activeStatus = (country.activeStatus ?? 1) == 1;
                   _isEditMode = true;
                 });
@@ -164,7 +165,7 @@ print(request.toJson());
                 setState(() {
                   _unitIdController.clear();
                   _unitNameController.text = typedValue;
-                  //_createdUserController.text = "1001";
+                  //_createdUserController.text = userId.value!;
                   _activeStatus = true;
                   _isEditMode = false; // <-- back to Add mode
                 });

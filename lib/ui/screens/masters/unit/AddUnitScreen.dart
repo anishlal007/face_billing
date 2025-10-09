@@ -46,7 +46,7 @@ class _AddunitscreenState extends State<Addunitscreen> {
     _unitNameController =
         TextEditingController(text: widget.unitInfo?.unitName ?? "");
     // _createdUserController = TextEditingController(
-    //     text: widget.countryInfo?.createdUserCode?.toString() ?? "1001");
+    //     text: widget.countryInfo?.createdUserCode?.toString() ?? userId.value!);
     _activeStatus = (widget.unitInfo?.activeStatus ?? 1) == 1;
      _isEditMode = widget.unitInfo != null;
   }
@@ -105,7 +105,7 @@ class _AddunitscreenState extends State<Addunitscreen> {
       _unitIdController.text = widget.unitInfo?.unitId ?? "";
       _unitNameController.text = widget.unitInfo?.unitName ?? "";
       // _createdUserController.text =
-      //     widget.countryInfo?.createdUserCode?.toString() ?? "1001";
+      //     widget.countryInfo?.createdUserCode?.toString() ?? userId.value!;
       _activeStatus = (widget.unitInfo?.activeStatus ?? 1) == 1;
          _isEditMode = widget.unitInfo != null;
     }
@@ -142,7 +142,7 @@ class _AddunitscreenState extends State<Addunitscreen> {
                   _unitIdController.text = country.unitId ?? "";
                   _unitNameController.text = country.unitName ?? "";
                   // _createdUserController.text =
-                  //     country.createdUserCode?.toString() ?? "1001";
+                  //     country.createdUserCode?.toString() ?? userId.value!;
                   _activeStatus = (country.activeStatus ?? 1) == 1;
                   _isEditMode = true;
                 });
@@ -157,7 +157,7 @@ class _AddunitscreenState extends State<Addunitscreen> {
                 setState(() {
                   _unitIdController.clear();
                   _unitNameController.text = typedValue;
-                  //_createdUserController.text = "1001";
+                  //_createdUserController.text = userId.value!;
                   _activeStatus = true;
                   _isEditMode = false; // <-- back to Add mode
                 });

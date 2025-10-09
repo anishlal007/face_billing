@@ -10,6 +10,7 @@ class ItemGroupService {
 
   Future<ApiResponse<bool>> addItemGroup(AddGroupRequest request) async {
     try {
+      
       final response =
           await _dio.post("itemgroupmaster", data: request.toJson());
 

@@ -50,7 +50,7 @@ class _AddGenericsMasterPageState extends State<AddGenericsMasterPage> {
     _unitNameController =
         TextEditingController(text: widget.unitInfo?.genericName ?? "");
     // _createdUserController = TextEditingController(
-    //     text: widget.countryInfo?.createdUserCode?.toString() ?? "1001");
+    //     text: widget.countryInfo?.createdUserCode?.toString() ?? userId.value!);
     _activeStatus = (widget.unitInfo?.activeStatus ?? 1) == 1;
       _isEditMode = widget.unitInfo != null;
   }
@@ -76,7 +76,7 @@ class _AddGenericsMasterPageState extends State<AddGenericsMasterPage> {
     final request = AddGenericsMasterModel(
 
   genericName: _unitNameController.text.trim(),
-  createdUserCode:  loadData.userCode,     // if this is the "user code"
+  createdUserCode:  userId.value!,     // if this is the "user code"
  
                            // hardcoded or from logged-in user
 
@@ -114,7 +114,7 @@ print(request.toJson());
       _unitIdController.text = widget.unitInfo?.genericCode.toString() ?? "";
       _unitNameController.text = widget.unitInfo?.genericName ?? "";
       // _createdUserController.text =
-      //     widget.countryInfo?.createdUserCode?.toString() ?? "1001";
+      //     widget.countryInfo?.createdUserCode?.toString() ?? userId.value!;
       _activeStatus = (widget.unitInfo?.activeStatus ?? 1) == 1;
           _isEditMode = widget.unitInfo != null;
     }
@@ -151,7 +151,7 @@ print(request.toJson());
                   _unitIdController.text = country.genericCode.toString() ?? "";
                   _unitNameController.text = country.genericName ?? "";
                   // _createdUserController.text =
-                  //     country.createdUserCode?.toString() ?? "1001";
+                  //     country.createdUserCode?.toString() ?? userId.value!;
                   _activeStatus = (country.activeStatus ?? 1) == 1;
                   _isEditMode = true;
                 });
@@ -164,7 +164,7 @@ print(request.toJson());
                 setState(() {
                   _unitIdController.clear();
                   _unitNameController.text = typedValue;
-                  //_createdUserController.text = "1001";
+                  //_createdUserController.text = userId.value!;
                   _activeStatus = true;
                   _isEditMode = false; // <-- back to Add mode
                 });

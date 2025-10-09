@@ -1,7 +1,7 @@
 import 'package:facebilling/data/models/item_group/add_group_request.dart';
 import 'package:facebilling/data/models/item_group/item_group_response.dart';
 import 'package:flutter/material.dart';
-
+import 'package:facebilling/core/const.dart';
 import '../../../../data/services/item_group_service.dart';
 import '../../../widgets/custom_switch.dart';
 import '../../../widgets/custom_text_field.dart';
@@ -44,7 +44,7 @@ bool _isEditMode = false;
     _itemGroupNameController =
         TextEditingController(text: widget.groupInfo?.itemGroupName ?? "");
     _createdUserController = TextEditingController(
-        text: widget.groupInfo?.cratedUserCode?.toString() ?? "1001");
+        text: widget.groupInfo?.cratedUserCode?.toString() ?? userId.value!);
     _activeStatus = (widget.groupInfo?.activeStatus ?? 1) == 1;
     _isEditMode = widget.groupInfo != null;
   }
@@ -67,14 +67,14 @@ bool _isEditMode = false;
     });
   final request = AddGroupRequest(
         itemGroupName: _itemGroupNameController.text.trim(),
-        createdUserCode: _createdUserController.text.trim(),
+        createdUserCode:  _createdUserController.text.trim(),
         createdDate:
             '${DateTime.now().year}-${DateTime.now().month}-${DateTime.now().day}',
-        // updatedUserCode: _createdUserController.text.trim(),
+        updatedUserCode: _createdUserController.text.trim(),
         activeStatus: _activeStatus ? 1 : 0,
       );
-
-    if (_isEditMode && widget.groupInfo != null) {
+print(request.createdUserCode);
+    if (_isEditMode && widget.groupInfo != null) {  
       // EDIT mode
       final response = await _service.updateItemGroup(
         widget.groupInfo!.itemGroupCode!,
@@ -104,7 +104,7 @@ bool _isEditMode = false;
       _itemGroupNameController.text = widget.groupInfo?.itemGroupName ?? "";
       // _countryNameController.text = widget.countryInfo?.countryName ?? "";
       _createdUserController.text =
-          widget.groupInfo?.cratedUserCode?.toString() ?? "1001";
+          widget.groupInfo?.cratedUserCode?.toString() ?? userId.value!;
       _activeStatus = (widget.groupInfo?.activeStatus ?? 1) == 1;
        _isEditMode = widget.groupInfo != null; // update button too
     }
@@ -121,9 +121,18 @@ bool _isEditMode = false;
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            SearchDropdownField<ItemGroupInfo>(
+            CustomSwitch(
+              value: _activeStatus,
+              title: "Active Status",
+              onChanged: (val) {
+                setState(() {
+                  _activeStatus = val;
+                });
+              },
+            ),
+            const SizedBox(height: 26),
+             SearchDropdownField<ItemGroupInfo>(
               hintText: "Group Name",
-              controller: _itemGroupNameController,
               prefixIcon: Icons.search,
               fetchItems: (q) async {
                 final response = await _service.getItemGroupSearch(q);
@@ -134,91 +143,94 @@ bool _isEditMode = false;
                 }
                 return [];
               },
-              displayString: (country) => country.itemGroupName ?? "",
+              displayString: (unit) => unit.itemGroupName ?? "",
               onSelected: (country) {
-                if(country !=null){
+                if(country != null){
                   setState(() {
-                  _itemGroupNameController.text =
+                 _itemGroupNameController.text =
                       country.itemGroupName.toString();
                   _createdUserController.text =
-                      country.cratedUserCode?.toString() ?? "1001";
+                      country.cratedUserCode?.toString() ?? userId.value!;
                   _activeStatus = (country.activeStatus ?? 1) == 1;
                    _isEditMode = true;
                 });
 
                 // ✅ Switch form into "Update mode"
-                widget.onSaved(false); 
+                widget.onSaved(false);
                 }
-               
+             
               },
-                onSubmitted: (typedValue) {
-    // ✅ User pressed enter or confirmed text without selecting
-    setState(() {
-      _itemGroupNameController.clear(); // no id since not from API
+                 onSubmitted: (typedValue) {
+                setState(() {
+                    _itemGroupNameController.clear(); // no id since not from API
       _itemGroupNameController.text = typedValue; 
       print("_itemGroupNameController.text");// use typed text
       print(_itemGroupNameController.text);// use typed text
-      _createdUserController.text = "1001";
+      _createdUserController.text = userId.value!;
       _activeStatus = true;
        _isEditMode = false;
-    });
-    widget.onSaved(false);
-  },
-            ),
-
-            const SizedBox(height: 26),
-            // SwitchListTile(
-            //   value: _activeStatus,
-            //   title: const Text("Active Status"),
-            //   onChanged: (val) => setState(() => _activeStatus = val),
-            // ),
-            CustomSwitch(
-              value: _activeStatus,
-              title: "Active Status",
-              onChanged: (val) {
-                setState(() {
-                  _activeStatus = val;
-                });
+                }); 
+                widget.onSaved(false);
               },
             ),
-            // CustomTextField(
-            //   title: "Group Name",
-            //   hintText: "Enter Group Name",
-            //   controller: _itemGroupNameController,
-            //   prefixIcon: Icons.flag_circle,
-            //   isValidate: true,
-            //   validator: (value) =>
-            //       value == null || value.isEmpty ? "Enter Group Name" : null,
-            //   focusNode: _itemGroupNameFocus,
-            //   textInputAction: TextInputAction.next,
-            //   onEditingComplete: () {
-            //     FocusScope.of(context).requestFocus(_itemGroupNameFocus);
-            //   },
-            // ),
+  //           SearchDropdownField<ItemGroupInfo>(
+  //             hintText: "Group Name",
+  //             controller: _itemGroupNameController,
+  //             prefixIcon: Icons.search,
+  //             fetchItems: (q) async {
+  //               final response = await _service.getItemGroupSearch(q);
+  //               if (response.isSuccess) {
+  //                 return (response.data?.info ?? [])
+  //                     .whereType<ItemGroupInfo>()
+  //                     .toList();
+  //               }
+  //               return [];
+  //             },
+  //             displayString: (country) => country.itemGroupName ?? "",
+  //             onSelected: (country) {
+  //               if(country !=null){
+  //                 setState(() {
+  //                 _itemGroupNameController.text =
+  //                     country.itemGroupName.toString();
+  //                 _createdUserController.text =
+  //                     country.cratedUserCode?.toString() ?? userId.value!;
+  //                 _activeStatus = (country.activeStatus ?? 1) == 1;
+  //                  _isEditMode = true;
+  //               });
+
+  //               // ✅ Switch form into "Update mode"
+  //               widget.onSaved(false); 
+  //               }
+               
+  //             },
+  //               onSubmitted: (typedValue) {
+  //   // ✅ User pressed enter or confirmed text without selecting
+  //   setState(() {
+  //     _itemGroupNameController.clear(); // no id since not from API
+  //     _itemGroupNameController.text = typedValue; 
+  //     print("_itemGroupNameController.text");// use typed text
+  //     print(_itemGroupNameController.text);// use typed text
+  //     _createdUserController.text = userId.value!;
+  //     _activeStatus = true;
+  //      _isEditMode = false;
+  //   });
+  //   widget.onSaved(false);
+  // },
+  //           ),
+ 
             
-            const SizedBox(height: 16),
-            CustomTextField(
-              title: "Create User",
-              controller: _createdUserController,
-              prefixIcon: Icons.person,
-              isEdit: true,
-              focusNode: _createdUserFocus,
-              textInputAction: TextInputAction.done,
-              onEditingComplete: _submit,
-            ),
-            const SizedBox(height: 16),
-            // SwitchListTile(
-            //   value: _activeStatus,
-            //   title: const Text("Active Status"),
-            //   onChanged: (val) => setState(() => _activeStatus = val),
-            // ),
+             
             const SizedBox(height: 16),
             if (_loading)
               const CircularProgressIndicator()
             else
-              GradientButton(
-                  text: _isEditMode ? "Update Group" : "Add Group",
-                  onPressed: _submit),
+              Row(
+                children: [
+                  GradientButton(
+                      text: _isEditMode ? "Update Group" : "Add Group",
+                      onPressed: _submit),
+                ],
+              ),
             if (_message != null) ...[
               const SizedBox(height: 16),
               Text(

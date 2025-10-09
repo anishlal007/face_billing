@@ -50,7 +50,7 @@ bool _isEditMode = false;
     _unitNameController =
         TextEditingController(text: widget.unitInfo?.itemLocationName ?? "");
     // _createdUserController = TextEditingController(
-    //     text: widget.countryInfo?.createdUserCode?.toString() ?? "1001");
+    //     text: widget.countryInfo?.createdUserCode?.toString() ?? userId.value!);
     _activeStatus = (widget.unitInfo?.activeStatus ?? 1) == 1;
         _isEditMode = widget.unitInfo != null;
   }
@@ -77,7 +77,7 @@ bool _isEditMode = false;
   itemLocationName: _unitNameController.text.trim(),
   cratedUserCode:  DateTime.now().toIso8601String(),     // if this is the "user code"
   createdDate: DateTime.now().toIso8601String(),     // required by API
-  updatedUserCode: loadData.userCode.toString(),                             // hardcoded or from logged-in user
+  updatedUserCode: userId.value!.toString(),                             // hardcoded or from logged-in user
   updatedDate: DateTime.now().toIso8601String(),     // current timestamp
   activeStatus: _activeStatus ? 1 : 0,
 );
@@ -110,7 +110,7 @@ bool _isEditMode = false;
       _unitIdController.text = widget.unitInfo?.itemLocationCode.toString() ?? "";
       _unitNameController.text = widget.unitInfo?.itemLocationName ?? "";
       // _createdUserController.text =
-      //     widget.countryInfo?.createdUserCode?.toString() ?? "1001";
+      //     widget.countryInfo?.createdUserCode?.toString() ?? userId.value!;
       _activeStatus = (widget.unitInfo?.activeStatus ?? 1) == 1;
        _isEditMode = widget.unitInfo != null;
     }
@@ -127,6 +127,16 @@ bool _isEditMode = false;
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
+             CustomSwitch(
+              value: _activeStatus,
+              title: "Active Status",
+              onChanged: (val) {
+                setState(() {
+                  _activeStatus = val;
+                });
+              },
+            ),
+            const SizedBox(height: 26),
             SearchDropdownField<Info>(
               hintText: "Location Name",
               controller: _unitNameController,
@@ -147,7 +157,7 @@ setState(() {
                   _unitIdController.text = country.itemLocationCode.toString() ?? "";
                   _unitNameController.text = country.itemLocationName ?? "";
                   // _createdUserController.text =
-                  //     country.createdUserCode?.toString() ?? "1001";
+                  //     country.createdUserCode?.toString() ?? userId.value!;
                   _activeStatus = (country.activeStatus ?? 1) == 1;
                    _isEditMode = true;
                 });
@@ -162,7 +172,7 @@ setState(() {
                 setState(() {
                   _unitIdController.clear();
                   _unitNameController.text = typedValue;
-                 // _createdUserController.text = "1001";
+                 // _createdUserController.text = userId.value!;
                   _activeStatus = true;
                   _isEditMode = false; // <-- back to Add mode
                 });
@@ -176,15 +186,7 @@ setState(() {
             //   title: const Text("Active Status"),
             //   onChanged: (val) => setState(() => _activeStatus = val),
             // ),
-            CustomSwitch(
-              value: _activeStatus,
-              title: "Active Status",
-              onChanged: (val) {
-                setState(() {
-                  _activeStatus = val;
-                });
-              },
-            ),
+           
             // CustomTextField(
             //   title: "Location Code",
             //   hintText: "Enter Location Code",

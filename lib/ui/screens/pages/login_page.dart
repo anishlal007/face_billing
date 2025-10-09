@@ -168,7 +168,7 @@ class _WebmailLoginFormState extends State<_WebmailLoginForm> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           const Text(
-            'Welcome To Webmail',
+            'Welcome To Billing App',
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
@@ -199,7 +199,20 @@ class _WebmailLoginFormState extends State<_WebmailLoginForm> {
                 value == null || value.isEmpty ? 'Please enter password' : null,
           ),
           const SizedBox(height: 40),
-
+TextButton(
+  onPressed: () {
+   _userIdController.text = "admin";
+   _passwordController.text = "B976ZUX5";
+  },
+  child: Text(
+    'Click Me for Demo Login',
+    style: TextStyle(
+      fontSize: 12,
+      color: primary,
+    ),
+  ),
+),
+ const SizedBox(height: 40),
           ElevatedButton(
             onPressed: _isLoading ? null : _handleLogin,
             style: ElevatedButton.styleFrom(
@@ -237,15 +250,17 @@ class _PurplePanel extends StatelessWidget {
         children: [
           // Placeholder for the logo (JD logo in the image)
           Center(
-            child: Text(
-              'JD', // Placeholder for the actual logo/image
-              style: TextStyle(
-                fontSize: 72,
-                fontWeight: FontWeight.w900,
-                color: white,
-              ),
-            ),
-          ),
+  child: Text(
+    'FACE BILLING',
+    textAlign: TextAlign.center,
+    style: TextStyle(
+      fontSize: 72,
+      fontWeight: FontWeight.w900,
+      color: white,
+    ),
+  ),
+)
+,
           // Links at the bottom
           Positioned(
             left: 20,

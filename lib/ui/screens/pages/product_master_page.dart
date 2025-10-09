@@ -69,11 +69,12 @@ class _ProductMasterPageState extends State<ProductMasterPage> {
     return Scaffold(
       backgroundColor: lightgray,
       appBar: AppBar(
+        scrolledUnderElevation: 0.0,
       backgroundColor: white,
       title: Row(
         children: [
-          Text("FaceBilling", style: const TextStyle(color: black)),
-          const SizedBox(width: 30),
+          // Text("FaceBilling", style: const TextStyle(color: black)),
+          // const SizedBox(width: 30),
           
         ],
       ),

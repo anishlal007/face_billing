@@ -61,7 +61,7 @@ _loadTax();
     _taxNameController =
         TextEditingController(text: widget.unitInfo?.gstPercentage.toString() ?? "");
     // _createdUserController = TextEditingController(
-    //     text: widget.countryInfo?.createdUserCode?.toString() ?? "1001");
+    //     text: widget.countryInfo?.createdUserCode?.toString() ?? userId.value!);
     _activeStatus = (widget.unitInfo?.activeStatus ?? 1) == 1;
       _isEditMode = widget.unitInfo != null;
   }
@@ -100,7 +100,7 @@ _loadTax();
     });
 final request = AddHnsModel(
   hsnName: _unitNameController.text.trim(),   // ❌ not in model
-  cratedUserCode: loadData.userCode,    // ✅ but should be user ID, not DateTime
+  cratedUserCode: userId.value!,    // ✅ but should be user ID, not DateTime
   gstPercentage:0,       // ✅ correct
   hsnNo: _unitIdController.text.trim(),                                 // ✅ int
   cessPercentage: 0,       // ✅ correct
@@ -142,7 +142,7 @@ final request = AddHnsModel(
      print("_taxNameController");
      print(_taxNameController.text);
       // _createdUserController.text =
-      //     widget.countryInfo?.createdUserCode?.toString() ?? "1001";
+      //     widget.countryInfo?.createdUserCode?.toString() ?? userId.value!;
       _activeStatus = (widget.unitInfo?.activeStatus ?? 1) == 1;
     }
   }
@@ -181,7 +181,7 @@ final request = AddHnsModel(
                   _unitIdController.text = country.hsnCode.toString() ?? "";
                   _unitNameController.text = country.hsnName ?? "";
                   // _createdUserController.text =
-                  //     country.createdUserCode?.toString() ?? "1001";
+                  //     country.createdUserCode?.toString() ?? userId.value!;
                   _activeStatus = (country.activeStatus ?? 1) == 1;
                   _isEditMode = true;
                 });
@@ -196,7 +196,7 @@ final request = AddHnsModel(
                 setState(() {
                   _unitIdController.clear();
                   _unitNameController.text = typedValue;
-                  //_createdUserController.text = "1001";
+                  //_createdUserController.text = userId.value!;
                   _activeStatus = true;
                   _isEditMode = false; // <-- back to Add mode
                 });

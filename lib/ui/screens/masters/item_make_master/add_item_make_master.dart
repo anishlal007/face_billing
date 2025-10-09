@@ -2,7 +2,7 @@ import 'package:facebilling/data/models/unit/add_unit_request.dart';
 import 'package:facebilling/data/models/unit/unit_response.dart';
 import 'package:facebilling/data/services/unit_service.dart';
 import 'package:flutter/material.dart';
-
+import 'package:facebilling/core/const.dart';
 import '../../../../data/models/item_make/item_make_list_master_model.dart';
 import '../../../../data/models/unit/add_item_make_unit_model.dart';
 import '../../../../data/models/unit/add_location_master_req.dart';
@@ -51,7 +51,7 @@ bool _isEditMode = false;
     _unitNameController =
         TextEditingController(text: widget.unitInfo?.itemMaketName ?? "");
     // _createdUserController = TextEditingController(
-    //     text: widget.countryInfo?.createdUserCode?.toString() ?? "1001");
+    //     text: widget.countryInfo?.createdUserCode?.toString() ?? userId.value!);
     _activeStatus = (widget.unitInfo?.activeStatus ?? 1) == 1;
     _isEditMode = widget.unitInfo != null;
   }
@@ -79,7 +79,7 @@ bool _isEditMode = false;
   itemMaketName: _unitNameController.text.trim(),
   cratedUserCode:  DateTime.now().toIso8601String(),     // if this is the "user code"
  
-  updatedUserCode: "1001",                             // hardcoded or from logged-in user
+  updatedUserCode: userId.value!,                             // hardcoded or from logged-in user
 
   activeStatus: _activeStatus ? 1 : 0,
 );
@@ -112,7 +112,7 @@ bool _isEditMode = false;
       _unitIdController.text = widget.unitInfo?.itemMakeCode.toString() ?? "";
       _unitNameController.text = widget.unitInfo?.itemMaketName ?? "";
       // _createdUserController.text =
-      //     widget.countryInfo?.createdUserCode?.toString() ?? "1001";
+      //     widget.countryInfo?.createdUserCode?.toString() ?? userId.value!;
       _activeStatus = (widget.unitInfo?.activeStatus ?? 1) == 1;
     _isEditMode = widget.unitInfo != null;
     }
@@ -149,7 +149,7 @@ setState(() {
                   _unitIdController.text = country.itemMakeCode.toString() ?? "";
                   _unitNameController.text = country.itemMaketName ?? "";
                   // _createdUserController.text =
-                  //     country.createdUserCode?.toString() ?? "1001";
+                  //     country.createdUserCode?.toString() ?? userId.value!;
                   _activeStatus = (country.activeStatus ?? 1) == 1;
                    _isEditMode = true;
                 });
@@ -164,7 +164,7 @@ setState(() {
                 setState(() {
                   _unitIdController.clear();
                   _unitNameController.text = typedValue;
-                 // _createdUserController.text = "1001";
+                 // _createdUserController.text = userId.value!;
                   _activeStatus = true;
                   _isEditMode = false; // <-- back to Add mode
                 });

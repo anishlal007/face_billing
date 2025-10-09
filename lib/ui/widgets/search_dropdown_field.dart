@@ -30,39 +30,44 @@ class SearchDropdownField<T extends Object> extends StatefulWidget {
   State<SearchDropdownField<T>> createState() => _SearchDropdownFieldState<T>();
 }
 
-class _SearchDropdownFieldState<T extends Object>
-    extends State<SearchDropdownField<T>> {
+class _SearchDropdownFieldState<T extends Object> extends State<SearchDropdownField<T>> {
   List<T> _options = [];
   bool _loading = false;
   late TextEditingController _controller;
+  late final VoidCallback _listener;
 
   @override
   void initState() {
     super.initState();
     _controller = widget.controller ?? TextEditingController();
-    _controller.addListener(() {
-      _fetchSuggestions(_controller.text);
-    });
+    _listener = () => _fetchSuggestions(_controller.text);
+    _controller.addListener(_listener);
   }
 
   @override
   void dispose() {
+    _controller.removeListener(_listener);
     if (widget.controller == null) _controller.dispose();
     super.dispose();
   }
 
   Future<void> _fetchSuggestions(String query) async {
     if (query.isEmpty) {
-      setState(() => _options = []);
+      if (mounted) setState(() => _options = []);
       return;
     }
-    setState(() => _loading = true);
+
+    if (mounted) setState(() => _loading = true);
     final results = await widget.fetchItems(query);
-    setState(() {
-      _options = results;
-      _loading = false;
-    });
-  }
+
+    if (mounted) {
+      setState(() {
+        _options = results;
+        _loading = false;
+      });
+    }
+  } 
+
 
   @override
   Widget build(BuildContext context) {
@@ -74,32 +79,56 @@ class _SearchDropdownFieldState<T extends Object>
       fieldViewBuilder: (context, textEditingController, focusNode, onFieldSubmitted) {
         // Sync controller with our external one
         textEditingController.text = _controller.text;
-        textEditingController.selection = _controller.selection;
-
-        return TextField(
-          controller: _controller,
-          focusNode: focusNode,
-          onSubmitted: (value) {
-            widget.onSubmitted?.call(value);
-            onFieldSubmitted();
-          },
-          decoration: InputDecoration(
-            hintText: widget.hintText,
-            prefixIcon: Icon(widget.prefixIcon),
-            suffixIcon: _loading
-                ? const Padding(
-                    padding: EdgeInsets.all(12),
-                    child: SizedBox(
-                      width: 16,
-                      height: 16,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    ),
-                  )
-                : null,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
+        textEditingController.selection = _controller.selection; 
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (widget.hintText != null)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 0),
+              child: Text(
+                widget.hintText!,
+                style: const TextStyle(
+                  fontSize: 12,
+                  // fontWeight: FontWeight.w500,
+                  color: Colors.black87,
+                ),
+              ),
             ),
-          ),
+            SizedBox(
+              height: 30,
+              child: TextField(
+                controller: _controller,
+                style: TextStyle(fontSize: 12.0, height: 1.0, color: Colors.black),
+                focusNode: focusNode,
+                onSubmitted: (value) {
+                  widget.onSubmitted?.call(value);
+                  onFieldSubmitted();
+                },
+                onChanged: (value) {
+                  widget.onSubmitted?.call(value);
+print(value);
+                },
+                decoration: InputDecoration(
+                  hintText: widget.hintText,
+                  prefixIcon: Icon(widget.prefixIcon, size: 20,),
+                  suffixIcon: _loading
+                      ? const Padding(
+                          padding: EdgeInsets.all(12),
+                          child: SizedBox(
+                            width: 10,
+                            height: 10,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                        )
+                      : null,
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                ),
+              ),
+            ),
+          ],
         );
       },
       optionsViewBuilder: (context, onSelected, options) {

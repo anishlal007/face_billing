@@ -108,7 +108,7 @@ class _AddCompanyMasterPageState extends State<AddCompanyMasterPage> {
     _unitNameController =
         TextEditingController(text: widget.unitInfo?.coName ?? "");
     // _createdUserController = TextEditingController(
-    //     text: widget.countryInfo?.createdUserCode?.toString() ?? "1001");
+    //     text: widget.countryInfo?.createdUserCode?.toString() ?? userId.value!);
     _activeStatus = (widget.unitInfo?.coActiveStatus ?? 1) == 1;
 
     _compNameController =
@@ -302,7 +302,7 @@ class _AddCompanyMasterPageState extends State<AddCompanyMasterPage> {
       _unitIdController.text = widget.unitInfo?.coCode.toString() ?? "";
       _unitNameController.text = widget.unitInfo?.coName ?? "";
       // _createdUserController.text =
-      //     widget.countryInfo?.createdUserCode?.toString() ?? "1001";
+      //     widget.countryInfo?.createdUserCode?.toString() ?? userId.value!;
       _activeStatus = (widget.unitInfo?.coActiveStatus ?? 1) == 1;
     }
   }
@@ -377,7 +377,7 @@ class _AddCompanyMasterPageState extends State<AddCompanyMasterPage> {
                             country.itemCode.toString() ?? "";
                         _itemNameController.text = country.itemName ?? "";*/
                         // _createdUserController.text =
-                        //     country.createdUserCode?.toString() ?? "1001";
+                        //     country.createdUserCode?.toString() ?? userId.value!;
                         // _activeStatus = (country.custActiveStatus ?? 1) == 1;
                       });
 

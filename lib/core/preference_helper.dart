@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:facebilling/core/const.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../data/models/login_model.dart';
@@ -34,6 +35,9 @@ class SharedPreferenceHelper {
     final prefs = await SharedPreferences.getInstance();
     String userJson = jsonEncode(user.toJson());
     await prefs.setString(_keyUser, userJson);
+    userId.value=user.userCode.toString();
+    print("userId.value");
+    print(userId.value);
   }
 
   /// Get user

@@ -16,7 +16,7 @@ class AddGroupRequest {
   Map<String, dynamic> toJson() {
     return {
       "ItemGroupName": itemGroupName,
-      "CreatedUserCode": createdUserCode,
+      "CratedUserCode": createdUserCode,
       "UpdatedUserCode": updatedUserCode,
       "CreatedDate": createdDate,
       "ActiveStatus": activeStatus,

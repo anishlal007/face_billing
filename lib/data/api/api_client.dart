@@ -4,7 +4,7 @@ import 'package:facebilling/core/const.dart';
 class ApiClient {
   static final Dio dio = Dio(
     BaseOptions(
-      baseUrl: "http://billingapp.captchatime.com/api/",
+      baseUrl: "https://billingapp.captchatime.com/api/",
       connectTimeout: const Duration(seconds: 10),
       receiveTimeout: const Duration(seconds: 10),
       headers: {

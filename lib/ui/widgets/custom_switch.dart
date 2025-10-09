@@ -21,12 +21,21 @@ import 'package:flutter/material.dart';
 class CustomSwitch extends StatefulWidget {
   final bool value;
   final String? title;
+  final String? onText;
+  final Color ? activecolor;
+  final Color ? inactiveColor;
+  
+  final String? offText;
   final ValueChanged<bool> onChanged;
 
   const CustomSwitch({
     super.key,
     required this.value,
     this.title,
+    this.onText,
+    this.offText,
+    this.activecolor,
+    this.inactiveColor,
     required this.onChanged,
   });
 
@@ -62,7 +71,7 @@ class _CustomSwitchState extends State<CustomSwitch>
         padding: const EdgeInsets.all(4),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(5),
-          color: _isOn ? Colors.green : Colors.red,
+          color: _isOn ? widget.activecolor ?? Colors.green : widget.inactiveColor ?? Colors.red,
         ),
         child: Stack(
           children: [
@@ -72,7 +81,7 @@ class _CustomSwitchState extends State<CustomSwitch>
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Text(
-                  "Active",
+                  widget.onText ?? "Active",
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
@@ -88,7 +97,7 @@ class _CustomSwitchState extends State<CustomSwitch>
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Text(
-                  "Inactive",
+                  widget.offText ?? "Inactive",
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
@@ -111,11 +120,11 @@ class _CustomSwitchState extends State<CustomSwitch>
                 ),
                 alignment: Alignment.center,
                 child: Text(
-                  _isOn ? "Active" : "Inactive",
+                  _isOn ?  widget.onText ?? "Active" :  widget.offText ??"Inactive",
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
-                    color: _isOn ? Colors.green : Colors.red,
+                    color: _isOn ? widget.activecolor ?? Colors.green : widget.inactiveColor ?? Colors.red,
                   ),
                 ),
               ),
