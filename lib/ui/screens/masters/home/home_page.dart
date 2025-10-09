@@ -50,6 +50,12 @@ class _HomePageState extends State<HomePage> {
       icon: Icons.dashboard,
       page: const DashboardPage(title: 'Dashboard',),
     ),
+    // Patient
+    MenuItemData(
+          title: "Patient Master",
+          icon: Icons.person,
+          page: const CustomerMasterPage(),
+        ),
     ///appointment
     MenuItemData(
       title: "Appointment",
@@ -84,7 +90,7 @@ class _HomePageState extends State<HomePage> {
           page: const ItemLocationMasterScreen(),
         ),
           MenuItemData(
-          title: "Generics Master",
+          title: "Generic Master",
           icon: Icons.money,
           page: const GenericsMasterPage(),
         ),
@@ -92,6 +98,12 @@ class _HomePageState extends State<HomePage> {
           title: "Unit Master",
           icon: Icons.ac_unit,
           page: const UnitMasterScreen(),
+        ),
+        
+        MenuItemData(
+          title: " Hsn Master",
+          icon: Icons.ac_unit,
+          page: const HnsMasterPage(),
         ),
           MenuItemData(
           title: "TAX Master",
@@ -133,11 +145,8 @@ class _HomePageState extends State<HomePage> {
       title: "Sales",
       icon: Icons.account_balance,
       subItems: [
-       MenuItemData(
-          title: "Pataint Master",
-          icon: Icons.person,
-          page: const CustomerMasterPage(),
-        ),MenuItemData(
+       
+        MenuItemData(
       title: "Sales POS",
       icon: Icons.shopping_basket,
        page: const DemoPage(title:"Sales POS" ,),
@@ -164,33 +173,13 @@ class _HomePageState extends State<HomePage> {
       ]
       ),
    ///general master
-    MenuItemData(
-      title: "General Master",
-      icon: Icons.account_balance,
-      subItems: [
-         MenuItemData(
-          title: "Area Master",
-          icon: Icons.ac_unit,
-          page: const AreaMasterPage(),
-        ),
-         MenuItemData(
-          title: "Country Master",
-          icon: Icons.savings,
-          page: const CountryMasterScreen(),
-        ),
-             MenuItemData(
-          title: "Supplier Group Master",
-          icon: Icons.ac_unit,
-          page: const SupplierGrpupMasterPage(),
-        ),
-      
-        MenuItemData(
-          title: "Customer Group Master",
-          icon: Icons.person_3,
-          page: const CustomerGroupMasterPage(),
-        ),
-      ]
-      ),
+    // MenuItemData(
+    //   title: "General Master",
+    //   icon: Icons.account_balance,
+    //   subItems: [
+        
+    //   ]
+    //   ),
 
    ///report
    MenuItemData(
@@ -370,10 +359,10 @@ class _HomePageState extends State<HomePage> {
       title: "Expense Entry",
       icon: Icons.account_balance,
        page: const DemoPage(title:"Expense Entry" ,),),
-    MenuItemData(
-      title: "Account Entry",
-      icon: Icons.account_balance,
-       page: const DemoPage(title:"Account Entry" ,),),
+    // MenuItemData(
+    //   title: "Account Entry",
+    //   icon: Icons.account_balance,
+    //    page: const DemoPage(title:"Account Entry" ,),),
     MenuItemData(
       title: "Admin Setup",
       icon: Icons.account_balance,
@@ -391,29 +380,28 @@ class _HomePageState extends State<HomePage> {
       title: "Number Initialize",
       icon: Icons.account_balance,
        page: const DemoPage(title:"Number Initialize" ,),),
-       ]
-       ),
-  
-    MenuItemData(
-      title: "Masters",
-      icon: Icons.account_balance,
-      subItems: [
-       
         MenuItemData(
-          title: "Group Master",
-          icon: Icons.group,
-          page: const ItemGroupMasterScreen(),
-        ),
-      
-      
-        MenuItemData(
-          title: " Hsn Master",
+          title: "Area Master",
           icon: Icons.ac_unit,
-          page: const HnsMasterPage(),
+          page: const AreaMasterPage(),
+        ),
+         MenuItemData(
+          title: "Country Master",
+          icon: Icons.savings,
+          page: const CountryMasterScreen(),
+        ),
+             MenuItemData(
+          title: "Supplier Group Master",
+          icon: Icons.ac_unit,
+          page: const SupplierGrpupMasterPage(),
         ),
       
-      
         MenuItemData(
+          title: "Customer Group Master",
+          icon: Icons.person_3,
+          page: const CustomerGroupMasterPage(),
+        ),
+          MenuItemData(
           title: "State Master",
           icon: Icons.ac_unit,
           page: const StateMasterPage(),
@@ -440,9 +428,27 @@ class _HomePageState extends State<HomePage> {
           icon: Icons.money,
           page: const FinanceYearMaster(),
         ),
+       ]
+       ),
+  
+    // MenuItemData(
+    //   title: "Masters",
+    //   icon: Icons.account_balance,
+    //   subItems: [
+       
+    //     // MenuItemData(
+    //     //   title: "Group Master",
+    //     //   icon: Icons.group,
+    //     //   page: const ItemGroupMasterScreen(),
+    //     // ),
       
-      ],
-    ),
+      
+      
+      
+      
+      
+    //   ],
+    // ),
    
   
     
@@ -456,11 +462,11 @@ class _HomePageState extends State<HomePage> {
       icon: Icons.report,
       page: SalesOrderEntryPage(),
     ),
-    MenuItemData(
-      title: "Transactions",
-      icon: Icons.swap_horiz,
-      page: const TransactionsPage(),
-    ),
+    // MenuItemData(
+    //   title: "Transactions",
+    //   icon: Icons.swap_horiz,
+    //   page: const TransactionsPage(),
+    // ),
     MenuItemData(
       title: "User",
       icon: Icons.account_balance,
