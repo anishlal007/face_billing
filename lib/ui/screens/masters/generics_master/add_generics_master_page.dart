@@ -100,11 +100,15 @@ print(request.toJson());
   }
 
   void _handleResponse(bool success, String? error) {
-    setState(() {
+  if(success){
+setState(() {
+   _unitNameController.clear();
+   _unitIdController.clear();
       _loading = false;
       _message = success ? "Saved successfully!" : error;
     });
     if (success) widget.onSaved(true);
+    }
   }
 
   @override

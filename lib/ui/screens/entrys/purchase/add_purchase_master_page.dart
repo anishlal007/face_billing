@@ -334,6 +334,8 @@ String? serialError;
     setState(() {
       _getAllLoading = true;
       error = null;
+      print("error 5");
+print(error);
     });
 
     try {
@@ -342,7 +344,10 @@ String? serialError;
       if (response.isSuccess) {
         getAllMasterListModel = response.data!;
       } else {
+        print("error 6");
+        print(response.error);
         throw Exception(response.error);
+        
       }
 
       // 🔹 Load product list
@@ -351,6 +356,8 @@ String? serialError;
         productMasterListModel = productResponse.data!;
         items = productMasterListModel!.info!;
       } else {
+         print("error 7");
+        print(response.error);
         throw Exception(productResponse.error);
       }
 
@@ -359,6 +366,8 @@ String? serialError;
     } catch (e) {
       setState(() {
         error = e.toString();
+        print("error 4");
+print(error);
       });
     } finally {
       setState(() {
@@ -374,16 +383,22 @@ Future<void> _loadSerialNo() async {
       setState(() {
         serialNo = serialNoResponse.data!;
         _purchaseNoController.text = serialNo?.info?.purchaseNextId ?? "";
-        serialError = null; // ✅ clear if success
+        serialError = null; 
+        print("error 1");
+print(serialError);// ✅ clear if success
       });
     } else {
       setState(() {
         serialError = serialNoResponse.error ?? "Serial number not found.";
+        print("error 2");
+print(serialError);
       });
     }
   } catch (e) {
     setState(() {
       serialError = e.toString();
+      print("error 3");
+print(serialError);
     });
   }
 }
@@ -457,7 +472,7 @@ Future<void> _loadSerialNo() async {
       // netValue: 0,           // Net Value
       salesRate: 0, // Sale Rate
       gstPercentage: 0, // GST %
-      finYearCode : "2025-26",
+     // finYearCode : "2025-26",
       // gstPercentage: 0,           // GST Value
       // supName: '',           // Supplier Name
       //purchaseAccCode: null, // Purchase Account Code
@@ -633,7 +648,8 @@ final formattedInvoiceDate = DateFormat('dd-MM-yyyy').parse(invoiceDate);
     _supDueDaysController.clear();
     _vehicleNoController.clear();
     _finYearCodeController.clear();
-
+items.clear();
+_isBottomBarExpanded=false;
     // Clear items list
     setState(() {
       itemsList.clear();
@@ -718,14 +734,51 @@ final formattedInvoiceDate = DateFormat('dd-MM-yyyy').parse(invoiceDate);
     }
   }
 
-  void _handleResponse(bool success, String? error) {
-    setState(() {
-      _loading = false;
-      _message = success ? "Saved successfully!" : error;
-    });
-    if (success) widget.onSaved(true);
-  }
+void _handleResponse(bool success, String? error) {
+  setState(() {
+    _loading = false;
+    _message = success ? "Saved successfully!" : error;
+  });
 
+  if (success) {
+    // Clear all text fields
+    _supplierInvoicNoController.clear();
+    _purchaseNoController.clear();
+    _purchaseDateController.clear();
+    _invoiceDateController.clear();
+    _supplierNameController.clear();
+    _gstValueController.clear();
+    _netAmountController.clear();
+    _subTotalValueController.clear();
+    _sgstAmtController.clear();
+    _cgstAmtController.clear();
+    _igstAmtController.clear();
+    _roundOffController.clear();
+    _frightChargesController.clear();
+    _discountController.clear();
+    _cashDiscountValueController.clear();
+    _paidAmountController.clear();
+    _supDueDaysController.clear();
+    _vehicleNoController.clear();
+    _finYearCodeController.clear();
+
+    // Clear items list
+    itemsList.clear();
+    _isBottomBarExpanded = false;
+
+    // Reset dropdowns
+    selectedPaymentType = 0;
+    selectedEntryType = 0;
+    selectedEntryMode = 1;
+    selectedTaxType = 0;
+    selectedGstType = 0;
+
+    setState(() {}); // Update the UI
+
+    // Notify parent widget if needed
+    widget.onSaved(true);
+  }
+}
   @override
   void didUpdateWidget(covariant AddPurchaseMasterPage oldWidget) {
     super.didUpdateWidget(oldWidget);

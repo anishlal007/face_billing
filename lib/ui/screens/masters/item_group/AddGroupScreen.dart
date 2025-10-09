@@ -89,13 +89,28 @@ print(request.createdUserCode);
   
   }
 
-  void _handleResponse(bool success, String? error) {
+void _handleResponse(bool isSuccess, String? error) {
+  setState(() => _loading = false);
+
+  if (isSuccess) {
+    // ✅ Clear all text fields
+    _itemGroupNameController.clear();
+    _createdUserController.clear();
+    _activeStatus = true; // or default false, depending on your logic
+
+    setState(() {});
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Group saved successfully!")),
+    );
+
+    widget.onSaved(true); // notify parent to refresh list
+  } else {
     setState(() {
-      _loading = false;
-      _message = success ? "Saved successfully!" : error;
+      _message = error ?? "Something went wrong.";
     });
-    if (success) widget.onSaved(true);
   }
+}
 
   @override
   void didUpdateWidget(covariant Addgroupscreen oldWidget) {
@@ -133,6 +148,7 @@ print(request.createdUserCode);
             const SizedBox(height: 26),
              SearchDropdownField<ItemGroupInfo>(
               hintText: "Group Name",
+              controller: _itemGroupNameController,
               prefixIcon: Icons.search,
               fetchItems: (q) async {
                 final response = await _service.getItemGroupSearch(q);

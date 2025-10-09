@@ -227,14 +227,39 @@ print(request);
     }
   }
 
-  void _handleResponse(bool success, String? error) {
-    setState(() {
-      _loading = false;
-      _message = success ? "Saved successfully!" : error;
-    });
-    if (success) widget.onSaved(true);
-  }
+void _handleResponse(bool success, String? error) {
+  setState(() {
+    _loading = false;
+    _message = success ? "Saved successfully!" : error;
+  });
 
+  if (success) {
+    // Clear all text fields
+    _suppIdController.clear();
+    _suppNameController.clear();
+    _suppAddress1Controller.clear();
+    _supppinCodeController.clear();
+    _suppMobileController.clear();
+    _suppMailIdController.clear();
+    _suppGstNoController.clear();
+    _suppLicenseNoController.clear();
+    _suppPanNoController.clear();
+    _unitNameController.clear();
+    _unitIdController.clear();
+
+    // Reset dropdowns/flags
+    _subGrpCode = 0;
+    _areaCode = 0;
+    _stateCode = 0;
+    _countryCode = 0;
+    _taxCode = 1; // default GST Type
+    _isTaxInclusive = false;
+    _activeStatus = true;
+
+    // Notify parent widget
+    widget.onSaved(true);
+  }
+}
   void _fieldFocusChange(
       BuildContext context, FocusNode current, FocusNode next) {
     current.unfocus();

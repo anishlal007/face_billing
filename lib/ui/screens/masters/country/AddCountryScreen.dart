@@ -105,11 +105,15 @@ class _AddCountryScreenState extends State<AddCountryScreen> {
   }
 
   void _handleResponse(bool success, String? error) {
-    setState(() {
+  if(success){
+setState(() {
+   _countryNameController.clear();
+   _countryIdController.clear();
       _loading = false;
       _message = success ? "Saved successfully!" : error;
     });
     if (success) widget.onSaved(true);
+    }
   }
 
 @override

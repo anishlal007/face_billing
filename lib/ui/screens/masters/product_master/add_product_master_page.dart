@@ -473,13 +473,61 @@ Future<void> _loadList() async {
 }
 
 
-  void _handleResponse(bool success, String? error) {
+void _handleResponse(bool isSuccess, String? error) {
+  setState(() => _loading = false);
+
+  if (isSuccess) {
+    // ✅ Clear all text controllers
+    _itemIdController.clear();
+    _itemNameController.clear();
+    _subQtyController.clear();
+    _subQtyController.clear();
+    _subQtyController.clear();
+    _purchaseRateController.clear();
+    _purchaseRateWTaxController.clear();
+    _salesRateController.clear();
+    _mRPRateController.clear();
+    _itemDiscountValueController.clear();
+    _subQtyController.clear();
+
+    // ✅ Reset dropdowns and switches
+    selectedPaymentType = null;
+    _itemGroup = null;
+    _unitCode = null;
+    _itemMake = null;
+    selectedExpiryType = null;
+    priceTakenFrom = null;
+    _nonScheduledItem = false;
+    _isNarocotic = false;
+    _expiryRequired = false;
+    _isBatchNumbeRequired = false;
+    _isDiscountReq = false;
+
+    // ✅ Refresh UI
+    setState(() {});
+
+    // ✅ Show success snackbar
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text("Product saved successfully!"),
+        backgroundColor: Colors.green,
+      ),
+    );
+
+  } else {
+    // ❌ Show error message
     setState(() {
-      _loading = false;
-      _message = success ? "Saved successfully!" : error;
+      _message = error ?? "Something went wrong.";
     });
-    if (success) widget.onSaved(true);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(_message!),
+        backgroundColor: Colors.red,
+      ),
+    );
   }
+}
 
   @override
   void didUpdateWidget(covariant AddProductMasterPage oldWidget) {
@@ -647,6 +695,7 @@ Future<void> _loadList() async {
                   SizedBox(
                       width: constraints.maxWidth / columns - 30,
                       child: SearchDropdownField<Info>(
+                        controller: _itemNameController,
                       hintText: "Item Name",
                       prefixIcon: Icons.search,
                       fetchItems: (q) async {

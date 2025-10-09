@@ -11,6 +11,7 @@ import '../../../../data/models/product/product_master_list_model.dart'
     as product;
 import '../../../../data/models/purchase_model/add_purchase_master_model.dart';
 import '../../../../data/models/purchase_model/purchase_list_model.dart';
+import '../../../../data/models/sales/add_sales_req_model.dart';
 import '../../../../data/services/get_all_master_service.dart';
 import '../../../../data/services/get_serial_no_services.dart';
 import '../../../../data/services/product_service.dart';
@@ -360,6 +361,8 @@ class _AddSalesEntryMasterPageState extends State<AddSalesEntryMasterPage> {
         getAllMasterListModel = response.data!;
         _getAllLoading = false;
         error = null;
+        print("error");
+print(error);
       });
     } else {
       setState(() {
@@ -374,11 +377,15 @@ class _AddSalesEntryMasterPageState extends State<AddSalesEntryMasterPage> {
         items = productMasterListModel!.info!;
         _getAllLoading = false;
         error = null;
+        print("error");
+print(error);
       });
     } else {
       setState(() {
         error = response.error;
         _getAllLoading = false;
+        print("error");
+print(error);
       });
     }
     final serialNoResponse = await _getSerialservice.getSerialNo();
@@ -388,11 +395,15 @@ class _AddSalesEntryMasterPageState extends State<AddSalesEntryMasterPage> {
         salesNoController.text = serialNo!.info!.salesNextId!;
         _getAllLoading = false;
         error = null;
+        print("error");
+print(error);
       });
     } else {
       setState(() {
         error = serialNoResponse.error;
         _getAllLoading = false;
+        print("error");
+print(error);
       });
     }
   }
@@ -511,6 +522,9 @@ class _AddSalesEntryMasterPageState extends State<AddSalesEntryMasterPage> {
       // String? userPassword;
       // int? userType;
       // int? activeStatus;
+      final req=AddSalesReqModel(
+        
+      );
       final request = AddPurchaseMasterModel(
 // Basic info
         // purchaseDate: _salesDateController.text.trim(),
@@ -660,7 +674,8 @@ class _AddSalesEntryMasterPageState extends State<AddSalesEntryMasterPage> {
   Widget build(BuildContext context) {
     if (_getAllLoading) return const Center(child: CircularProgressIndicator());
     if (error != null) return Center(child: Text("Error: $error"));
-
+print("error");
+print(error);
     final isEdit = widget.unitInfo != null;
 
     return RawKeyboardListener(
