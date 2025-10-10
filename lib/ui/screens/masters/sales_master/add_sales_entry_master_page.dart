@@ -1438,7 +1438,7 @@ print(error);
   itemName: p.itemName ?? '',
   batchNo: 'B001',
   mFGDate: '2025-01-01',
-  expiryDate: p.expiryDateFormat ?? '2026-01-01',
+  expiryDate:'2026-01-01',
   hsnCode: int.tryParse(p.hSNCode ?? '0') ?? 0,
   gstPercentage: double.tryParse(p.gstPercentage?.toString() ?? '0') ?? 0,
   itemQuantity: int.tryParse(p.maximumStockQty?.toString() ?? '0') ?? 0,
