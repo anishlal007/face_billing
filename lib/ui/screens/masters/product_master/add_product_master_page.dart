@@ -55,8 +55,8 @@ class _AddProductMasterPageState extends State<AddProductMasterPage> {
     
   int? _hsntaxCode, _gsttaxCode, _itemGroup, _itemUnit, _itemMake, _itemGeneric, _unitCode;
   bool _activeStatus = true;
-  bool _itemIdType = true;        
-bool _isItemIdEditable = false;  
+  bool _itemIdType = false;        
+bool _isItemIdEditable = true;  
 
   bool _ismfgreatured = true;
   bool _loading = false;
@@ -68,6 +68,7 @@ bool _isItemIdEditable = false;
       _isDiscountReq = false;
   String? _message;
   bool _getAllLoading = true;
+  bool _serailNoLoding = true;
   File? _image;
   int? selectedPaymentType  = 0;
   int? priceTakenFrom = 0;
@@ -294,6 +295,49 @@ Future<void> _loadList() async {
   });
 }
 
+
+Future<void> _loadSerialNumber() async {
+  setState(() {
+    serialError = null;
+    _serailNoLoding = true;
+  });
+
+  try {
+    final serialNoResponse = await _getSerialservice.getSerialNo();
+    if (serialNoResponse.isSuccess) {
+      final serialData = serialNoResponse.data;
+      if (serialData != null && serialData.info != null) {
+        setState(() {
+          serialNo = serialData;
+          _itemIdController.text = serialNo!.info!.productNextId ?? "";
+          serialError = null;
+        });
+      } else {
+        setState(() {
+          serialNo = null;
+          _itemIdController.clear();
+          serialError = "Number initialization record not found";
+        });
+      }
+    } else {
+      setState(() {
+        serialNo = null;
+        _itemIdController.clear();
+        serialError = serialNoResponse.error ?? "Failed to fetch serial number";
+      });
+    }
+  } catch (e) {
+    setState(() {
+      serialNo = null;
+      _itemIdController.clear();
+      serialError = "Error fetching serial number: $e";
+    });
+  }
+
+  setState(() {
+    _serailNoLoding = false;
+  });
+}
 //   Future<void> _loadList() async {
 //   final response = await _getAllMasterService.getAllMasterService();
 //   if (response.isSuccess) {
@@ -631,7 +675,7 @@ void _handleResponse(bool isSuccess, String? error) {
 
                 if (val) {
                   // 🔸 Switch ON → Auto mode
-                  await _loadList(); // fetch from API
+                  await _loadSerialNumber(); // fetch from API
                   setState(() {
                     _isItemIdEditable = false; // disable manual edit
                   });
@@ -644,6 +688,7 @@ void _handleResponse(bool isSuccess, String? error) {
                 }
               },
                     ),
+           
             ],
           ),
         ),
@@ -801,9 +846,10 @@ void _handleResponse(bool isSuccess, String? error) {
                       
                       // Add page popup
                       addPage: Addgroupscreen(
-                        onSaved: (success) {
+                        onSaved: (success) async {
                           if (success) {
                             Navigator.pop(context, true);
+                            await _loadList();
                           }
                         },
                       ),
@@ -811,6 +857,7 @@ void _handleResponse(bool isSuccess, String? error) {
                     ),
                     
                   ),
+                
                   // SizedBox(
                   //   width: constraints.maxWidth / columns - 20,
                   //   child:
@@ -878,9 +925,10 @@ void _handleResponse(bool isSuccess, String? error) {
                       ),
                       // Add page popup
                       addPage: AddItemMakeMaster(
-                        onSaved: (success) {
+                         onSaved: (success) async {
                           if (success) {
                             Navigator.pop(context, true);
+                            await _loadList();
                           }
                         },
                       ),
@@ -928,11 +976,12 @@ void _handleResponse(bool isSuccess, String? error) {
                               _nonScheduleItemFocus,
                             ),
                             addPage: AddGenericsMasterPage(
-                              onSaved: (success) {
-                                if (success) {
-                                  Navigator.pop(context, true);
-                                }
-                              },
+                               onSaved: (success) async {
+                          if (success) {
+                            Navigator.pop(context, true);
+                            await _loadList();
+                          }
+                        },
                             ),
                             addTooltip: "Add Item Generic",
                           ),
@@ -1292,9 +1341,10 @@ void _handleResponse(bool isSuccess, String? error) {
                       //               ),
 
                       addPage: AddHnsMasterPage(
-                        onSaved: (success) {
+                       onSaved: (success) async {
                           if (success) {
                             Navigator.pop(context, true);
+                            await _loadList();
                           }
                         },
                       ),

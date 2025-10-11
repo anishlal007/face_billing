@@ -62,8 +62,8 @@ final FocusNode _keyboardFocusNode = FocusNode();
   final FocusNode _subTableFocus = FocusNode(); // focus for keyboard
   ///sales rate calculation
   double _totalSalesRate = 0.0;
-  int? selectedPaymentType;
-  int? selectedEntryType;
+  int? selectedPaymentType=1;
+  int? selectedEntryType=1;
   int? selectedEntryMode = 1;
   int? selectedTaxType;
   int? selectedGstType;
@@ -995,6 +995,7 @@ Widget build(BuildContext context) {
                     SizedBox(
                       width: constraints.maxWidth / columns - 20,
                       child: CustomDropdownField<int>(
+                        
                         title: "Purchase Entry Type",
                         hintText: "Select Entry Type",
                         items: const [

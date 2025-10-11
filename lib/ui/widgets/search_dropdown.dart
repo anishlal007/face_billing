@@ -109,96 +109,114 @@ class _SearchableDropdownState<T> extends State<SearchableDropdown<T>> {
     }
   }
 
-  OverlayEntry _createOverlayEntry() {
-    RenderBox renderBox = context.findRenderObject() as RenderBox;
-    final size = renderBox.size;
+OverlayEntry _createOverlayEntry() {
+  RenderBox renderBox = context.findRenderObject() as RenderBox;
+  final size = renderBox.size;
 
-    return OverlayEntry(
-      builder: (context) => Positioned(
-        width: size.width,
-        child: CompositedTransformFollower(
-          link: _layerLink,
-          showWhenUnlinked: false,
-         // offset: Offset(0, size.height + 5),
-          child: Material(
-            elevation: 4,
-            borderRadius: BorderRadius.circular(4),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // 🔹 Compact search bar
-                TextField(
-                  controller: _searchController,
-                  focusNode: _effectiveFocusNode,
-                  style: const TextStyle(fontSize: 12.0, height: 1.0, color: black),
-                  decoration: InputDecoration(
-                    hintText: "Search...",
-                    isDense: true,
-                    contentPadding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
-                    border: const OutlineInputBorder(
-                      borderSide: BorderSide(color: black),
-                    ),
-                  ),
-                  onChanged: (value) {
-                    setState(() {
-                      _filteredItems = widget.items
-                          .where((e) => widget
-                              .itemLabel(e)
-                              .toLowerCase()
-                              .contains(value.toLowerCase()))
-                          .toList();
-                    });
-                    _overlayEntry!.markNeedsBuild();
-                  },
-                  onEditingComplete: () {
-                    if (_filteredItems.isNotEmpty) {
-                      _selectedItem = _filteredItems.first;
-                      widget.onChanged?.call(_selectedItem!);
-                    }
-                    _closeDropdown();
-                    widget.onEditingComplete?.call();
-                  },
-                ),
-                ConstrainedBox(
-                  constraints: const BoxConstraints(maxHeight: 200),
-                  child: _filteredItems.isEmpty
-                      ? const Center(
-                          child: Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Text("No items found"),
-                        ))
-                      : ListView(
-                          shrinkWrap: true,
-                          children: _filteredItems.map((e) {
-                            return ListTile(
-                              dense: true,
-                              visualDensity: VisualDensity.compact,
-                              title: Text(
-                                widget.itemLabel(e),
-                                style: const TextStyle(fontSize: 12),
-                              ),
-                              onTap: () {
-                                setState(() {
-                                  _selectedItem = e;
-                                  _filteredItems = widget.items;
-                                });
-                                widget.onChanged?.call(e);
-                                _searchController.clear();
-                                _closeDropdown();
-                                widget.onEditingComplete?.call();
-                              },
-                            );
-                          }).toList(),
-                        ),
-                ),
-              ],
+  return OverlayEntry(
+    builder: (context) => Stack(
+      children: [
+        // 🔹 Transparent layer to detect outside taps
+        Positioned.fill(
+          child: GestureDetector(
+            onTap: _closeDropdown, // close when tapped outside
+            behavior: HitTestBehavior.translucent,
+            child: Container(
+             // color: Colors.transparent,
             ),
           ),
         ),
-      ),
-    );
-  }
 
+        // 🔹 The dropdown overlay
+        Positioned(
+          width: size.width,
+          child: CompositedTransformFollower(
+            link: _layerLink,
+            showWhenUnlinked: false,
+            child: Material(
+              elevation: 4,
+              borderRadius: BorderRadius.circular(4),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // 🔹 Search field
+                  TextField(
+                    controller: _searchController,
+                    focusNode: _effectiveFocusNode,
+                    style: const TextStyle(fontSize: 12.0, height: 1.0, color: black),
+                    decoration: InputDecoration(
+                      hintText: "Search...",
+                      isDense: true,
+                      contentPadding:
+                          const EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
+                      border: const OutlineInputBorder(
+                        borderSide: BorderSide(color: black),
+                      ),
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        _filteredItems = widget.items
+                            .where((e) => widget
+                                .itemLabel(e)
+                                .toLowerCase()
+                                .contains(value.toLowerCase()))
+                            .toList();
+                      });
+                      _overlayEntry!.markNeedsBuild();
+                    },
+                    onEditingComplete: () {
+                      if (_filteredItems.isNotEmpty) {
+                        _selectedItem = _filteredItems.first;
+                        widget.onChanged?.call(_selectedItem!);
+                      }
+                      _closeDropdown();
+                      widget.onEditingComplete?.call();
+                    },
+                  ),
+
+                  // 🔹 List of items
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(maxHeight: 200),
+                    child: _filteredItems.isEmpty
+                        ? const Center(
+                            child: Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: Text("No items found"),
+                            ),
+                          )
+                        : ListView(
+                            shrinkWrap: true,
+                            children: _filteredItems.map((e) {
+                              return ListTile(
+                                dense: true,
+                                visualDensity: VisualDensity.compact,
+                                title: Text(
+                                  widget.itemLabel(e),
+                                  style: const TextStyle(fontSize: 12),
+                                ),
+                                onTap: () {
+                                  setState(() {
+                                    _selectedItem = e;
+                                    _filteredItems = widget.items;
+                                  });
+                                  widget.onChanged?.call(e);
+                                  _searchController.clear();
+                                  _closeDropdown();
+                                  widget.onEditingComplete?.call();
+                                },
+                              );
+                            }).toList(),
+                          ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
+}
   @override
   Widget build(BuildContext context) {
     return Column(

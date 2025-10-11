@@ -17,6 +17,7 @@ import '../../pages/hns_master_page.dart';
 import '../../pages/item_group_master.dart';
 import '../../pages/item_make_master.dart';
 import '../../pages/item_make_master_page.dart';
+import '../../pages/product_list_master_master.dart';
 import '../../pages/product_master_page.dart';
 import '../../pages/sales_entry_page.dart';
 import '../../pages/sales_master_page.dart';
@@ -74,6 +75,11 @@ class _HomePageState extends State<HomePage> {
       title: "Product",
       icon: Icons.production_quantity_limits_rounded,
       page: const ProductMasterPage(),
+    ),
+         MenuItemData(
+      title: "Product List",
+      icon: Icons.production_quantity_limits_rounded,
+      page: const ProductListMasterMaster(),
     ),
            MenuItemData(
           title: "Group Master",
@@ -407,11 +413,11 @@ class _HomePageState extends State<HomePage> {
           icon: Icons.ac_unit,
           page: const StateMasterPage(),
         ),
-        MenuItemData(
-          title: "Company Master",
-          icon: Icons.ac_unit,
-          page: const CompanyMasterPage(),
-        ),
+        // MenuItemData(
+        //   title: "Company Master",
+        //   icon: Icons.ac_unit,
+        //   page: const CompanyMasterPage(),
+        // ),
         MenuItemData(
           title: "User Master",
           icon: Icons.ac_unit,

@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-
 import '../../../../core/preference_helper.dart';
 import '../../pages/login_page.dart';
 
-class TopNavBar extends StatelessWidget implements PreferredSizeWidget {
+class TopNavBar extends StatefulWidget implements PreferredSizeWidget {
   final String title;
   final bool isMenuCollapsed;
   final VoidCallback onToggleMenu;
@@ -16,6 +15,29 @@ class TopNavBar extends StatelessWidget implements PreferredSizeWidget {
   });
 
   @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+
+  @override
+  State<TopNavBar> createState() => _TopNavBarState();
+}
+
+class _TopNavBarState extends State<TopNavBar> {
+  String? _username;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUsername();
+  }
+
+  Future<void> _loadUsername() async {
+    final user = await SharedPreferenceHelper.getUser();
+    setState(() {
+      _username = user?.userName ?? "Guest";
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final isMobile = MediaQuery.of(context).size.width < 800;
     return AppBar(
@@ -23,60 +45,64 @@ class TopNavBar extends StatelessWidget implements PreferredSizeWidget {
       backgroundColor: Colors.white,
       title: Row(
         children: [
-          Text("FaceBilling", style: const TextStyle(color: Colors.black)),
+           Text(_username!, style: TextStyle(color: Colors.black)),
           const SizedBox(width: 30),
-          !isMobile
-              ? IconButton(
-                  icon: Icon(
-                    isMenuCollapsed ? Icons.menu_open : Icons.menu,
-                    color: Colors.black,
-                  ),
-                  onPressed: onToggleMenu,
-                )
-              : SizedBox(),
-const SizedBox(width: 100,),
-               Text(title, style: const TextStyle(color: Colors.black)),
+          if (!isMobile)
+            IconButton(
+              icon: Icon(
+                widget.isMenuCollapsed ? Icons.menu_open : Icons.menu,
+                color: Colors.black,
+              ),
+              onPressed: widget.onToggleMenu,
+            ),
+          const SizedBox(width: 100),
+          Text(widget.title, style: const TextStyle(color: Colors.black)),
         ],
       ),
       actions: [
         IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.search, color: Colors.black)),
-       
+          onPressed: () {},
+          icon: const Icon(Icons.search, color: Colors.black),
+        ),
         IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.notifications, color: Colors.black)),
+          onPressed: () {},
+          icon: const Icon(Icons.notifications, color: Colors.black),
+        ),
         IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.settings, color: Colors.black)),
-            IconButton(
-  onPressed: () async {
-    // 1. Clear token and user
-    await SharedPreferenceHelper.clearToken();
-    await SharedPreferenceHelper.clearUser();
+          onPressed: () {},
+          icon: const Icon(Icons.settings, color: Colors.black),
+        ),
+        // 👇 Logout button
+        IconButton(
+          onPressed: () async {
+            await SharedPreferenceHelper.clearAll();
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => const WebmailLoginScreen()),
+              (route) => false,
+            );
+          },
+          icon: const Icon(Icons.logout, color: Colors.black),
+        ),
 
-    // 2. Update global token if using ValueNotifier
-    // globalToken.value = null; // uncomment if you have global token
-
-    // 3. Navigate to LoginPage and remove all previous routes
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(builder: (context) => const WebmailLoginScreen()),
-      (route) => false, // remove all previous routes
-    );
-  },
-  icon: const Icon(Icons.logout, color: Colors.black),
-),
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 12),
-          child: CircleAvatar(
-            backgroundImage: AssetImage("assets/profile.jpg"),
+        // 👇 Display Username
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          child: Row(
+            children: [
+              CircleAvatar(
+                backgroundImage: const AssetImage("assets/profile.jpg"),
+                radius: 18,
+              ),
+              // const SizedBox(width: 8),
+              // Text(
+              //   _username ?? "",
+              //   style: const TextStyle(color: Colors.black, fontSize: 14),
+              // ),
+            ],
           ),
         ),
       ],
     );
   }
-
-  @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }

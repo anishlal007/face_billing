@@ -1,5 +1,7 @@
+import 'package:facebilling/ui/screens/masters/area_master/add_area_master_page.dart';
 import 'package:flutter/material.dart';
 import 'package:facebilling/core/const.dart';
+import 'package:intl/intl.dart';
 import '../../../../data/models/get_all_master_list_model.dart' as master;
 import '../../../../data/models/customer_master/add_customer_master_model.dart';
 import '../../../../data/models/customer_master/customer_master_list_model.dart';
@@ -9,6 +11,7 @@ import '../../../widgets/custom_dropdown_text_field.dart';
 import '../../../widgets/custom_switch.dart';
 import '../../../widgets/custom_text_field.dart';
 import '../../../widgets/gradient_button.dart';
+import '../../../widgets/search_dropdown.dart';
 import '../../../widgets/search_dropdown_field.dart';
 
 class AddCustomerMasterPage extends StatefulWidget {
@@ -41,7 +44,7 @@ class _AddCustomerMasterPageState extends State<AddCustomerMasterPage> {
       _gender;
   bool _activeStatus = true, _isTaxInclusive = true;
   String? error, _genderValue;
-
+master.States? _selectedState;
   late TextEditingController _unitIdController;
   late TextEditingController _unitNameController;
 
@@ -96,6 +99,21 @@ class _AddCustomerMasterPageState extends State<AddCustomerMasterPage> {
   late TextEditingController _countryNameController;
   // final FocusNode _createdUserFocus = FocusNode();
 
+ Future<void> _pickDate() async {
+    DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(), // default date
+      firstDate: DateTime(2000), // earliest date allowed
+      lastDate: DateTime(2100),  // latest date allowed
+    );
+
+    if (pickedDate != null) {
+      setState(() {
+        _customerDobController.text = DateFormat('yyyy-MM-dd').format(pickedDate);
+      });
+    }
+  }
+   int _taxOption = 1;
   @override
   void initState() {
     super.initState();
@@ -104,6 +122,8 @@ class _AddCustomerMasterPageState extends State<AddCustomerMasterPage> {
         TextEditingController(text: widget.unitInfo?.custId ?? "");
     _unitNameController =
         TextEditingController(text: widget.unitInfo?.custName ?? "");
+    _countryNameController =
+        TextEditingController(text: "India");
     // _createdUserController = TextEditingController(
     //     text: widget.countryInfo?.createdUserCode?.toString() ?? userId.value!);
     _activeStatus = (widget.unitInfo?.custActiveStatus ?? 1) == 1;
@@ -129,22 +149,63 @@ class _AddCustomerMasterPageState extends State<AddCustomerMasterPage> {
         text: widget.unitInfo?.createdUserCode?.toString() ?? userId.value!);
   }
 
-  Future<void> _loadList() async {
-    final response = await _getAllMasterService.getAllMasterService();
-    if (response.isSuccess) {
-      setState(() {
-        getAllMasterListModel = response.data!;
-        _getAllLoading = false;
-        error = null;
-      });
-    } else {
-      setState(() {
-        error = response.error;
-        _getAllLoading = false;
-      });
+Future<void> _loadList() async {
+  final response = await _getAllMasterService.getAllMasterService();
+
+  if (response.isSuccess) {
+    final data = response.data!;
+    final countries = data.info?.countries ?? [];
+    final states = data.info?.states ?? [];
+final groups = data.info?.customerGroups ?? [];
+    // 🔹 Set default country → India
+    int? defaultCountryCode;
+    if (countries.isNotEmpty) {
+      final india = countries.firstWhere(
+        (c) => (c.countryName ?? '').toLowerCase() == 'india',
+        orElse: () => countries.first,
+      );
+      defaultCountryCode = india.countryCode;
     }
+
+    // 🔹 Set default state → Tamil Nadu
+    master.States? defaultState;
+    int? defaultStateCode;
+    if (states.isNotEmpty) {
+      defaultState = states.firstWhere(
+        (s) => (s.stateName ?? '').toLowerCase() == 'tamil nadu',
+        orElse: () => states.first,
+      );
+      defaultStateCode = defaultState.stateCode;
+    }
+  int? defaultGroupCode;
+  if (groups.isNotEmpty) {
+    final commonGroup = groups.firstWhere(
+      (g) => (g.custGroupName ?? '').toLowerCase() == 'Common Group',
+      orElse: () => groups[1],
+    );
+    defaultGroupCode = commonGroup.custGroupCode;
   }
 
+    setState(() {
+      getAllMasterListModel = data;
+      _countryCode = defaultCountryCode;
+      _stateCode = defaultStateCode;
+      _selectedState = defaultState;
+      _subGrpCode = defaultGroupCode;
+      _getAllLoading = false;
+      error = null;
+    });
+
+    print("Default Country: India ($_countryCode)");
+    print("Default State: Tamil Nadu ($_stateCode)");
+     print("Default Patient Group: $_subGrpCode");
+  } else {
+    setState(() {
+      error = response.error;
+      _getAllLoading = false;
+    });
+  }
+}
   @override
   void dispose() {
     _unitIdController.dispose();
@@ -333,23 +394,29 @@ class _AddCustomerMasterPageState extends State<AddCustomerMasterPage> {
                       ],
                     ),
                   ),
-                  SizedBox(
-                    width: constraints.maxWidth / columns - 20,
-                    child: CustomTextField(
-                      title: "Pataint ID",
-                      hintText: "Enter Pataint ID",
-                      controller: _suppIdController,
-                      prefixIcon: Icons.flag_circle,
-                      isValidate: true,
-                      validator: (value) => value == null || value.isEmpty
-                          ? "Enter Pataint ID"
-                          : null,
-                      focusNode: _suppIdFocus,
-                      textInputAction: TextInputAction.next,
-                      onEditingComplete: () => _fieldFocusChange(
-                          context, _suppIdFocus, _suppNameFocus),
-                    ),
-                  ),
+               SizedBox(
+  width: constraints.maxWidth / columns - 20,
+  child: CustomTextField(
+    title: "Patient ID",
+    hintText: "Enter Patient ID",
+    controller: _suppIdController,
+    prefixIcon: Icons.flag_circle,
+    isValidate: true,
+    validator: (value) {
+      if (value == null || value.trim().isEmpty) {
+        return "Enter Patient ID";
+      }
+      return null;
+    },
+    focusNode: _suppIdFocus,
+    textInputAction: TextInputAction.next,
+    onEditingComplete: () => _fieldFocusChange(
+      context,
+      _suppIdFocus,
+      _suppNameFocus,
+    ),
+  ),
+),
                   SizedBox(
                     width: constraints.maxWidth / columns - 20,
                     child: CustomTextField(
@@ -369,18 +436,24 @@ class _AddCustomerMasterPageState extends State<AddCustomerMasterPage> {
                   ),
                   SizedBox(
                     width: constraints.maxWidth / columns - 20,
-                    child: CustomTextField(
-                      title: "Pataint Date Of Birth",
-                      hintText: "Enter Pataint Date Of Birth",
-                      controller: _customerDobController,
-                      isValidate: true,
-                      validator: (value) => value == null || value.isEmpty
-                          ? "Enter Pataint Date Of Birth"
-                          : null,
-                      focusNode: _supDobFocus,
-                      textInputAction: TextInputAction.next,
-                      onEditingComplete: () => _fieldFocusChange(
-                          context, _supDobFocus, _suppGroupFocus),
+                    child: GestureDetector(
+                      onTap: (){
+                        _pickDate();
+                      },
+                      child: CustomTextField(
+                        title: "Pataint Date Of Birth",
+                        hintText: "Enter Pataint Date Of Birth",
+                        controller: _customerDobController,
+                        isValidate: true,
+                        isEdit: true,
+                        validator: (value) => value == null || value.isEmpty
+                            ? "Enter Pataint Date Of Birth"
+                            : null,
+                        focusNode: _supDobFocus,
+                        textInputAction: TextInputAction.next,
+                        onEditingComplete: () => _fieldFocusChange(
+                            context, _supDobFocus, _suppGroupFocus),
+                      ),
                     ),
                   ),
 
@@ -438,48 +511,50 @@ class _AddCustomerMasterPageState extends State<AddCustomerMasterPage> {
                     ),
                   ),
 
+                 SizedBox(
+  width: constraints.maxWidth / columns - 20,
+  child: CustomDropdownField<int>(
+    title: "Select Patient Group",
+    hintText: "Choose Patient Group",
+    items: getAllMasterListModel!.info!.customerGroups!
+        .map((e) => DropdownMenuItem<int>(
+              value: e.custGroupCode,
+              child: Text(e.custGroupName ?? ''),
+            ))
+        .toList(),
+
+    // 🔹 Set default value to "Common" group
+    initialValue: _subGrpCode, // will hold default or selected value
+
+    onChanged: (value) {
+      setState(() {
+        _subGrpCode = value;
+      });
+
+      final selected = getAllMasterListModel!.info!.customerGroups!.firstWhere(
+        (c) => c.custGroupCode == value,
+        orElse: () => master.CustomerGroups(),
+      );
+
+      print("Selected Group: ${selected.custGroupName}");
+    },
+
+    isValidate: true,
+    validator: (value) =>
+        value == null ? "Please select Patient Group" : null,
+    focusNode: _suppGroupFocus,
+    onEditingComplete: () => _fieldFocusChange(
+      context,
+      _suppGroupFocus,
+      _countryNameFocus,
+    ),
+  ),
+),
                   SizedBox(
                     width: constraints.maxWidth / columns - 20,
                     child: CustomDropdownField<int>(
-                      title: "Select Pataint Group",
-                      hintText: "Choose Pataint Group",
-                      items: getAllMasterListModel!.info!.customerGroups!
-                          .map((e) => DropdownMenuItem<int>(
-                                value:
-                                    e.custGroupCode, // 🔹 use taxCode as value
-                                child: Text("${e.custGroupName} "),
-                              ))
-                          .toList(),
-                      // initialValue: _taxCode, // int? taxCode
-                      onChanged: (value) {
-                        setState(() {
-                          _subGrpCode = value;
-                          //  _taxCode = value;
-                        });
-
-                        final selected = getAllMasterListModel!
-                            .info!.supplierGroups!
-                            .firstWhere((c) => c.supGroupCode == value,
-                                orElse: () => master.SupplierGroups());
-
-                        print("Selected GST %: ${selected.supGroupCode}");
-                        print("Selected TAX Code: ${selected.supGroupCode}");
-                      },
-                      isValidate: true,
-                      validator: (value) =>
-                          value == null ? "Please select Country" : null,
-                      focusNode: _suppGroupFocus,
-                      onEditingComplete: () => _fieldFocusChange(
-                        context,
-                        _suppGroupFocus,
-                        _countryNameFocus,
-                      ),
-                    ),
-                  ),
-
-                  SizedBox(
-                    width: constraints.maxWidth / columns - 20,
-                    child: CustomDropdownField<int>(
+                        initialValue: _countryCode,
+                      controller: _countryNameController,
                       title: "Select Country",
                       hintText: "Choose Country",
                       items: getAllMasterListModel!.info!.countries!
@@ -513,75 +588,138 @@ class _AddCustomerMasterPageState extends State<AddCustomerMasterPage> {
                       ),
                     ),
                   ),
-
-                  SizedBox(
-                    width: constraints.maxWidth / columns - 20,
-                    child: CustomDropdownField<int>(
-                      title: "Select State",
-                      hintText: "Choose State",
-                      items: getAllMasterListModel!.info!.states!
-                          .map((e) => DropdownMenuItem<int>(
-                                value: e.stateCode, // 🔹 use taxCode as value
-                                child: Text("${e.stateName} "),
-                              ))
-                          .toList(),
-                      // initialValue: _taxCode, // int? taxCode
-                      onChanged: (value) {
-                        setState(() {
-                          _stateCode = value;
-                          //  _taxCode = value;
-                        });
-
-                        final selected = getAllMasterListModel!.info!.states!
-                            .firstWhere((c) => c.stateCode == value,
-                                orElse: () => master.States());
-
-                        print("Selected GST %: ${selected.stateCode}");
-                        print("Selected TAX Code: ${selected.stateCode}");
-                      },
-                      isValidate: true,
-                      validator: (value) =>
-                          value == null ? "Please select State" : null,
-                      focusNode: _suppStateFocus,
-                      onEditingComplete: () => _fieldFocusChange(
-                          context, _suppStateFocus, _suppAreaFocus),
+SizedBox(
+                      width: constraints.maxWidth / columns - 20,
+                      child: SearchableDropdown<master.States>(
+                      initialValue: _selectedState!,
+                        hintText: "Select State",
+                        items: getAllMasterListModel!.info!.states!,
+                        itemLabel: (supplier) => supplier.stateName ?? "",
+                        onChanged: (supplier) {
+                          if (supplier != null) {
+                         _selectedState = supplier;
+                            print("Selected Code: ${supplier.stateCode}");
+                            print("Selected Name: ${supplier.stateName}");
+                         //   print("Selected GSt type: ${supplier.supGSTType}");
+                            _stateCode=supplier.stateCode;
+                            print("_stateCode");
+                            print(_stateCode);
+                             // TaxType: 0=Exclusive, 1=Inclusive
+                       
+                           
+                          }
+                        },
+                      ),
                     ),
-                  ),
+                   
+                  // SizedBox(
+                  //   width: constraints.maxWidth / columns - 20,
+                  //   child: CustomDropdownField<int>(
+                  //     initialValue: _stateCode,
+                  //     title: "Select State",
+                  //     hintText: "Choose State",
+                  //     items: getAllMasterListModel!.info!.states!
+                  //         .map((e) => DropdownMenuItem<int>(
+                  //               value: e.stateCode, // 🔹 use taxCode as value
+                  //               child: Text("${e.stateName} "),
+                  //             ))
+                  //         .toList(),
+                  //     // initialValue: _taxCode, // int? taxCode
+                  //     onChanged: (value) {
+                  //       setState(() {
+                  //         _stateCode = value;
+                  //         //  _taxCode = value;
+                  //       });
 
-                  SizedBox(
+                  //       final selected = getAllMasterListModel!.info!.states!
+                  //           .firstWhere((c) => c.stateCode == value,
+                  //               orElse: () => master.States());
+
+                  //       print("Selected GST %: ${selected.stateCode}");
+                  //       print("Selected TAX Code: ${selected.stateCode}");
+                  //     },
+                  //     isValidate: true,
+                  //     validator: (value) =>
+                  //         value == null ? "Please select State" : null,
+                  //     focusNode: _suppStateFocus,
+                  //     onEditingComplete: () => _fieldFocusChange(
+                  //         context, _suppStateFocus, _suppAreaFocus),
+                  //   ),
+                  // ),
+
+                  // SizedBox(
+                  //   width: constraints.maxWidth / columns - 20,
+                  //   child: CustomDropdownField<int>(
+                  //     title: "Select Areas",
+                  //     hintText: "Choose Areas",
+                  //     items: getAllMasterListModel!.info!.areas!
+                  //         .map((e) => DropdownMenuItem<int>(
+                  //               value: e.areaCode, // 🔹 use taxCode as value
+                  //               child: Text("${e.areaName} "),
+                  //             ))
+                  //         .toList(),
+                  //     // initialValue: _taxCode, // int? taxCode
+                  //     onChanged: (value) {
+                  //       setState(() {
+                  //         _areaCode = value;
+                  //         //  _taxCode = value;
+                  //       });
+
+                  //       final selected = getAllMasterListModel!.info!.areas!
+                  //           .firstWhere((c) => c.stateCode == value,
+                  //               orElse: () => master.Areas());
+
+                  //       print("Selected GST %: ${selected.areaCode}");
+                  //       print("Selected TAX Code: ${selected.areaCode}");
+                        
+
+                  //     },
+                  //     isValidate: true,
+                  //     validator: (value) =>
+                  //         value == null ? "Please select Area" : null,
+                  //     focusNode: _suppAreaFocus,
+                  //     onEditingComplete: () => _fieldFocusChange(
+                  //       context,
+                  //       _suppAreaFocus,
+                  //       _pinCodeFocus,
+                  //     ),
+                  //   ),
+                  // ),
+
+ SizedBox(
                     width: constraints.maxWidth / columns - 20,
-                    child: CustomDropdownField<int>(
-                      title: "Select Areas",
-                      hintText: "Choose Areas",
-                      items: getAllMasterListModel!.info!.areas!
-                          .map((e) => DropdownMenuItem<int>(
-                                value: e.areaCode, // 🔹 use taxCode as value
-                                child: Text("${e.areaName} "),
-                              ))
-                          .toList(),
-                      // initialValue: _taxCode, // int? taxCode
-                      onChanged: (value) {
-                        setState(() {
-                          _areaCode = value;
-                          //  _taxCode = value;
-                        });
+                    child: SearchableDropdown<master.Areas>(
+                      hintText: "Select Area",
+                     // initialValue: _selectItemMake,
+                      items: getAllMasterListModel!.info!.areas!,
+                      itemLabel: (group) => group.areaName ?? "",
+                      onChanged: (group) {
+                        if (group != null) {
+                         // _itemMake = group.itemMakeCode;
+                          //_selectItemMake = group;
+                          print("Selected Code: ${group.areaCode}");
+                          print("Selected Name: ${group.areaName}");
+                           _areaCode = group.areaCode;
+                           print("_areaCode");
+                           print(_areaCode);
+                        }
 
-                        final selected = getAllMasterListModel!.info!.areas!
-                            .firstWhere((c) => c.stateCode == value,
-                                orElse: () => master.Areas());
-
-                        print("Selected GST %: ${selected.areaCode}");
-                        print("Selected TAX Code: ${selected.areaCode}");
                       },
-                      isValidate: true,
-                      validator: (value) =>
-                          value == null ? "Please select Area" : null,
                       focusNode: _suppAreaFocus,
                       onEditingComplete: () => _fieldFocusChange(
                         context,
-                        _suppAreaFocus,
+                     _suppAreaFocus,
                         _pinCodeFocus,
                       ),
+                      // Add page popup
+                      addPage: AddAreaMasterPage(
+                        onSaved: (success) {
+                          if (success) {
+                            Navigator.pop(context, true);
+                          }
+                        },
+                      ),
+                      addTooltip: "Add Area",
                     ),
                   ),
 
@@ -711,18 +849,18 @@ class _AddCustomerMasterPageState extends State<AddCustomerMasterPage> {
                     ),
                   ),
 
-                  SizedBox(
-                    width: constraints.maxWidth / columns - 20,
-                    child: CustomTextField(
-                      title: "Create Pataint",
-                      controller: _createdUserController,
-                      prefixIcon: Icons.person,
-                      isEdit: true,
-                      focusNode: _createUserFocus,
-                      textInputAction: TextInputAction.done,
-                      onEditingComplete: _submit,
-                    ),
-                  ),
+                  // SizedBox(
+                  //   width: constraints.maxWidth / columns - 20,
+                  //   child: CustomTextField(
+                  //     title: "Create Pataint",
+                  //     controller: _createdUserController,
+                  //     prefixIcon: Icons.person,
+                  //     isEdit: true,
+                  //     focusNode: _createUserFocus,
+                  //     textInputAction: TextInputAction.done,
+                  //     onEditingComplete: _submit,
+                  //   ),
+                  // ),
 
                   SizedBox(
                     width: constraints.maxWidth,
@@ -733,15 +871,45 @@ class _AddCustomerMasterPageState extends State<AddCustomerMasterPage> {
                         SizedBox(
                           width: 10,
                         ),
-                        CustomSwitch(
-                          value: _isTaxInclusive,
-                          title: "Active Status",
-                          onChanged: (val) {
-                            setState(() {
-                              _isTaxInclusive = val;
-                            });
-                          },
-                        ),
+       
+        Row(
+          children: [
+            Radio<int>(
+              value: 1,
+              groupValue: _taxOption,
+              onChanged: (value) {
+                setState(() {
+                  _taxOption = value!;
+                  _isTaxInclusive=false!;
+                });
+              },
+            ),
+            const Text('Included'),
+
+            const SizedBox(width: 20),
+
+            Radio<int>(
+              value: 0,
+              groupValue: _taxOption,
+              onChanged: (value) {
+                setState(() {
+                  _taxOption = value!;
+                  _isTaxInclusive=true!;
+                });
+              },
+            ),
+            const Text('Excluded'),
+          ],
+        ),
+                        // CustomSwitch(
+                        //   value: _isTaxInclusive,
+                        //   title: "Active Status",
+                        //   onChanged: (val) {
+                        //     setState(() {
+                        //       _isTaxInclusive = val;
+                        //     });
+                        //   },
+                        // ),
                       ],
                     ),
                   ),

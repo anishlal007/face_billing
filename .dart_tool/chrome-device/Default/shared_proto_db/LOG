@@ -1,16 +1,29 @@
-2025/10/10-20:07:28.224 30d86e Reusing MANIFEST /private/var/folders/13/qls48qw97vj5n2gk3ppy9gx00000gn/T/flutter_tools.WlWahj/flutter_tools_chrome_device.rSbASK/Default/shared_proto_db/MANIFEST-000001
-2025/10/10-20:07:28.225 30d86e Recovering log #26
-2025/10/10-20:07:28.227 30d86e Reusing old log /private/var/folders/13/qls48qw97vj5n2gk3ppy9gx00000gn/T/flutter_tools.WlWahj/flutter_tools_chrome_device.rSbASK/Default/shared_proto_db/000026.log 
-2025/10/10-20:07:28.227 30d86e Delete type=0 #13
-2025/10/10-20:07:28.227 30d86e Delete type=0 #7
-2025/10/10-20:07:28.227 30d86e Delete type=0 #4
-2025/10/10-20:07:28.227 30d86e Delete type=0 #10
-2025/10/10-20:07:28.227 30d86e Delete type=0 #16
-2025/10/10-20:07:28.227 30d86e Delete type=0 #3
-2025/10/10-20:07:28.227 30d86e Delete type=2 #14
-2025/10/10-20:07:28.227 30d86e Delete type=2 #17
-2025/10/10-20:07:28.227 30d86e Delete type=2 #11
-2025/10/10-20:07:28.227 30d86e Delete type=2 #8
-2025/10/10-20:07:28.227 30d86e Delete type=2 #27
-2025/10/10-20:07:28.227 30d86e Delete type=0 #19
-2025/10/10-20:07:28.227 30d86e Delete type=0 #23
+2025/10/11-06:58:01.162 34e46c Reusing MANIFEST /private/var/folders/13/qls48qw97vj5n2gk3ppy9gx00000gn/T/flutter_tools.RdYrI4/flutter_tools_chrome_device.6NhOB2/Default/shared_proto_db/MANIFEST-000001
+2025/10/11-06:58:01.162 34e46c Recovering log #28
+2025/10/11-06:58:01.165 34e46c Reusing old log /private/var/folders/13/qls48qw97vj5n2gk3ppy9gx00000gn/T/flutter_tools.RdYrI4/flutter_tools_chrome_device.6NhOB2/Default/shared_proto_db/000028.log 
+2025/10/11-06:58:01.165 34e46c Delete type=0 #13
+2025/10/11-06:58:01.166 34e46c Delete type=0 #7
+2025/10/11-06:58:01.166 34e46c Delete type=0 #4
+2025/10/11-06:58:01.166 34e46c Delete type=0 #10
+2025/10/11-06:58:01.166 34e46c Delete type=0 #16
+2025/10/11-06:58:01.166 34e46c Delete type=0 #3
+2025/10/11-06:58:01.166 34e46c Delete type=2 #14
+2025/10/11-06:58:01.166 34e46c Delete type=2 #17
+2025/10/11-06:58:01.166 34e46c Delete type=2 #11
+2025/10/11-06:58:01.166 34e46c Delete type=2 #8
+2025/10/11-06:58:01.166 34e46c Delete type=2 #27
+2025/10/11-06:58:01.166 34e46c Delete type=0 #26
+2025/10/11-06:58:01.166 34e46c Delete type=0 #19
+2025/10/11-06:58:01.166 34e46c Delete type=0 #23
+2025/10/11-07:01:05.170 34e46c Level-0 table #32: started
+2025/10/11-07:01:05.173 34e46c Level-0 table #32: 125870 bytes OK
+2025/10/11-07:01:05.176 34e46c Delete type=0 #28
+2025/10/11-07:01:05.177 34e46c Compacting 4@0 + 1@1 files
+2025/10/11-07:01:05.182 34e46c Generated table #33@0: 1281 keys, 231720 bytes
+2025/10/11-07:01:05.183 34e46c Compacted 4@0 + 1@1 files => 231720 bytes
+2025/10/11-07:01:05.185 34e46c compacted to: files[ 0 1 1 0 0 0 0 ]
+2025/10/11-07:01:05.185 34e46c Delete type=2 #29
+2025/10/11-07:01:05.185 34e46c Delete type=2 #21
+2025/10/11-07:01:05.185 34e46c Delete type=2 #26
+2025/10/11-07:01:05.185 34e46c Delete type=2 #32
+2025/10/11-07:01:05.185 34e46c Delete type=2 #24
