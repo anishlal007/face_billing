@@ -1,5 +1,6 @@
 import 'package:facebilling/core/colors.dart';
 import 'package:flutter/material.dart';
+
 class SearchableDropdown<T> extends StatefulWidget {
   final List<T> items;
   final String Function(T) itemLabel;
@@ -25,8 +26,6 @@ class SearchableDropdown<T> extends StatefulWidget {
     this.controller,
     this.initialValue,
   });
- 
-
 
   @override
   State<SearchableDropdown<T>> createState() => _SearchableDropdownState<T>();
@@ -47,7 +46,7 @@ class _SearchableDropdownState<T> extends State<SearchableDropdown<T>> {
   void initState() {
     super.initState();
     _filteredItems = widget.items;
-     if (widget.initialValue != null) {
+    if (widget.initialValue != null) {
       _selectedItem = widget.initialValue;
     }
   }
@@ -61,7 +60,8 @@ class _SearchableDropdownState<T> extends State<SearchableDropdown<T>> {
       _effectiveFocusNode.requestFocus();
     });
   }
- @override
+
+  @override
   void didUpdateWidget(covariant SearchableDropdown<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.initialValue != oldWidget.initialValue) {
@@ -70,7 +70,7 @@ class _SearchableDropdownState<T> extends State<SearchableDropdown<T>> {
       });
     }
   }
-  
+
   void _closeDropdown() {
     _overlayEntry?.remove();
     _overlayEntry = null;
@@ -87,7 +87,8 @@ class _SearchableDropdownState<T> extends State<SearchableDropdown<T>> {
       showDialog(
         context: context,
         builder: (context) => Dialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 500, maxHeight: 600),
             child: widget.addPage!,
@@ -109,114 +110,116 @@ class _SearchableDropdownState<T> extends State<SearchableDropdown<T>> {
     }
   }
 
-OverlayEntry _createOverlayEntry() {
-  RenderBox renderBox = context.findRenderObject() as RenderBox;
-  final size = renderBox.size;
+  OverlayEntry _createOverlayEntry() {
+    RenderBox renderBox = context.findRenderObject() as RenderBox;
+    final size = renderBox.size;
 
-  return OverlayEntry(
-    builder: (context) => Stack(
-      children: [
-        // 🔹 Transparent layer to detect outside taps
-        Positioned.fill(
-          child: GestureDetector(
-            onTap: _closeDropdown, // close when tapped outside
-            behavior: HitTestBehavior.translucent,
-            child: Container(
-             // color: Colors.transparent,
+    return OverlayEntry(
+      builder: (context) => Stack(
+        children: [
+          // 🔹 Transparent layer to detect outside taps
+          Positioned.fill(
+            child: GestureDetector(
+              onTap: _closeDropdown, // close when tapped outside
+              behavior: HitTestBehavior.translucent,
+              child: Container(
+                  // color: Colors.transparent,
+                  ),
             ),
           ),
-        ),
 
-        // 🔹 The dropdown overlay
-        Positioned(
-          width: size.width,
-          child: CompositedTransformFollower(
-            link: _layerLink,
-            showWhenUnlinked: false,
-            child: Material(
-              elevation: 4,
-              borderRadius: BorderRadius.circular(4),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // 🔹 Search field
-                  TextField(
-                    controller: _searchController,
-                    focusNode: _effectiveFocusNode,
-                    style: const TextStyle(fontSize: 12.0, height: 1.0, color: black),
-                    decoration: InputDecoration(
-                      hintText: "Search...",
-                      isDense: true,
-                      contentPadding:
-                          const EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
-                      border: const OutlineInputBorder(
-                        borderSide: BorderSide(color: black),
+          // 🔹 The dropdown overlay
+          Positioned(
+            width: size.width,
+            child: CompositedTransformFollower(
+              link: _layerLink,
+              showWhenUnlinked: false,
+              child: Material(
+                elevation: 4,
+                borderRadius: BorderRadius.circular(4),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // 🔹 Search field
+                    TextField(
+                      controller: _searchController,
+                      focusNode: _effectiveFocusNode,
+                      style: const TextStyle(
+                          fontSize: 12.0, height: 1.0, color: black),
+                      decoration: InputDecoration(
+                        hintText: "Search...",
+                        isDense: true,
+                        contentPadding: const EdgeInsets.symmetric(
+                            vertical: 15.0, horizontal: 8.0),
+                        border: const OutlineInputBorder(
+                          borderSide: BorderSide(color: black),
+                        ),
                       ),
+                      onChanged: (value) {
+                        setState(() {
+                          _filteredItems = widget.items
+                              .where((e) => widget
+                                  .itemLabel(e)
+                                  .toLowerCase()
+                                  .contains(value.toLowerCase()))
+                              .toList();
+                        });
+                        _overlayEntry!.markNeedsBuild();
+                      },
+                      onEditingComplete: () {
+                        if (_filteredItems.isNotEmpty) {
+                          _selectedItem = _filteredItems.first;
+                          widget.onChanged?.call(_selectedItem!);
+                        }
+                        _closeDropdown();
+                        widget.onEditingComplete?.call();
+                      },
                     ),
-                    onChanged: (value) {
-                      setState(() {
-                        _filteredItems = widget.items
-                            .where((e) => widget
-                                .itemLabel(e)
-                                .toLowerCase()
-                                .contains(value.toLowerCase()))
-                            .toList();
-                      });
-                      _overlayEntry!.markNeedsBuild();
-                    },
-                    onEditingComplete: () {
-                      if (_filteredItems.isNotEmpty) {
-                        _selectedItem = _filteredItems.first;
-                        widget.onChanged?.call(_selectedItem!);
-                      }
-                      _closeDropdown();
-                      widget.onEditingComplete?.call();
-                    },
-                  ),
 
-                  // 🔹 List of items
-                  ConstrainedBox(
-                    constraints: const BoxConstraints(maxHeight: 200),
-                    child: _filteredItems.isEmpty
-                        ? const Center(
-                            child: Padding(
-                              padding: EdgeInsets.all(8.0),
-                              child: Text("No items found"),
+                    // 🔹 List of items
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(maxHeight: 200),
+                      child: _filteredItems.isEmpty
+                          ? const Center(
+                              child: Padding(
+                                padding: EdgeInsets.all(8.0),
+                                child: Text("No items found"),
+                              ),
+                            )
+                          : ListView(
+                              shrinkWrap: true,
+                              children: _filteredItems.map((e) {
+                                return ListTile(
+                                  dense: true,
+                                  visualDensity: VisualDensity.compact,
+                                  title: Text(
+                                    widget.itemLabel(e),
+                                    style: const TextStyle(fontSize: 12),
+                                  ),
+                                  onTap: () {
+                                    setState(() {
+                                      _selectedItem = e;
+                                      _filteredItems = widget.items;
+                                    });
+                                    widget.onChanged?.call(e);
+                                    _searchController.clear();
+                                    _closeDropdown();
+                                    widget.onEditingComplete?.call();
+                                  },
+                                );
+                              }).toList(),
                             ),
-                          )
-                        : ListView(
-                            shrinkWrap: true,
-                            children: _filteredItems.map((e) {
-                              return ListTile(
-                                dense: true,
-                                visualDensity: VisualDensity.compact,
-                                title: Text(
-                                  widget.itemLabel(e),
-                                  style: const TextStyle(fontSize: 12),
-                                ),
-                                onTap: () {
-                                  setState(() {
-                                    _selectedItem = e;
-                                    _filteredItems = widget.items;
-                                  });
-                                  widget.onChanged?.call(e);
-                                  _searchController.clear();
-                                  _closeDropdown();
-                                  widget.onEditingComplete?.call();
-                                },
-                              );
-                            }).toList(),
-                          ),
-                  ),
-                ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
-        ),
-      ],
-    ),
-  );
-}
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -248,12 +251,12 @@ OverlayEntry _createOverlayEntry() {
                       decoration: InputDecoration(
                         hintText: widget.hintText,
                         hintStyle: const TextStyle(fontSize: 12, color: black),
-                        contentPadding:
-                            const EdgeInsets.symmetric(vertical: 0.0, horizontal: 12.0),
+                        contentPadding: const EdgeInsets.symmetric(
+                            vertical: 0.0, horizontal: 12.0),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(2),
-                          borderSide:
-                              const BorderSide(color: Color.fromARGB(76, 0, 0, 0), width: 1.2),
+                          borderSide: const BorderSide(
+                              color: Color.fromARGB(76, 0, 0, 0), width: 1.2),
                         ),
                         suffixIcon: const Icon(Icons.arrow_drop_down, size: 18),
                       ),
@@ -267,14 +270,22 @@ OverlayEntry _createOverlayEntry() {
                   ),
                 ),
               ),
-        
+
               // 🔹 Add (+) button
-              if (widget.addPage != null)
-                IconButton(
-                  icon: const Icon(Icons.add_circle, color: Color(0xFF0B2046), size: 20),
-                  tooltip: widget.addTooltip,
-                  onPressed: _openAddPopup,
-                ),
+
+              widget.addPage != null
+                  ? IconButton(
+                      tooltip: widget.addTooltip,
+                      icon: const Icon(
+                        Icons.add_circle,
+                        color: Color(0xFF0B2046),
+                        size: 20,
+                      ),
+                      onPressed: _openAddPopup,
+                    )
+                  : SizedBox(
+                      width: 35,
+                    )
             ],
           ),
         ),

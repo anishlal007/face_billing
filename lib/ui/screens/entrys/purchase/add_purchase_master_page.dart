@@ -71,7 +71,7 @@ final FocusNode _keyboardFocusNode = FocusNode();
   void _calculateTotalSalesRate() {
     double total = 0.0;
     for (var item in items) {
-    total += double.parse (item.salesRate ?? 0).toDouble();
+    total += item.salesRate ?? 0;
     }
     setState(() {
       _totalSalesRate = total;
@@ -1249,6 +1249,7 @@ Widget build(BuildContext context) {
                         ],
                         rows: List.generate(items.length, (index) {
                           final item = items[index];
+                          print(controllers[index]);
                           final controller = controllers[index];
                           return DataRow(cells: [
                             DataCell(Text(

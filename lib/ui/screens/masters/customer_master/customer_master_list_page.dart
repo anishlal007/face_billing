@@ -1,3 +1,4 @@
+import 'package:facebilling/ui/widgets/EmptyListWidget.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../data/models/customer_master/customer_master_list_model.dart';
@@ -63,18 +64,19 @@ class _CustomerMasterListPageState extends State<CustomerMasterListPage> {
 
     final infos = customerMasterListModel?.info ?? [];
 
-    return ListView.builder(
-      itemCount: infos.length,
+    return EmptyListWidget(
+      items: customerMasterListModel?.info,
+      loading: loading,
+      error: error,
+      emptyMessage: "No customers found!",
+      emptyImage: "assets/watermark.png", // optional
       itemBuilder: (context, index) {
-        final info = infos[index]!;
+        final info = customerMasterListModel!.info![index]!;
         return ListCardWidget(
           title: info.custName ?? "",
-          subtitle: "Code: ${info.custCode.toString() ?? ""}",
-          initials:  "NA",
-          //initials: info.unitId?.substring(0, 2).toUpperCase() ?? "NA",
-          onEdit: () {
-            widget.onEdit(info);
-          },
+          subtitle: "Code: ${info.custCode ?? ""}",
+          initials: "NA",
+          onEdit: () => widget.onEdit(info),
           onDelete: () async {
             final confirm = await showDialog<bool>(
               context: context,
@@ -84,28 +86,25 @@ class _CustomerMasterListPageState extends State<CustomerMasterListPage> {
                     Text("Are you sure you want to delete ${info.custName}?"),
                 actions: [
                   TextButton(
-                    onPressed: () => Navigator.pop(context, false),
-                    child: const Text("Cancel"),
-                  ),
+                      onPressed: () => Navigator.pop(context, false),
+                      child: const Text("Cancel")),
                   TextButton(
-                    onPressed: () => Navigator.pop(context, true),
-                    child: const Text("Delete"),
-                  ),
+                      onPressed: () => Navigator.pop(context, true),
+                      child: const Text("Delete")),
                 ],
               ),
             );
 
             if (confirm == true) {
-              final response = await _service.deleteCustomerMaster(info.custId!);
+              final response =
+                  await _service.deleteCustomerMaster(info.custId!);
               if (response.isSuccess) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text("Deleted ${info.custId}")),
-                );
+                    SnackBar(content: Text("Deleted ${info.custId}")));
                 _loadLocationMaster();
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text("Error: ${response.error}")),
-                );
+                    SnackBar(content: Text("Error: ${response.error}")));
               }
             }
           },

@@ -71,6 +71,8 @@ flutter:
   assets:
     
     - assets/profile.jpg
+    - assets/eye_background.png
+    - assets/watermark.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

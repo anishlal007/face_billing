@@ -177,7 +177,7 @@ setState(() {
             const SizedBox(height: 10,),
             SearchDropdownField<Info>(
               controller: _unitNameController,
-              hintText: "Location State",
+              hintText: "State Name",
               prefixIcon: Icons.search,
               fetchItems: (q) async {
                 final response = await _service.getStateMasterSearch(q);
@@ -224,7 +224,7 @@ setState(() {
         
             CustomTextField(
               title: "Location Code",
-              hintText: "Enter Location Code",
+              hintText: "Location Code",
               controller: _unitIdController,
               prefixIcon: Icons.flag_circle,
               isValidate: true,

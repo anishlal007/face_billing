@@ -9,7 +9,7 @@ import '../../../widgets/list_card_widget.dart';
 
 class UserMasterListPage extends StatefulWidget {
   final bool refreshList;
-  final Function(Info) onEdit;
+  final Function(UserInfo) onEdit;
   const UserMasterListPage({
     super.key,
     required this.refreshList,

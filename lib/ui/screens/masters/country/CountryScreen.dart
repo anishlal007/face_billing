@@ -69,6 +69,7 @@ class _CountryScreenState extends State<CountryScreen> {
     final infos = country?.info ?? [];
 
     if (infos.isEmpty) {
+      
       return const Center(child: Text("No countries found."));
     }
 

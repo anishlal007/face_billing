@@ -80,8 +80,8 @@ class _CustomerMasterPageState extends State<CustomerMasterPage> {
           : Row(
               children: [
                 // Left side: Country list
-            /*    Expanded(
-                  flex: 5,
+                Expanded(
+                  flex: 4,
                   child: Padding(
                     padding: const EdgeInsets.all(18.0),
                     child: CustomerMasterListPage(
@@ -97,10 +97,10 @@ class _CustomerMasterPageState extends State<CustomerMasterPage> {
                 ),
                 const SizedBox(width: 20),
                 Container(color: gray, width: 1),
-                const SizedBox(width: 20),*/
+                const SizedBox(width: 20), 
                 // Right side: Add/Edit form
                 Expanded(
-                  flex: 5,
+                  flex: 6,
                   child: Padding(
                     padding: const EdgeInsets.all(18.0),
                     child: AddCustomerMasterPage(

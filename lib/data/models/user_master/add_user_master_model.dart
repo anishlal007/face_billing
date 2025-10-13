@@ -1,9 +1,9 @@
 class AddUserMasterModel {
-  String? userId;
-  String? userName;
-  String? userPassword;
-  int? userType;
-  int? activeStatus;
+  dynamic userId;
+  dynamic userName;
+  dynamic userPassword;
+  dynamic userType;
+  dynamic activeStatus;
 
   AddUserMasterModel(
       {this.userId,

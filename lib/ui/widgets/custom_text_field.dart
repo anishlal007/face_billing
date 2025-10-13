@@ -16,6 +16,7 @@ class CustomTextField extends StatefulWidget {
   final ValueChanged<String>? onChanged; // ✅ new callback
   final bool isPassword;
   final bool isNumeric;
+  final bool isWhitspace;
   final bool isValidate;
   final String? Function(String?)? validator;
   final bool isEdit;
@@ -25,6 +26,7 @@ class CustomTextField extends StatefulWidget {
     super.key,
     required this.controller,
     this.title,
+    this.isWhitspace = false,
     this.hintText,
     this.prefixIcon,
     this.suffixIcon,
@@ -79,55 +81,66 @@ class _CustomTextFieldState extends State<CustomTextField> {
             ),
           SizedBox(
             height: 30,
-            child: TextField(
-              style:
-                  const TextStyle(fontSize: 12.0, height: 1.0, color: Colors.black),
-              controller: widget.controller,
-              focusNode: widget.focusNode,
-              textInputAction: widget.textInputAction,
-              onEditingComplete: widget.onEditingComplete,
-              obscureText: widget.isPassword ? _obscureText : false,
-              keyboardType:
-                  widget.isNumeric ? TextInputType.number : TextInputType.text,
-              enabled: !widget.isEdit,
-              autofocus: widget.autoFocus,
-
-              // ✅ Combined onChanged functionality
-              onChanged: (value) {
-                if (widget.isValidate) _validate(value);
-                if (widget.onChanged != null) widget.onChanged!(value);
-              },
-
-              // ✅ Allow only numbers if numeric
-              inputFormatters: widget.isNumeric
-                  ? [FilteringTextInputFormatter.digitsOnly]
-                  : [],
-
-              decoration: InputDecoration(
-                hintText: widget.hintText,
-                suffixIcon: widget.isPassword
-                    ? IconButton(
-                        icon: Icon(_obscureText
-                            ? Icons.visibility
-                            : Icons.visibility_off),
-                        onPressed: widget.isEdit
-                            ? null
-                            : () {
-                                setState(() {
-                                  _obscureText = !_obscureText;
-                                });
-                              },
-                      )
-                    : (widget.suffixIcon != null
-                        ? Icon(widget.suffixIcon)
-                        : null),
-                errorText: _errorText,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(2),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    style: const TextStyle(
+                        fontSize: 12.0, height: 1.0, color: Colors.black),
+                    controller: widget.controller,
+                    focusNode: widget.focusNode,
+                    textInputAction: widget.textInputAction,
+                    onEditingComplete: widget.onEditingComplete,
+                    obscureText: widget.isPassword ? _obscureText : false,
+                    keyboardType:
+                        widget.isNumeric ? TextInputType.number : TextInputType.text,
+                    enabled: !widget.isEdit,
+                    autofocus: widget.autoFocus,
+                  
+                    // ✅ Combined onChanged functionality
+                    onChanged: (value) {
+                      if (widget.isValidate) _validate(value);
+                      if (widget.onChanged != null) widget.onChanged!(value);
+                    },
+                  
+                    // ✅ Allow only numbers if numeric
+                    inputFormatters: [
+                      if (widget.isNumeric)
+                        FilteringTextInputFormatter.digitsOnly
+                      else if (widget.isWhitspace)
+                        FilteringTextInputFormatter.deny(
+                            RegExp(r'\s')), // ❌ block all whitespace
+                    ],
+                  
+                    decoration: InputDecoration(
+                      hintText: widget.hintText,
+                      suffixIcon: widget.isPassword
+                          ? IconButton(
+                              icon: Icon(_obscureText
+                                  ? Icons.visibility
+                                  : Icons.visibility_off),
+                              onPressed: widget.isEdit
+                                  ? null
+                                  : () {
+                                      setState(() {
+                                        _obscureText = !_obscureText;
+                                      });
+                                    },
+                            )
+                          : (widget.suffixIcon != null
+                              ? Icon(widget.suffixIcon)
+                              : null),
+                      errorText: _errorText,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                          vertical: 16.0, horizontal: 12.0),
+                    ),
+                  ),
                 ),
-                contentPadding:
-                    const EdgeInsets.symmetric(vertical: 16.0, horizontal: 12.0),
-              ),
+                SizedBox(width: 37,) 
+              ],
             ),
           ),
         ],

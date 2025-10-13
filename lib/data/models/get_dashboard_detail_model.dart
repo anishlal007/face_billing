@@ -1,6 +1,6 @@
 class GetDashboardDetailModel {
   bool? status;
-  String? message;
+  dynamic message;
   Info? info;
 
   GetDashboardDetailModel({this.status, this.message, this.info});
@@ -67,44 +67,44 @@ class Info {
 }
 
 class Purchase {
-  int? purchaseID;
-  String? purchaseNo;
-  String? purchaseDate;
-  String? invoiceNo;
-  String? invoiceDate;
-  String? paymentType;
-  String? supCode;
-  String? supName;
-  String? purchaseOrderNo;
-  String? purchaseOrderDate;
-  String? purchaseTaxableAmount;
-  String? purchaseGstAmount;
-  String? purchaseNetAmount;
-  String? subTotalBeforeDiscount;
-  String? sGSTAmount;
-  String? cGSTAmount;
-  String? iGSTAmount;
-  String? roundOffAmount;
-  String? supDueDays;
-  String? purchaseEntryType;
-  String? purchaseEntryMode;
-  String? paidAmount;
-  String? taxType;
-  String? supGstType;
-  String? createUserCode;
-  String? createDateTime;
-  String? computerName;
-  String? vehicleNo;
-  String? finYearCode;
-  String? coCode;
-  String? purchaseNotes;
-  String? purchaseAccCode;
-  String? purchaseDiscoutPercentage;
-  String? purchaseDiscountValue;
-  String? cashDiscountPercentage;
-  String? cashDiscountValue;
-  String? frieghtChargesAddWithTotal;
-  String? frieghtChargesAddWithoutTotal;
+  dynamic purchaseID;
+  dynamic purchaseNo;
+  dynamic purchaseDate;
+  dynamic invoiceNo;
+  dynamic invoiceDate;
+  dynamic paymentType;
+  dynamic supCode;
+  dynamic supName;
+  dynamic purchaseOrderNo;
+  dynamic purchaseOrderDate;
+  dynamic purchaseTaxableAmount;
+  dynamic purchaseGstAmount;
+  dynamic purchaseNetAmount;
+  dynamic subTotalBeforeDiscount;
+  dynamic sGSTAmount;
+  dynamic cGSTAmount;
+  dynamic iGSTAmount;
+  dynamic roundOffAmount;
+  dynamic supDueDays;
+  dynamic purchaseEntryType;
+  dynamic purchaseEntryMode;
+  dynamic paidAmount;
+  dynamic taxType;
+  dynamic supGstType;
+  dynamic createUserCode;
+  dynamic createDateTime;
+  dynamic computerName;
+  dynamic vehicleNo;
+  dynamic finYearCode;
+  dynamic coCode;
+  dynamic purchaseNotes;
+  dynamic purchaseAccCode;
+  dynamic purchaseDiscoutPercentage;
+  dynamic purchaseDiscountValue;
+  dynamic cashDiscountPercentage;
+  dynamic cashDiscountValue;
+  dynamic frieghtChargesAddWithTotal;
+  dynamic frieghtChargesAddWithoutTotal;
 
   Purchase(
       {this.purchaseID,
@@ -232,8 +232,8 @@ class Purchase {
 }
 
 class Customers {
-  int? activeCustomers;
-  int? inactiveCustomers;
+  dynamic activeCustomers;
+  dynamic inactiveCustomers;
   List<CustomerList>? customerList;
 
   Customers({this.activeCustomers, this.inactiveCustomers, this.customerList});
@@ -262,34 +262,34 @@ class Customers {
 }
 
 class CustomerList {
-  int? custCode;
-  String? custId;
-  String? custName;
-  String? custDOB;
-  String? gender;
-  String? custGroupCode;
-  String? custAreaCode;
-  String? custStateCode;
-  String? custCountryCode;
-  String? custaddress1;
-  String? custAddress2;
-  String? custAddress3;
-  String? custAddress4;
-  String? custAddress5;
-  String? custPinCode;
-  String? custMobileNo;
-  String? custPhoneNo;
-  String? custWhatsappNo;
-  String? custEmailId;
-  String? custPanNo;
-  String? custGSTINNo;
-  String? custGSTType;
-  String? taxIsIncluded;
-  String? custCreatedDate;
-  String? createdUserCode;
-  String? custUpdatedDate;
-  String? updatedUserCode;
-  String? custActiveStatus;
+  dynamic custCode;
+  dynamic custId;
+  dynamic custName;
+  dynamic custDOB;
+  dynamic gender;
+  dynamic custGroupCode;
+  dynamic custAreaCode;
+  dynamic custStateCode;
+  dynamic custCountryCode;
+  dynamic custaddress1;
+  dynamic custAddress2;
+  dynamic custAddress3;
+  dynamic custAddress4;
+  dynamic custAddress5;
+  dynamic custPinCode;
+  dynamic custMobileNo;
+  dynamic custPhoneNo;
+  dynamic custWhatsappNo;
+  dynamic custEmailId;
+  dynamic custPanNo;
+  dynamic custGSTINNo;
+  dynamic custGSTType;
+  dynamic taxIsIncluded;
+  dynamic custCreatedDate;
+  dynamic createdUserCode;
+  dynamic custUpdatedDate;
+  dynamic updatedUserCode;
+  dynamic custActiveStatus;
 
   CustomerList(
       {this.custCode,
@@ -387,8 +387,8 @@ class CustomerList {
 }
 
 class Suppliers {
-  int? activeSuppliers;
-  int? inactiveSuppliers;
+  dynamic activeSuppliers;
+  dynamic inactiveSuppliers;
   List<SuppliersList>? suppliersList;
 
   Suppliers({this.activeSuppliers, this.inactiveSuppliers, this.suppliersList});
@@ -417,33 +417,33 @@ class Suppliers {
 }
 
 class SuppliersList {
-  int? supCode;
-  String? supId;
-  String? supName;
-  String? supGroupCode;
-  String? supAreaCode;
-  String? supStateCode;
-  String? supCountryCode;
-  String? supAddress1;
+  dynamic supCode;
+  dynamic supId;
+  dynamic supName;
+  dynamic supGroupCode;
+  dynamic supAreaCode;
+  dynamic supStateCode;
+  dynamic supCountryCode;
+  dynamic supAddress1;
   Null? supAddress2;
   Null? supAddress3;
   Null? supAddress4;
   Null? supAddress5;
-  String? supPinCode;
-  String? supMobileNo;
+  dynamic supPinCode;
+  dynamic supMobileNo;
   Null? supPhoneNo;
   Null? supWhatsappNo;
-  String? supEmailId;
-  String? supLicenseNo;
-  String? supPanNo;
-  String? supGSTINNo;
-  String? supGSTType;
-  String? taxIsIncluded;
-  String? supCreatedDate;
-  String? createdUserCode;
-  String? suptUpdatedDate;
+  dynamic supEmailId;
+  dynamic supLicenseNo;
+  dynamic supPanNo;
+  dynamic supGSTINNo;
+  dynamic supGSTType;
+  dynamic taxIsIncluded;
+  dynamic supCreatedDate;
+  dynamic createdUserCode;
+  dynamic suptUpdatedDate;
   Null? updatedUserCode;
-  String? supActiveStatus;
+  dynamic supActiveStatus;
 
   SuppliersList(
       {this.supCode,
@@ -538,9 +538,9 @@ class SuppliersList {
 }
 
 class Products {
-  int? pharmaProducts;
-  int? opticalProducts;
-  int? products;
+  dynamic pharmaProducts;
+  dynamic opticalProducts;
+  dynamic products;
 
   Products({this.pharmaProducts, this.opticalProducts, this.products});
 

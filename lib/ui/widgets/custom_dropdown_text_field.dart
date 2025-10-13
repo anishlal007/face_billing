@@ -2,7 +2,6 @@ import 'package:facebilling/core/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-
 class CustomDropdownField<T> extends StatefulWidget {
   final String? title;
   final String? hintText;
@@ -46,7 +45,7 @@ class _CustomDropdownFieldState<T> extends State<CustomDropdownField<T>> {
   final TextEditingController _searchController = TextEditingController();
   List<DropdownMenuItem<T>> _filteredItems = [];
 
-   @override
+  @override
   void initState() {
     super.initState();
     _selectedValue = widget.initialValue;
@@ -170,7 +169,7 @@ class _CustomDropdownFieldState<T> extends State<CustomDropdownField<T>> {
                         ? Icon(widget.prefixIcon, size: 16)
                         : null,
                     hintText: widget.hintText ?? "Select",
-                    hintStyle: const TextStyle(fontSize: 12.0, color: black),
+                    hintStyle: const TextStyle(fontSize: 12.0, color: Color.fromARGB(136, 0, 0, 0)),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(2),
                     ),
@@ -183,27 +182,27 @@ class _CustomDropdownFieldState<T> extends State<CustomDropdownField<T>> {
                     color: black,
                   ),
                   items: _filteredItems,
-                  validator:
-                      widget.isValidate ? widget.validator : (_) => null,
+                  validator: widget.isValidate ? widget.validator : (_) => null,
                   onChanged: widget.isEdit
                       ? null
                       : (value) {
-        setState(() => _selectedValue = value);
+                          setState(() => _selectedValue = value);
 
-        // ✅ Sync dropdown -> controller
-        if (widget.controller != null && value != null) {
-          widget.controller!.text = value.toString();
-        }
+                          // ✅ Sync dropdown -> controller
+                          if (widget.controller != null && value != null) {
+                            widget.controller!.text = value.toString();
+                          }
 
-        widget.onChanged?.call(value);
-        widget.onEditingComplete?.call();
-      },
+                          widget.onChanged?.call(value);
+                          widget.onEditingComplete?.call();
+                        },
                 ),
               ),
 
               // 🔹 Add button (optional)
-              if (widget.addPage != null)
-                IconButton(
+              // if (widget.addPage != null)
+              
+               widget.addPage != null ? IconButton(
                   tooltip: widget.addTooltip,
                   icon: const Icon(
                     Icons.add_circle,
@@ -211,7 +210,7 @@ class _CustomDropdownFieldState<T> extends State<CustomDropdownField<T>> {
                     size: 20,
                   ),
                   onPressed: _openPopup,
-                ),
+                ) : SizedBox(width: 37,)  
             ],
           ),
         ),

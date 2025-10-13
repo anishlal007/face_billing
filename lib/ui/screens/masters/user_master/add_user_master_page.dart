@@ -3,7 +3,6 @@ import 'package:facebilling/data/models/unit/unit_response.dart';
 import 'package:facebilling/data/services/unit_service.dart';
 import 'package:flutter/material.dart';
 
-
 import '../../../../data/models/unit/add_location_master_req.dart';
 import '../../../../data/models/user_master/add_user_master_model.dart';
 import '../../../../data/models/user_master/user_master_list_model.dart';
@@ -15,7 +14,7 @@ import '../../../widgets/gradient_button.dart';
 import '../../../widgets/search_dropdown_field.dart';
 
 class AddUserMasterPage extends StatefulWidget {
-  final Info? unitInfo;
+  final UserInfo? unitInfo;
   final Function(bool success) onSaved;
   const AddUserMasterPage({
     super.key,
@@ -30,7 +29,7 @@ class AddUserMasterPage extends StatefulWidget {
 class _AddUserMasterPageState extends State<AddUserMasterPage> {
   final _formKey = GlobalKey<FormState>();
   final UserMasterService _service = UserMasterService();
-  bool _isEditMode = false; 
+  bool _isEditMode = false;
   bool _activeStatus = true;
   bool _loading = false;
   String? _message;
@@ -54,7 +53,7 @@ class _AddUserMasterPageState extends State<AddUserMasterPage> {
     // _createdUserController = TextEditingController(
     //     text: widget.countryInfo?.createdUserCode?.toString() ?? userId.value!);
     _activeStatus = (widget.unitInfo?.activeStatus ?? 1) == 1;
-       _isEditMode = widget.unitInfo != null;
+    _isEditMode = widget.unitInfo != null;
   }
 
   @override
@@ -75,14 +74,14 @@ class _AddUserMasterPageState extends State<AddUserMasterPage> {
       _loading = true;
       _message = null;
     });
-     final request = AddUserMasterModel(
-  userName: _unitNameController.text.trim(),
-    // current timestamp
-  activeStatus: _activeStatus ? 1 : 0,
-);
-print("request");
-print(request.toJson());
-      if (_isEditMode && widget.unitInfo != null) {
+    final request = AddUserMasterModel(
+      userName: _unitNameController.text.trim(),
+      // current timestamp
+      activeStatus: _activeStatus ? 1 : 0,
+    );
+    print("request");
+    print(request.toJson());
+    if (_isEditMode && widget.unitInfo != null) {
       // EDIT mode
       final response = await _service.updateUserMaster(
         widget.unitInfo!.userCode!,
@@ -97,14 +96,14 @@ print(request.toJson());
   }
 
   void _handleResponse(bool success, String? error) {
-    if(success){
-setState(() {
-   _unitNameController.clear();
-   _unitIdController.clear();
-      _loading = false;
-      _message = success ? "Saved successfully!" : error;
-    });
-    if (success) widget.onSaved(true);
+    if (success) {
+      setState(() {
+        _unitNameController.clear();
+        _unitIdController.clear();
+        _loading = false;
+        _message = success ? "Saved successfully!" : error;
+      });
+      if (success) widget.onSaved(true);
     }
   }
 
@@ -117,7 +116,7 @@ setState(() {
       // _createdUserController.text =
       //     widget.countryInfo?.createdUserCode?.toString() ?? userId.value!;
       _activeStatus = (widget.unitInfo?.activeStatus ?? 1) == 1;
-       _isEditMode = widget.unitInfo != null;
+      _isEditMode = widget.unitInfo != null;
     }
   }
 
@@ -132,7 +131,7 @@ setState(() {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            SearchDropdownField<Info>(
+            SearchDropdownField<UserInfo>(
               controller: _unitNameController,
               hintText: "User Name",
               prefixIcon: Icons.search,
@@ -140,29 +139,28 @@ setState(() {
                 final response = await _service.getUserMasterSearch(q);
                 if (response.isSuccess) {
                   return (response.data?.info ?? [])
-                      .whereType<Info>()
+                      .whereType<UserInfo>()
                       .toList();
                 }
                 return [];
               },
               displayString: (unit) => unit.userName ?? "",
               onSelected: (country) {
-                if(country != null){
-  setState(() {
-                  _unitIdController.text = country.userCode.toString() ?? "";
-                  _unitNameController.text = country.userName ?? "";
-                  // _createdUserController.text =
-                  //     country.createdUserCode?.toString() ?? userId.value!;
-                  _activeStatus = (country.activeStatus ?? 1) == 1;
-                     _isEditMode = true;
-                });
+                if (country != null) {
+                  setState(() {
+                    _unitIdController.text = country.userCode.toString() ?? "";
+                    _unitNameController.text = country.userName ?? "";
+                    // _createdUserController.text =
+                    //     country.createdUserCode?.toString() ?? userId.value!;
+                    _activeStatus = (country.activeStatus ?? 1) == 1;
+                    _isEditMode = true;
+                  });
 
-                // ✅ Switch form into "Update mode"
-                widget.onSaved(false);
+                  // ✅ Switch form into "Update mode"
+                  widget.onSaved(false);
                 }
-              
               },
-                 onSubmitted: (typedValue) {
+              onSubmitted: (typedValue) {
                 setState(() {
                   _unitIdController.clear();
                   _unitNameController.text = typedValue;
@@ -218,7 +216,7 @@ setState(() {
             //     // FocusScope.of(context).requestFocus(_createdUserFocus);
             //   },
             // ),
-            
+
             const SizedBox(height: 16),
             // CustomTextField(
             //   title: "Create User",

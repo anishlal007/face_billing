@@ -32,12 +32,14 @@ class _AddSupplierMasterPageState extends State<AddSupplierMasterPage> {
   final _formKey = GlobalKey<FormState>();
   final SupplierMasterService _service = SupplierMasterService();
   final GetAllMasterService _getAllMasterService = GetAllMasterService();
-  int? _areaCode, _cityCode, _stateCode, _countryCode, _subGrpCode,_taxCode;
-  bool _activeStatus = true,_isTaxInclusive=true;
+  int? _areaCode, _cityCode, _stateCode, _countryCode, _subGrpCode;
+  bool _activeStatus = true,_isTaxInclusive=false;
   bool _loading = false;
   String? _message;
   bool _getAllLoading = true;
 
+  int _taxOption = 1;
+  int? _taxCode = 1;
 
   late TextEditingController _unitIdController;
   late TextEditingController _unitNameController;
@@ -361,9 +363,12 @@ void _handleResponse(bool success, String? error) {
                       controller: _suppIdController,
                       prefixIcon: Icons.flag_circle,
                       isValidate: true,
-                      validator: (value) => value == null || value.isEmpty
-                          ? "Enter Supplier ID"
-                          : null,
+                      isWhitspace: true,
+                      //  validator: (value) {
+                      //     if (value == null || value.isEmpty) return "Enter Supplier ID";
+                      //     if (value.contains(' ')) return "Spaces are not allowed";
+                      //     return null;
+                      //   },
                       focusNode: _suppIdFocus,
                       textInputAction: TextInputAction.next,
                       onEditingComplete: () => _fieldFocusChange(
@@ -378,9 +383,9 @@ void _handleResponse(bool success, String? error) {
                       controller: _suppNameController,
                       prefixIcon: Icons.flag,
                       isValidate: true,
-                      validator: (value) => value == null || value.isEmpty
-                          ? "Enter Supplier Name"
-                          : null,
+                      // validator: (value) => value == null || value.isEmpty
+                      //     ? "Enter Supplier Name"
+                      //     : null,
                       focusNode: _suppNameFocus,
                       textInputAction: TextInputAction.next,
                       onEditingComplete: () => _fieldFocusChange(
@@ -549,9 +554,9 @@ void _handleResponse(bool success, String? error) {
                       hintText: "Enter Supplier Address",
                       controller: _suppAddress1Controller,
                       isValidate: true,
-                      validator: (value) => value == null || value.isEmpty
-                          ? "Enter Supplier Address"
-                          : null,
+                      // validator: (value) => value == null || value.isEmpty
+                      //     ? "Enter Supplier Address"
+                      //     : null,
                       focusNode: _suppAddress1Focus,
                       textInputAction: TextInputAction.next,
                       onEditingComplete: () => _fieldFocusChange(
@@ -568,9 +573,9 @@ void _handleResponse(bool success, String? error) {
                       hintText: "Enter Supplier Pin Code",
                       controller: _supppinCodeController,
                       isValidate: true,
-                      validator: (value) => value == null || value.isEmpty
-                          ? "Enter Supplier Pin Code"
-                          : null,
+                      // validator: (value) => value == null || value.isEmpty
+                      //     ? "Enter Supplier Pin Code"
+                      //     : null,
                       focusNode: _pinCodeFocus,
                       textInputAction: TextInputAction.next,
                       onEditingComplete: () => _fieldFocusChange(
@@ -586,9 +591,9 @@ void _handleResponse(bool success, String? error) {
                       hintText: "Enter Supplier Mobile Number",
                       controller: _suppMobileController,
                       isValidate: true,
-                      validator: (value) => value == null || value.isEmpty
-                          ? "Enter Supplier Mobile Number"
-                          : null,
+                      // validator: (value) => value == null || value.isEmpty
+                      //     ? "Enter Supplier Mobile Number"
+                      //     : null,
                       focusNode: _compMobileFocus,
                       textInputAction: TextInputAction.next,
                       onEditingComplete: () => _fieldFocusChange(
@@ -605,9 +610,9 @@ void _handleResponse(bool success, String? error) {
                       hintText: "Enter Supplier Email ID",
                       controller: _suppMailIdController,
                       isValidate: true,
-                      validator: (value) => value == null || value.isEmpty
-                          ? "Enter Supplier Email ID"
-                          : null,
+                      // validator: (value) => value == null || value.isEmpty
+                      //     ? "Enter Supplier Email ID"
+                      //     : null,
                       focusNode: _compMailIdFocus,
                       textInputAction: TextInputAction.next,
                       onEditingComplete: () => _fieldFocusChange(
@@ -623,9 +628,9 @@ void _handleResponse(bool success, String? error) {
                       hintText: "Enter Supplier GST Number",
                       controller: _suppGstNoController,
                       isValidate: true,
-                      validator: (value) => value == null || value.isEmpty
-                          ? "Enter Supplier GST Number"
-                          : null,
+                      // validator: (value) => value == null || value.isEmpty
+                      //     ? "Enter Supplier GST Number"
+                      //     : null,
                       focusNode: _compGstNoFocus,
                       textInputAction: TextInputAction.next,
                       onEditingComplete: () => _fieldFocusChange(
@@ -640,9 +645,9 @@ void _handleResponse(bool success, String? error) {
                       hintText: "Enter Supplier License Number",
                       controller: _suppLicenseNoController,
                       isValidate: true,
-                      validator: (value) => value == null || value.isEmpty
-                          ? "Enter Supplier License Number"
-                          : null,
+                      // validator: (value) => value == null || value.isEmpty
+                      //     ? "Enter Supplier License Number"
+                      //     : null,
                       focusNode: _compLicenseNoFocus,
                       textInputAction: TextInputAction.next,
                       onEditingComplete: () => _fieldFocusChange(
@@ -661,9 +666,9 @@ void _handleResponse(bool success, String? error) {
                       hintText: "Enter Supplier PAN Number",
                       controller: _suppPanNoController,
                       isValidate: true,
-                      validator: (value) => value == null || value.isEmpty
-                          ? "Enter Company PAN Number"
-                          : null,
+                      // validator: (value) => value == null || value.isEmpty
+                      //     ? "Enter Company PAN Number"
+                      //     : null,
                       focusNode: _compPanNoFocus,
                       textInputAction: TextInputAction.next,
                       onEditingComplete: () => _fieldFocusChange(
@@ -671,39 +676,60 @@ void _handleResponse(bool success, String? error) {
                       autoFocus: true,
                     ),
                   ),
-
-                  SizedBox(
-                    width: constraints.maxWidth / columns - 20,
+ SizedBox(
+                    width: constraints.maxWidth / columns - 30,
                     child: CustomDropdownField<int>(
                       title: "Select GST Type",
-                      hintText: "Choose the GST Type",
-                      items: getAllMasterListModel!.info!.taxMasters!
-                          .map((e) => DropdownMenuItem<int>(
-                        value: e.taxCode, // 🔹 use taxCode as value
-                        child:
-                        Text("${e.taxName} (${e.taxPercentage}%)"),
-                      ))
-                          .toList(),
-                      // initialValue: _taxCode, // int? taxCode
-                      onChanged: (value) {
-                        setState(() {
-                          _taxCode = value;
-                          //  _taxCode = value;
-                        });
-
-                        final selected = getAllMasterListModel!
-                            .info!.taxMasters!
-                            .firstWhere((c) => c.taxCode == value,
-                            orElse: () => master.TaxMasters());
-
-                        print("Selected GST %: ${selected.taxPercentage}");
-                        print("Selected TAX Code: ${selected.taxCode}");
+                      hintText: "Select GST Type",
+                      items: const [
+                        DropdownMenuItem(value: 0, child: Text("NoTax")),
+                        DropdownMenuItem(value: 1, child: Text("SGST")),
+                        DropdownMenuItem(value: 2, child: Text("IGST")),
+                      ],
+                      // controller: productTypeController,
+                      initialValue: _taxCode,
+                      onChanged: (val) {
+                        setState(() => _taxCode = val ?? 0);
                       },
-                      isValidate: true,
-                      validator: (value) =>
-                      value == null ? "Please select a GST" : null,
+                      // focusNode: _itemTypeFocus,
+                      onEditingComplete: () {
+                        // _fieldFocusChange(
+                        //     context, _itemTypeFocus, _itemGroupFocus);
+                      },
                     ),
                   ),
+                  // SizedBox(
+                  //   width: constraints.maxWidth / columns - 20,
+                  //   child: CustomDropdownField<int>(
+                  //     title: "Select GST Type",
+                  //     hintText: "Choose the GST Type",
+                  //     items: getAllMasterListModel!.info!.taxMasters!
+                  //         .map((e) => DropdownMenuItem<int>(
+                  //       value: e.taxCode, // 🔹 use taxCode as value
+                  //       child:
+                  //       Text("${e.taxName} (${e.taxPercentage}%)"),
+                  //     ))
+                  //         .toList(),
+                  //     // initialValue: _taxCode, // int? taxCode
+                  //     onChanged: (value) {
+                  //       setState(() {
+                  //         _taxCode = value;
+                  //         //  _taxCode = value;
+                  //       });
+
+                  //       final selected = getAllMasterListModel!
+                  //           .info!.taxMasters!
+                  //           .firstWhere((c) => c.taxCode == value,
+                  //           orElse: () => master.TaxMasters());
+
+                  //       print("Selected GST %: ${selected.taxPercentage}");
+                  //       print("Selected TAX Code: ${selected.taxCode}");
+                  //     },
+                  //     isValidate: true,
+                  //     validator: (value) =>
+                  //     value == null ? "Please select a GST" : null,
+                  //   ),
+                  // ),
 
 
 
@@ -719,8 +745,7 @@ void _handleResponse(bool success, String? error) {
                       onEditingComplete: _submit,
                     ),
                   ),
-
-                  SizedBox(
+SizedBox(
                     width: constraints.maxWidth,
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -729,18 +754,81 @@ void _handleResponse(bool success, String? error) {
                         SizedBox(
                           width: 10,
                         ),
-                        CustomSwitch(
-                          value: _isTaxInclusive,
-                          title: "Active Status",
-                          onChanged: (val) {
-                            setState(() {
-                              _isTaxInclusive = val;
-                            });
-                          },
+
+                        Row(
+                          children: [
+                            Radio<int>(
+                              value: 0,
+                              groupValue: _taxOption,
+                              onChanged: (value) {
+                                setState(() {
+                                  _taxOption = value!;
+                                  _isTaxInclusive = false!;
+                                });
+                              },
+                            ),
+                            const Text('Included'),
+                            const SizedBox(width: 20),
+                            Radio<int>(
+                              value: 1,
+                              groupValue: _taxOption,
+                              onChanged: (value) {
+                                setState(() {
+                                  _taxOption = value!;
+                                  _isTaxInclusive = true!;
+                                });
+                              },
+                            ),
+                            const Text('Excluded'),
+                          ],
                         ),
+                        // CustomSwitch(
+                        //   value: _isTaxInclusive,
+                        //   title: "Active Status",
+                        //   onChanged: (val) {
+                        //     setState(() {
+                        //       _isTaxInclusive = val;
+                        //     });
+                        //   },
+                        // ),
                       ],
                     ),
                   ),
+                  // SizedBox(
+                  //   width: constraints.maxWidth,
+                  //   child: Row(
+                  //     crossAxisAlignment: CrossAxisAlignment.center,
+                  //     children: [
+                  //       Text("Is Tax Inclusive"),
+                  //       SizedBox(
+                  //         width: 10,
+                  //       ),
+                  //        CustomSwitch(
+                  //                 value: _isTaxInclusive,
+                  //                 title: "Inclusive",
+                  //                 onText: "Inclusive",
+                  //                 offText: "ExClusive",
+                  //                 activecolor: const Color.fromARGB(255, 34, 1, 115),
+                  //                 inactiveColor: Colors.blue,
+                  //                 onChanged: (val) async {
+                  //                   setState(() {
+                  //                     _isTaxInclusive = val;
+                  //                   });
+ 
+                  //                 },
+                  //               ),
+                  //       // CustomSwitch(
+                  //       //   value: _isTaxInclusive,
+                  //       //   title: "Active Status",
+                  //       //   onChanged: (val) {
+                  //       //     setState(() {
+                  //       //       _isTaxInclusive = val;
+                  //       //     });
+                  //       //   },
+                  //       // ),
+                  //     ],
+                  //   ),
+                  // ),
 
 
                   const SizedBox(height: 16),

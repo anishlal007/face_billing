@@ -72,11 +72,11 @@ class _DashboardPageState extends State<DashboardPage> {
 
     return Scaffold(
       backgroundColor: white,
-      appBar: AppBar(
-         backgroundColor: white,
-        scrolledUnderElevation: 0,
-        title: Text(widget.title),
-      ),
+      // appBar: AppBar(
+      //    backgroundColor: white,
+      //   scrolledUnderElevation: 0,
+      //   title: Text(widget.title),
+      // ),
       body: Padding(
         padding: const EdgeInsets.all(12.0),
         child: isMobile

@@ -10,6 +10,9 @@ class HomeBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      decoration: BoxDecoration(
+        border: Border.all(width: 1,color: black), 
+      ),
       color: lightgray,
       child: page,
     );

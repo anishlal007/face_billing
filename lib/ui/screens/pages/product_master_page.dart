@@ -1,3 +1,4 @@
+import 'package:facebilling/ui/screens/pages/product_list_master_master.dart';
 import 'package:flutter/material.dart';
 
 import '../../../core/colors.dart';
@@ -98,10 +99,57 @@ class _ProductMasterPageState extends State<ProductMasterPage> {
 
 //       ],
 //     ),
-      body: AddProductMasterPage(
-        unitInfo: editingUnit,
-        onSaved: _onSaved,
-      ),
+      body:  isMobile
+          ? Padding(
+              padding: const EdgeInsets.all(18.0),
+              child: ProductListMasterMaster(
+                refreshList: refreshList,
+                onEdit: (country) {
+                  _showAddEditBottomSheet(
+                      country as Info?); // ✅ open bottom sheet for edit
+                },
+              ),
+            )
+          : Row(
+              children: [
+                // Left side: Country list
+                Expanded(
+                  flex: 5,
+                  child: Padding(
+                    padding: const EdgeInsets.all(18.0),
+                    child:  AddProductMasterPage(
+                      unitInfo: editingUnit,
+                      onSaved: _onSaved,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 20),
+                Container(color: gray, width: 1),
+                const SizedBox(width: 20),
+                // Right side: Add/Edit form
+                Expanded(
+                  flex: 5,
+                  child: Padding(
+                    padding: const EdgeInsets.all(18.0),
+                    child:  ProductListMasterMaster(
+                      refreshList: refreshList,
+                      onEdit: (country) {
+                        setState(() {
+                          editingUnit = country;
+                          refreshList = false;
+                        });
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ),
+      
+      // ProductListMasterMaster()
+      //  AddProductMasterPage(
+      //   unitInfo: editingUnit,
+      //   onSaved: _onSaved,
+      // ),
     );
 
     //   isMobile

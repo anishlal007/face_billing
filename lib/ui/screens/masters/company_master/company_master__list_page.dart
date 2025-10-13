@@ -1,3 +1,4 @@
+import 'package:facebilling/ui/widgets/EmptyStateWidget.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../data/models/company_master/company_master_list_model.dart';
@@ -63,19 +64,23 @@ class _CompanyMasterListPageState extends State<CompanyMasterListPage> {
     if (error != null) return Center(child: Text("Error: $error"));
 
     final infos = companyMasterListModel?.info ?? [];
+    if (infos.isEmpty) {
+      return const EmptyStateWidget(
+        message: "No Company Data Available",
+        imagePath: "assets/images/watermark.png", // optional image
+      );
+    }
 
     return ListView.builder(
       itemCount: infos.length,
       itemBuilder: (context, index) {
-        final info = infos[index]!;
+        final info = infos[index];
+
         return ListCardWidget(
           title: info.coName ?? "",
           subtitle: "Code: ${info.coCode.toString() ?? ""}",
-          initials:  "NA",
-          //initials: info.unitId?.substring(0, 2).toUpperCase() ?? "NA",
-          onEdit: () {
-            widget.onEdit(info);
-          },
+          initials: "NA",
+          onEdit: () => widget.onEdit(info),
           onDelete: () async {
             final confirm = await showDialog<bool>(
               context: context,
@@ -97,7 +102,8 @@ class _CompanyMasterListPageState extends State<CompanyMasterListPage> {
             );
 
             if (confirm == true) {
-              final response = await _service.deleteComapanyMaster(info.coCode!);
+              final response =
+                  await _service.deleteComapanyMaster(info.coCode!);
               if (response.isSuccess) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text("Deleted ${info.coCode}")),

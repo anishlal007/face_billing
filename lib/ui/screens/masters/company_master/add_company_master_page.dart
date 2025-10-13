@@ -918,7 +918,7 @@ class _AddCompanyMasterPageState extends State<AddCompanyMasterPage> {
                     const CircularProgressIndicator()
                   else
                     GradientButton(
-                        text: isEdit ? "Update Company" : "Add Company",
+                        text: "Update Company" ,
                         onPressed: _submit),
                   if (_message != null) ...[
                     const SizedBox(height: 16),

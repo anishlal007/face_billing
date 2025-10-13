@@ -1,0 +1,14 @@
+# Target labels
+ pdfium-download
+# Source files and their labels
+C:/Users/AK/Desktop/flutter git/face billing/face_billing/build/windows/x64/pdfium-download/CMakeFiles/pdfium-download
+C:/Users/AK/Desktop/flutter git/face billing/face_billing/build/windows/x64/pdfium-download/CMakeFiles/1ddf60ebc463dbfd59fafbd000a62568/pdfium-download.rule
+C:/Users/AK/Desktop/flutter git/face billing/face_billing/build/windows/x64/pdfium-download/CMakeFiles/254811fcf16e3eb015a47ae1e7d926d2/pdfium-download-complete.rule
+C:/Users/AK/Desktop/flutter git/face billing/face_billing/build/windows/x64/pdfium-download/CMakeFiles/84fa5ad8e7f641d7fb384caedcc43d6a/pdfium-download-build.rule
+C:/Users/AK/Desktop/flutter git/face billing/face_billing/build/windows/x64/pdfium-download/CMakeFiles/84fa5ad8e7f641d7fb384caedcc43d6a/pdfium-download-configure.rule
+C:/Users/AK/Desktop/flutter git/face billing/face_billing/build/windows/x64/pdfium-download/CMakeFiles/84fa5ad8e7f641d7fb384caedcc43d6a/pdfium-download-download.rule
+C:/Users/AK/Desktop/flutter git/face billing/face_billing/build/windows/x64/pdfium-download/CMakeFiles/84fa5ad8e7f641d7fb384caedcc43d6a/pdfium-download-install.rule
+C:/Users/AK/Desktop/flutter git/face billing/face_billing/build/windows/x64/pdfium-download/CMakeFiles/84fa5ad8e7f641d7fb384caedcc43d6a/pdfium-download-mkdir.rule
+C:/Users/AK/Desktop/flutter git/face billing/face_billing/build/windows/x64/pdfium-download/CMakeFiles/84fa5ad8e7f641d7fb384caedcc43d6a/pdfium-download-patch.rule
+C:/Users/AK/Desktop/flutter git/face billing/face_billing/build/windows/x64/pdfium-download/CMakeFiles/84fa5ad8e7f641d7fb384caedcc43d6a/pdfium-download-test.rule
+C:/Users/AK/Desktop/flutter git/face billing/face_billing/build/windows/x64/pdfium-download/CMakeFiles/84fa5ad8e7f641d7fb384caedcc43d6a/pdfium-download-update.rule

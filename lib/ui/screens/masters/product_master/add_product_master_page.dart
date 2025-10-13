@@ -12,7 +12,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../data/models/get_all_master_list_model.dart' as master;
 //import '../../../../data/models/tax_master/tax_master_list_model.dart'  as tax;
-import '../../../../data/models/get_serial_no_model.dart'as serialno;
+import '../../../../data/models/get_serial_no_model.dart' as serialno;
 import '../../../../data/models/product/add_product_request.dart';
 import '../../../../data/models/product/product_master_list_model.dart';
 import '../../../../data/services/get_all_master_service.dart';
@@ -29,7 +29,6 @@ import '../../../widgets/image_pickerField.dart';
 import '../../../widgets/search_dropdown.dart';
 import '../../../widgets/search_dropdown_field.dart';
 
-
 class AddProductMasterPage extends StatefulWidget {
   final Info? unitInfo;
   final Function(bool success) onSaved;
@@ -44,33 +43,37 @@ class AddProductMasterPage extends StatefulWidget {
 }
 
 class _AddProductMasterPageState extends State<AddProductMasterPage> {
-  final _formKey = GlobalKey<FormState>(); 
- 
-
+  final _formKey = GlobalKey<FormState>();
 
   ///services
   final ProductService _service = ProductService();
   final GetAllMasterService _getAllMasterService = GetAllMasterService();
-    final GetSerialNoServices _getSerialservice = GetSerialNoServices();
-    
-  int? _hsntaxCode, _gsttaxCode, _itemGroup, _itemUnit, _itemMake, _itemGeneric, _unitCode;
-  bool _activeStatus = true;
-  bool _itemIdType = false;        
-bool _isItemIdEditable = true;  
+  final GetSerialNoServices _getSerialservice = GetSerialNoServices();
 
-  bool _ismfgreatured = true;
+  int? _hsntaxCode,
+      _gsttaxCode,
+      _itemGroup,
+      _itemUnit,
+      _itemMake,
+      _itemGeneric,
+      _unitCode;
+  bool _activeStatus = true;
+  bool _itemIdType = false;
+  bool _isItemIdEditable = true;
+
+  bool _ismfgreatured = false;
   bool _loading = false;
-  bool _nonScheduledItem = true,
-      _scheduledItem = true,
-      _expiryRequired = true,
+  bool _nonScheduledItem = false,
+      _scheduledItem = false,
+      _expiryRequired = false,
       _isNarocotic = false,
-      _isBatchNumbeRequired = true,
+      _isBatchNumbeRequired = false,
       _isDiscountReq = false;
   String? _message;
   bool _getAllLoading = true;
   bool _serailNoLoding = true;
   File? _image;
-  int? selectedPaymentType  = 0;
+  int? selectedPaymentType = 0;
   int? priceTakenFrom = 0;
   int? selectedExpiryType;
   String? error;
@@ -78,18 +81,19 @@ bool _isItemIdEditable = true;
 
   master.ItemGroups? _selectedItemGroup;
   master.ItemMakes? _selectItemMake;
-   master.HsnMasters? _selectHSN;
-   master.TaxMasters? _selectgst;
-String? groumName ;
+  master.HsnMasters? _selectHSN;
+  master.TaxMasters? _selectgst;
+  String? groumName;
 
   ///model
-serialno.GetSerialNoModel?serialNo;
+  serialno.GetSerialNoModel? serialNo;
   master.GetAllMasterListModel? getAllMasterListModel;
   late TextEditingController _itemIdController;
   late TextEditingController _itemNameController;
   final TextEditingController productTypeController = TextEditingController();
   final TextEditingController itemgroupController = TextEditingController();
-  final TextEditingController pricetakenfromController = TextEditingController();
+  final TextEditingController pricetakenfromController =
+      TextEditingController();
 
   late TextEditingController _itemTypeController;
   late TextEditingController _itemGroupCodeController;
@@ -105,7 +109,7 @@ serialno.GetSerialNoModel?serialNo;
   late TextEditingController _subQtyController;
   late TextEditingController _subUnitsController;
   late TextEditingController _subQtyFormatController;
-  
+
   late TextEditingController _formaldigitController;
   late TextEditingController _batchNoRequiredController;
   late TextEditingController _minimumStockQtyController;
@@ -190,7 +194,7 @@ serialno.GetSerialNoModel?serialNo;
         TextEditingController(text: widget.unitInfo?.expiryDateRequired ?? "");
     _subUnitCodeController = TextEditingController(
         text: widget.unitInfo?.subUnitCode?.toString() ?? "");
-        _formaldigitController = TextEditingController();
+    _formaldigitController = TextEditingController();
     _subQtyFormatController = TextEditingController(
         text: widget.unitInfo?.subQtyFormalDigits?.toString() ?? "");
     _subQtyController =
@@ -229,115 +233,117 @@ serialno.GetSerialNoModel?serialNo;
 
     _activeStatus = (widget.unitInfo?.createdUserCode ?? 1) == 1;
   }
-Future<void> _loadList() async {
-  setState(() {
-    _getAllLoading = true;
-    error = null; // separate error for master list
-    serialError = null;     // separate error for serial number
-  });
 
-  // 1️⃣ Load master list
-  try {
-    final response = await _getAllMasterService.getAllMasterService();
-    if (response.isSuccess && response.data != null) {
-      setState(() {
-        getAllMasterListModel = response.data!;
-        error = null;
-      });
-    } else {
+  Future<void> _loadList() async {
+    setState(() {
+      _getAllLoading = true;
+      error = null; // separate error for master list
+      serialError = null; // separate error for serial number
+    });
+
+    // 1️⃣ Load master list
+    try {
+      final response = await _getAllMasterService.getAllMasterService();
+      if (response.isSuccess && response.data != null) {
+        setState(() {
+          getAllMasterListModel = response.data!;
+          error = null;
+        });
+      } else {
+        setState(() {
+          getAllMasterListModel = null;
+          error = response.error ?? "Failed to load master list";
+        });
+      }
+    } catch (e) {
       setState(() {
         getAllMasterListModel = null;
-        error = response.error ?? "Failed to load master list";
+        error = "Error fetching master list: $e";
       });
     }
-  } catch (e) {
-    setState(() {
-      getAllMasterListModel = null;
-      error = "Error fetching master list: $e";
-    });
-  }
 
-  // 2️⃣ Load serial number
-  try {
-    final serialNoResponse = await _getSerialservice.getSerialNo();
-    if (serialNoResponse.isSuccess) {
-      final serialData = serialNoResponse.data;
-      if (serialData != null && serialData.info != null) {
-        setState(() {
-          serialNo = serialData;
-          _itemIdController.text = serialNo!.info!.productNextId ?? "";
-          serialError = null;
-        });
+    // 2️⃣ Load serial number
+    try {
+      final serialNoResponse = await _getSerialservice.getSerialNo();
+      if (serialNoResponse.isSuccess) {
+        final serialData = serialNoResponse.data;
+        if (serialData != null && serialData.info != null) {
+          setState(() {
+            serialNo = serialData;
+            // _itemIdController.text = serialNo!.info!.productNextId ?? "";
+            serialError = null;
+          });
+        } else {
+          setState(() {
+            serialNo = null;
+            _itemIdController.clear();
+            serialError = "Number initialization record not found";
+          });
+        }
       } else {
         setState(() {
           serialNo = null;
           _itemIdController.clear();
-          serialError = "Number initialization record not found";
+          serialError =
+              serialNoResponse.error ?? "Failed to fetch serial number";
         });
       }
-    } else {
+    } catch (e) {
       setState(() {
         serialNo = null;
         _itemIdController.clear();
-        serialError = serialNoResponse.error ?? "Failed to fetch serial number";
+        serialError = "Error fetching serial number: $e";
       });
     }
-  } catch (e) {
+
     setState(() {
-      serialNo = null;
-      _itemIdController.clear();
-      serialError = "Error fetching serial number: $e";
+      _getAllLoading = false;
     });
   }
 
-  setState(() {
-    _getAllLoading = false;
-  });
-}
+  Future<void> _loadSerialNumber() async {
+    setState(() {
+      serialError = null;
+      _serailNoLoding = true;
+    });
 
-
-Future<void> _loadSerialNumber() async {
-  setState(() {
-    serialError = null;
-    _serailNoLoding = true;
-  });
-
-  try {
-    final serialNoResponse = await _getSerialservice.getSerialNo();
-    if (serialNoResponse.isSuccess) {
-      final serialData = serialNoResponse.data;
-      if (serialData != null && serialData.info != null) {
-        setState(() {
-          serialNo = serialData;
-          _itemIdController.text = serialNo!.info!.productNextId ?? "";
-          serialError = null;
-        });
+    try {
+      final serialNoResponse = await _getSerialservice.getSerialNo();
+      if (serialNoResponse.isSuccess) {
+        final serialData = serialNoResponse.data;
+        if (serialData != null && serialData.info != null) {
+          setState(() {
+            serialNo = serialData;
+            _itemIdController.text = serialNo!.info!.productNextId ?? "";
+            serialError = null;
+          });
+        } else {
+          setState(() {
+            serialNo = null;
+            _itemIdController.clear();
+            serialError = "Number initialization record not found";
+          });
+        }
       } else {
         setState(() {
           serialNo = null;
           _itemIdController.clear();
-          serialError = "Number initialization record not found";
+          serialError =
+              serialNoResponse.error ?? "Failed to fetch serial number";
         });
       }
-    } else {
+    } catch (e) {
       setState(() {
         serialNo = null;
         _itemIdController.clear();
-        serialError = serialNoResponse.error ?? "Failed to fetch serial number";
+        serialError = "Error fetching serial number: $e";
       });
     }
-  } catch (e) {
+
     setState(() {
-      serialNo = null;
-      _itemIdController.clear();
-      serialError = "Error fetching serial number: $e";
+      _serailNoLoding = false;
     });
   }
-
-  setState(() {
-    _serailNoLoding = false;
-  });
-}
 //   Future<void> _loadList() async {
 //   final response = await _getAllMasterService.getAllMasterService();
 //   if (response.isSuccess) {
@@ -368,7 +374,6 @@ Future<void> _loadSerialNumber() async {
 //     });
 //   }
 // }
-
 
   @override
   void dispose() {
@@ -440,138 +445,140 @@ Future<void> _loadSerialNumber() async {
   }
 
   Future<void> _submit() async {
-  if (!_formKey.currentState!.validate()) return;
+    if (!_formKey.currentState!.validate()) return;
 
-  setState(() {
-    _loading = true;
-    _message = null;
-  });
+    setState(() {
+      _loading = true;
+      _message = null;
+    });
 
-  try {
-    if (widget.unitInfo == null) {
-      // ADD mode
-      final request = AddProductMasterModel(
-        idtype:_itemIdController.text, 
-        itemID: _itemIdController.text.trim(),
-        itemName: _itemNameController.text.trim(),
-        itemType: selectedPaymentType,
-        itemGroupCode: _itemGroup,
-        itemUnitCode: _unitCode,
-        itemMakeCode: _itemMake,
-        itemGenericCode: "1", //int.tryParse(_itemGenericCodeController.text.trim()),
-        nonScheduleItem: _nonScheduledItem ? 0 : 1,
-        scheduledH1Item: _nonScheduledItem ? 1 : 0,
-        narcoticItem: _isNarocotic ? 1 : 0,
-        expiryDateRequired: _expiryRequired ? "1" : "0",
-        expiryDateFormat:selectedExpiryType.toString(),
-        subUnitCode: _unitCode,
-        subQty: int.tryParse(_subQtyController.text.trim()),
-        batchNoRequired: _isBatchNumbeRequired ? 1 : 0,
-        minimumStockQty: "10",//int.tryParse(_minimumStockQtyController.text.trim()),
-        maximumStockQty: "10",//int.tryParse(_maximumStockQtyController.text.trim()),
-        reOrderLevel:"100", //int.tryParse(_reOrderLevelController.text.trim()),
-        reOrderQty: "100",//int.tryParse(_reOrderQtyController.text.trim()),
-        priceTakenFrom: priceTakenFrom,
-        itemDiscountRequired: _isDiscountReq ? 1 : 0,
-        itemDiscountPercentage: _isDiscountReq
-            ? double.tryParse(_itemDiscountValueController.text.trim())
-            : 0.0,
-        itemDiscountValue: _isDiscountReq
-            ? double.tryParse(_itemDiscountValueController.text.trim())
-            : 0.0,
-        purchaseRate: int.tryParse(_purchaseRateController.text.trim()),
-        purchaseRateWTax:
-            double.tryParse(_purchaseRateWTaxController.text.trim()),
-        salesRate: int.tryParse(_salesRateController.text.trim()),
-        mRPRate: int.tryParse(_mRPRateController.text.trim()),
-        gstPercentage: _gsttaxCode,
-        createdDate: DateTime.now().toIso8601String(),
-        createdUserCode: 1,
-        updatedUserCode: 1,
-      );
+    try {
+      if (widget.unitInfo == null) {
+        // ADD mode
+        final request = AddProductMasterModel(
+          idtype: _itemIdController.text,
+          itemID: _itemIdController.text.trim(),
+          itemName: _itemNameController.text.trim(),
+          itemType: selectedPaymentType,
+          itemGroupCode: _itemGroup,
+          itemUnitCode: _unitCode,
+          itemMakeCode: _itemMake,
+          itemGenericCode:
+              "1", //int.tryParse(_itemGenericCodeController.text.trim()),
+          nonScheduleItem: _nonScheduledItem ? 0 : 1,
+          scheduledH1Item: _nonScheduledItem ? 1 : 0,
+          narcoticItem: _isNarocotic ? 1 : 0,
+          expiryDateRequired: _expiryRequired ? "1" : "0",
+          expiryDateFormat: selectedExpiryType.toString(),
+          subUnitCode: _unitCode,
+          subQty: int.tryParse(_subQtyController.text.trim()),
+          batchNoRequired: _isBatchNumbeRequired ? 1 : 0,
+          minimumStockQty:
+              "10", //int.tryParse(_minimumStockQtyController.text.trim()),
+          maximumStockQty:
+              "10", //int.tryParse(_maximumStockQtyController.text.trim()),
+          reOrderLevel:
+              "100", //int.tryParse(_reOrderLevelController.text.trim()),
+          reOrderQty: "100", //int.tryParse(_reOrderQtyController.text.trim()),
+          priceTakenFrom: priceTakenFrom,
+          itemDiscountRequired: _isDiscountReq ? 1 : 0,
+          itemDiscountPercentage: _isDiscountReq
+              ? double.tryParse(_itemDiscountValueController.text.trim())
+              : 0.0,
+          itemDiscountValue: _isDiscountReq
+              ? double.tryParse(_itemDiscountValueController.text.trim())
+              : 0.0,
+          purchaseRate: int.tryParse(_purchaseRateController.text.trim()),
+          purchaseRateWTax:
+              double.tryParse(_purchaseRateWTaxController.text.trim()),
+          salesRate: int.tryParse(_salesRateController.text.trim()),
+          mRPRate: int.tryParse(_mRPRateController.text.trim()),
+          gstPercentage: _gsttaxCode,
+          createdDate: DateTime.now().toIso8601String(),
+          createdUserCode: 1,
+          updatedUserCode: 1,
+        );
 
-      print("🟢 Request JSON: ${request.toJson()}");
+        print("🟢 Request JSON: ${request.toJson()}");
 
-      final response = await _service.addProductService(request);
-      _handleResponse(response.isSuccess, response.error);
-    } else {
-      // EDIT mode
-      final updated = AddProductMasterModel(
-        itemName: _itemNameController.text.trim(),
-      );
+        final response = await _service.addProductService(request);
+        _handleResponse(response.isSuccess, response.error);
+      } else {
+        // EDIT mode
+        final updated = AddProductMasterModel(
+          itemName: _itemNameController.text.trim(),
+        );
 
-      print("🟡 Updated Request JSON: ${updated.toJson()}");
+        print("🟡 Updated Request JSON: ${updated.toJson()}");
 
-      final response = await _service.updateProductService(
-        widget.unitInfo!.itemCode!,
-        updated,
-      );
-      _handleResponse(response.isSuccess, response.error);
+        final response = await _service.updateProductService(
+          widget.unitInfo!.itemCode!,
+          updated,
+        );
+        _handleResponse(response.isSuccess, response.error);
+      }
+    } catch (e) {
+      setState(() {
+        _loading = false;
+        _message = "Error: $e";
+      });
     }
-  } catch (e) {
-    setState(() {
-      _loading = false;
-      _message = "Error: $e";
-    });
   }
-}
 
+  void _handleResponse(bool isSuccess, String? error) {
+    setState(() => _loading = false);
 
-void _handleResponse(bool isSuccess, String? error) {
-  setState(() => _loading = false);
+    if (isSuccess) {
+      // ✅ Clear all text controllers
+      _itemIdController.clear();
+      _itemNameController.clear();
+      _subQtyController.clear();
+      _subQtyController.clear();
+      _subQtyController.clear();
+      _purchaseRateController.clear();
+      _purchaseRateWTaxController.clear();
+      _salesRateController.clear();
+      _mRPRateController.clear();
+      _itemDiscountValueController.clear();
+      _subQtyController.clear();
 
-  if (isSuccess) {
-    // ✅ Clear all text controllers
-    _itemIdController.clear();
-    _itemNameController.clear();
-    _subQtyController.clear();
-    _subQtyController.clear();
-    _subQtyController.clear();
-    _purchaseRateController.clear();
-    _purchaseRateWTaxController.clear();
-    _salesRateController.clear();
-    _mRPRateController.clear();
-    _itemDiscountValueController.clear();
-    _subQtyController.clear();
+      // ✅ Reset dropdowns and switches
+      selectedPaymentType = null;
+      _itemGroup = null;
+      _unitCode = null;
+      _itemMake = null;
+      selectedExpiryType = null;
+      priceTakenFrom = null;
+      _nonScheduledItem = false;
+      _isNarocotic = false;
+      _expiryRequired = false;
+      _isBatchNumbeRequired = false;
+      _isDiscountReq = false;
 
-    // ✅ Reset dropdowns and switches
-    selectedPaymentType = null;
-    _itemGroup = null;
-    _unitCode = null;
-    _itemMake = null;
-    selectedExpiryType = null;
-    priceTakenFrom = null;
-    _nonScheduledItem = false;
-    _isNarocotic = false;
-    _expiryRequired = false;
-    _isBatchNumbeRequired = false;
-    _isDiscountReq = false;
+      // ✅ Refresh UI
+      setState(() {});
 
-    // ✅ Refresh UI
-    setState(() {});
+      // ✅ Show success snackbar
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Product saved successfully!"),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } else {
+      // ❌ Show error message
+      setState(() {
+        _message = error ?? "Something went wrong.";
+      });
 
-    // ✅ Show success snackbar
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("Product saved successfully!"),
-        backgroundColor: Colors.green,
-      ),
-    );
-
-  } else {
-    // ❌ Show error message
-    setState(() {
-      _message = error ?? "Something went wrong.";
-    });
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(_message!),
-        backgroundColor: Colors.red,
-      ),
-    );
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(_message!),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
-}
 
   @override
   void didUpdateWidget(covariant AddProductMasterPage oldWidget) {
@@ -593,10 +600,8 @@ void _handleResponse(bool isSuccess, String? error) {
 
   @override
   Widget build(BuildContext context) {
-    
     if (_getAllLoading) return const Center(child: CircularProgressIndicator());
     if (error != null) return Center(child: Text("Error: $error"));
-
 
     final isEdit = widget.unitInfo != null;
 
@@ -610,9 +615,9 @@ void _handleResponse(bool isSuccess, String? error) {
               // Decide columns by screen width
               int columns = 1; // default mobile
               if (constraints.maxWidth > 1200) {
-                columns = 5;
+                columns = 1;
               } else if (constraints.maxWidth > 800) {
-                columns = 4;
+                columns = 1;
               }
 
               return Wrap(
@@ -648,77 +653,178 @@ void _handleResponse(bool isSuccess, String? error) {
                   //     widget.onSaved(false);
                   //   },
                   // ),
-                  
-                   SizedBox(
-  width: constraints.maxWidth / columns - 90,
-  child: Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      const Text(
-        "Item ID",
-        style: TextStyle(fontSize: 12.0, height: 1.0, color: Colors.black),
-      ),
-      const SizedBox(height: 4),
 
-      // 🔹 Auto / Manual Switch
-            CustomSwitch(
-              value: _itemIdType,
-              title: "Auto",
-              onText: "Auto",
-              offText: "Manual",
-              activecolor: Colors.black,
-              inactiveColor: Colors.blue,
-              onChanged: (val) async {
-                setState(() {
-                  _itemIdType = val;
-                });
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      SizedBox(
+                        // width: constraints.maxWidth / columns - 90,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              "Item ID",
+                              style: TextStyle(
+                                  fontSize: 12.0,
+                                  height: 1.0,
+                                  color: Colors.black),
+                            ),
+                            const SizedBox(height: 4),
 
-                if (val) {
-                  // 🔸 Switch ON → Auto mode
-                  await _loadSerialNumber(); // fetch from API
-                  setState(() {
-                    _isItemIdEditable = false; // disable manual edit
-                  });
-                } else {
-                  // 🔸 Switch OFF → Manual mode
-                  setState(() {
-                    _itemIdController.clear(); // clear text field
-                    _isItemIdEditable = true;  // allow manual input
-                  });
-                }
-              },
-                    ),
-           
-            ],
-          ),
-        ),
-                  SizedBox(
-                  width: constraints.maxWidth / columns - 20,
-                  child: CustomTextField(
-                    title: "Item ID",
-                    hintText: "Enter Item ID",
-                    isEdit: _isItemIdEditable ?false : true, // disable when auto
-                    controller: _itemIdController,
-                    isValidate: true,
-                    validator: (value) => value == null || value.isEmpty
-                        ? "Enter Item Code"
-                        : null,
-                    focusNode: _itemIdFocus,
-                    textInputAction: TextInputAction.next,
+                            // 🔹 Auto / Manual Switch
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                CustomSwitch(
+                                  value: _itemIdType,
+                                  title: "Auto",
+                                  onText: "Auto",
+                                  offText: "Manual",
+                                  activecolor: Colors.black,
+                                  inactiveColor: Colors.blue,
+                                  onChanged: (val) async {
+                                    setState(() {
+                                      _itemIdType = val;
+                                    });
+
+                                    if (val) {
+                                      // 🔸 Switch ON → Auto mode
+                                      await _loadSerialNumber(); // fetch from API
+                                      setState(() {
+                                        _isItemIdEditable =
+                                            false; // disable manual edit
+                                      });
+                                    } else {
+                                      // 🔸 Switch OFF → Manual mode
+                                      setState(() {
+                                        _itemIdController
+                                            .clear(); // clear text field
+                                        _isItemIdEditable =
+                                            true; // allow manual input
+                                      });
+                                    }
+                                  },
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(
+                        // width: constraints.maxWidth / columns - 90,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              "Product Status",
+                              style: TextStyle(
+                                  fontSize: 12.0,
+                                  height: 1.0,
+                                  color: Colors.black),
+                            ),
+                            const SizedBox(height: 4),
+
+                            // 🔹 Auto / Manual Switch
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                CustomSwitch(
+                                  value: _activeStatus,
+                                  title: "Active Status",
+                                  onChanged: (val) {
+                                    setState(() {
+                                      _activeStatus = val;
+                                    });
+                                  },
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(
+                        width: 102,
+                      )
+                    ],
                   ),
-                ),
-                 
+
                   SizedBox(
-                      width: constraints.maxWidth / columns - 30,
-                      child: SearchDropdownField<Info>(
-                        controller: _itemNameController,
+                    width: constraints.maxWidth / columns - 30,
+                    child: CustomDropdownField<int>(
+                      title: "Product Type",
+                      hintText: "Select Product Type",
+                      items: const [
+                        DropdownMenuItem(value: 0, child: Text("Pharma")),
+                        DropdownMenuItem(value: 1, child: Text("Optical")),
+                        DropdownMenuItem(value: 2, child: Text("Service")),
+                      ],
+                      controller: productTypeController,
+                      initialValue: selectedPaymentType,
+                      onChanged: (val) {
+                        setState(() => selectedPaymentType = val ?? 0);
+                      },
+                      focusNode: _itemTypeFocus,
+                      onEditingComplete: () {
+                        _fieldFocusChange(
+                            context, _itemTypeFocus, _itemGroupFocus);
+                      },
+                    ),
+
+                    //   CustomDropdownField<int>(
+                    //     key: _productTypeKey, // ✅ add key for direct state update
+                    //     title: "Product Type",
+                    //     hintText: "Select Product Type",
+                    //     items: const [
+                    //       DropdownMenuItem(value: 0, child: Text("Pharma")),
+                    //       DropdownMenuItem(value: 1, child: Text("Optical")),
+                    //       DropdownMenuItem(value: 2, child: Text("Service")),
+                    //     ],
+                    //     initialValue: selectedPaymentType,
+                    //     onChanged: (val) {
+                    //       setState(() => selectedPaymentType = val ?? 0);
+                    //       print("Selected Product Type: $val");
+                    //     },
+                    //     focusNode: _itemTypeFocus,
+                    //     onEditingComplete: () {
+                    //       _fieldFocusChange(context, _itemTypeFocus, _itemGroupFocus);
+                    //     },
+                    //   ),
+                  ),
+
+                  SizedBox(
+                    width: constraints.maxWidth / columns - 20,
+                    child: CustomTextField(
+                      title: "Item ID",
+                      hintText: "Enter Item ID",
+                      isEdit:
+                          _isItemIdEditable ? false : true, // disable when auto
+                      controller: _itemIdController,
+                      isValidate: true,
+                      // validator: (value) => value == null || value.isEmpty
+                      //     ? "Enter Item Code"
+                      //     : null,
+                      focusNode: _itemIdFocus,
+                      textInputAction: TextInputAction.next,
+                    ),
+                  ),
+
+                  SizedBox(
+                    width: constraints.maxWidth / columns - 30,
+                    child: SearchDropdownField<Info>(
+                      controller: _itemNameController,
                       hintText: "Item Name",
                       // title:  "Item Name",
                       prefixIcon: Icons.search,
                       fetchItems: (q) async {
-                        final response = await _service.getProductServiceSearch(q);
+                        final response =
+                            await _service.getProductServiceSearch(q);
                         if (response.isSuccess) {
-                          return (response.data?.info ?? []).whereType<Info>().toList();
+                          return (response.data?.info ?? [])
+                              .whereType<Info>()
+                              .toList();
                         }
                         return [];
                       },
@@ -728,46 +834,60 @@ void _handleResponse(bool isSuccess, String? error) {
                           _itemIdController.text = product.itemCode.toString();
                           _itemNameController.text = product.itemName ?? "";
                           _createdUserController.text =
-                              product.createdUserCode?.toString() ?? userId.value!;
-                          selectedPaymentType = int.tryParse(product.itemType ?? '') ?? 0;
-                          priceTakenFrom = int.tryParse(product.priceTakenFrom ?? '') ?? 0;
-                          
+                              product.createdUserCode?.toString() ??
+                                  userId.value!;
+                          selectedPaymentType =
+                              int.tryParse(product.itemType ?? '') ?? 0;
+                          priceTakenFrom =
+                              int.tryParse(product.priceTakenFrom ?? '') ?? 0;
+
                           print(product.itemGroupCode);
-                          final int itemGroupCode =   int.tryParse(product.itemGroupCode ?? '') ?? 0; // Use a local variable
-                          print('Item Group Code from Product: $itemGroupCode (Raw: ${product.itemGroupCode})');
+                          final int itemGroupCode =
+                              int.tryParse(product.itemGroupCode ?? '') ??
+                                  0; // Use a local variable
+                          print(
+                              'Item Group Code from Product: $itemGroupCode (Raw: ${product.itemGroupCode})');
                           _itemGroup = itemGroupCode;
-                          _selectedItemGroup = getAllMasterListModel?.info?.itemGroups?.firstWhere(
-                                (g) => g.itemGroupCode == itemGroupCode,
-                                orElse: () => master.ItemGroups(itemGroupCode: itemGroupCode, itemGroupName: 'Unknown Group'), 
-                              ); 
+                          _selectedItemGroup = getAllMasterListModel
+                              ?.info?.itemGroups
+                              ?.firstWhere(
+                            (g) => g.itemGroupCode == itemGroupCode,
+                            orElse: () => master.ItemGroups(
+                                itemGroupCode: itemGroupCode,
+                                itemGroupName: 'Unknown Group'),
+                          );
 
-                          final int itemMakeCode = int.tryParse(product.itemMakeCode ?? '') ?? 0; 
+                          final int itemMakeCode =
+                              int.tryParse(product.itemMakeCode ?? '') ?? 0;
                           _itemMake = itemMakeCode;
-                          _selectItemMake = getAllMasterListModel?.info?.itemMakes?.firstWhere(
-                                (g) => g.itemMakeCode == itemMakeCode,
-                                orElse: () => master.ItemMakes(itemMakeCode: itemMakeCode, itemMaketName: 'Unknown Group'),
-                              );
+                          _selectItemMake = getAllMasterListModel
+                              ?.info?.itemMakes
+                              ?.firstWhere(
+                            (g) => g.itemMakeCode == itemMakeCode,
+                            orElse: () => master.ItemMakes(
+                                itemMakeCode: itemMakeCode,
+                                itemMaketName: 'Unknown Group'),
+                          );
 
-                          final int itemHSNCode = int.tryParse(product.hSNCode ?? '') ?? 0; 
+                          final int itemHSNCode =
+                              int.tryParse(product.hSNCode ?? '') ?? 0;
                           _hsntaxCode = itemHSNCode;
-                          _selectHSN = getAllMasterListModel?.info?.hsnMasters?.firstWhere(
-                                (g) => g.hsnCode == itemHSNCode,
-                                orElse: () => master.HsnMasters(hsnCode: itemHSNCode, hsnName: 'Unknown Group'),
-                              );
-
-                             
-                          
+                          _selectHSN = getAllMasterListModel?.info?.hsnMasters
+                              ?.firstWhere(
+                            (g) => g.hsnCode == itemHSNCode,
+                            orElse: () => master.HsnMasters(
+                                hsnCode: itemHSNCode, hsnName: 'Unknown Group'),
+                          );
                         });
                         widget.onSaved(false);
-                      },  
+                      },
                       onSubmitted: (typedValue) {
                         // ✅ Manual entry (not in list)
-                        setState(()  {
-                          if(_activeStatus){
-                              _loadList();
-                          }else{ 
-                          }
-                          
+                        setState(() {
+                          if (_activeStatus) {
+                            _loadList();
+                          } else {}
+
                           _itemNameController.text = typedValue;
                           _createdUserController.text = userId.value!;
                           _activeStatus = true;
@@ -776,74 +896,28 @@ void _handleResponse(bool isSuccess, String? error) {
                         print(_itemNameController.text);
                       },
                     ),
-
-                    ),
-
-
-                  SizedBox(
-                    width: constraints.maxWidth / columns - 30,
-                    child: CustomDropdownField<int>(
-                    title: "Product Type",
-                    hintText: "Select Product Type",
-                    items: const [
-                      DropdownMenuItem(value: 0, child: Text("Pharma")),
-                      DropdownMenuItem(value: 1, child: Text("Optical")),
-                      DropdownMenuItem(value: 2, child: Text("Service")),
-                    ],
-                    controller: productTypeController,
-                    initialValue: selectedPaymentType,
-                    onChanged: (val) {
-                      setState(() => selectedPaymentType = val ?? 0);
-                    },
-                    focusNode: _itemTypeFocus,
-                      onEditingComplete: () {
-                        _fieldFocusChange(context, _itemTypeFocus, _itemGroupFocus);
-                      },
-                  ),
-
-                  //   CustomDropdownField<int>(
-                  //     key: _productTypeKey, // ✅ add key for direct state update
-                  //     title: "Product Type",
-                  //     hintText: "Select Product Type",
-                  //     items: const [
-                  //       DropdownMenuItem(value: 0, child: Text("Pharma")),
-                  //       DropdownMenuItem(value: 1, child: Text("Optical")),
-                  //       DropdownMenuItem(value: 2, child: Text("Service")),
-                  //     ],
-                  //     initialValue: selectedPaymentType,
-                  //     onChanged: (val) {
-                  //       setState(() => selectedPaymentType = val ?? 0);
-                  //       print("Selected Product Type: $val");
-                  //     },
-                  //     focusNode: _itemTypeFocus,
-                  //     onEditingComplete: () {
-                  //       _fieldFocusChange(context, _itemTypeFocus, _itemGroupFocus);
-                  //     },
-                  //   ),
                   ),
 
                   SizedBox(
                     width: constraints.maxWidth / columns - 20,
                     child: SearchableDropdown<master.ItemGroups>(
-                        
                       hintText: "Item Group",
                       items: getAllMasterListModel!.info!.itemGroups!,
-                      initialValue: _selectedItemGroup, 
+                      initialValue: _selectedItemGroup,
                       itemLabel: (group) => group.itemGroupName ?? "",
                       onChanged: (group) {
                         setState(() {
-                         _itemGroup = group.itemGroupCode; 
-                           _selectedItemGroup = group;
+                          _itemGroup = group.itemGroupCode;
+                          _selectedItemGroup = group;
                         });
-                       
                       },
-                      
+
                       onEditingComplete: () => _fieldFocusChange(
                         context,
                         _itemGroupFocus,
                         _itemUnitCodeFocus,
                       ),
-                      
+
                       // Add page popup
                       addPage: Addgroupscreen(
                         onSaved: (success) async {
@@ -855,9 +929,8 @@ void _handleResponse(bool isSuccess, String? error) {
                       ),
                       addTooltip: "Add Item Group",
                     ),
-                    
                   ),
-                
+
                   // SizedBox(
                   //   width: constraints.maxWidth / columns - 20,
                   //   child:
@@ -925,7 +998,7 @@ void _handleResponse(bool isSuccess, String? error) {
                       ),
                       // Add page popup
                       addPage: AddItemMakeMaster(
-                         onSaved: (success) async {
+                        onSaved: (success) async {
                           if (success) {
                             Navigator.pop(context, true);
                             await _loadList();
@@ -976,22 +1049,18 @@ void _handleResponse(bool isSuccess, String? error) {
                               _nonScheduleItemFocus,
                             ),
                             addPage: AddGenericsMasterPage(
-                               onSaved: (success) async {
-                          if (success) {
-                            Navigator.pop(context, true);
-                            await _loadList();
-                          }
-                        },
+                              onSaved: (success) async {
+                                if (success) {
+                                  Navigator.pop(context, true);
+                                  await _loadList();
+                                }
+                              },
                             ),
                             addTooltip: "Add Item Generic",
                           ),
                         )
                       : SizedBox(),
 
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  const Divider(),
                   SizedBox(
                     width: constraints.maxWidth / columns - 20,
                     child: SearchableDropdown<master.Units>(
@@ -1023,192 +1092,201 @@ void _handleResponse(bool isSuccess, String? error) {
                     ),
                   ),
 
-                  SizedBox(
-                    width: constraints.maxWidth / columns - 20,
-                    child: CustomTextField(
-                      title: "Conversion Quantity",
-                      hintText: "Enter Conversion Quantity",
-                      controller: _subQtyController,
-                      // isNumeric: true,
-                      // isValidate: true,
-                      // validator: (value) => value == null || value.isEmpty
-                      //     ? "Enter Conversion Quantity"
-                      //     : null,
-                           onChanged: (value) {
-      // ✅ Automatically update formal digit based on conversion value
-      if (value.isEmpty) return;
+                  selectedPaymentType == 0
+                      ? SizedBox(
+                          width: constraints.maxWidth / columns - 20,
+                          child: CustomTextField(
+                            title: "Conversion Quantity",
+                            hintText: "Enter Conversion Quantity",
+                            controller: _subQtyController,
+                            // isNumeric: true,
+                            // isValidate: true,
+                            // validator: (value) => value == null || value.isEmpty
+                            //     ? "Enter Conversion Quantity"
+                            //     : null,
+                            onChanged: (value) {
+                              // ✅ Automatically update formal digit based on conversion value
+                              if (value.isEmpty) return;
 
-      final double? conversion = double.tryParse(value);
-      if (conversion == null) return;
+                              final double? conversion = double.tryParse(value);
+                              if (conversion == null) return;
 
-      int formalDigit = 1;
+                              int formalDigit = 1;
 
-      if (conversion >= 1 && conversion <= 9) {
-        formalDigit = 1;
-      } else if (conversion >= 10 && conversion <= 99) {
-        formalDigit = 2;
-      } else if (conversion >= 100 && conversion <= 999) {
-        formalDigit = 3;
-      } else {
-        formalDigit = 0; // default fallback
-      }
+                              if (conversion >= 1 && conversion <= 9) {
+                                formalDigit = 1;
+                              } else if (conversion >= 10 && conversion <= 99) {
+                                formalDigit = 2;
+                              } else if (conversion >= 100 &&
+                                  conversion <= 999) {
+                                formalDigit = 3;
+                              } else {
+                                formalDigit = 0; // default fallback
+                              }
 
-      setState(() {
-        _formaldigitController.text = formalDigit.toString();
-      });
-    },
-                      focusNode: _subQtyFocus,
-                      textInputAction: TextInputAction.next,
-                      onEditingComplete: () {
-                        FocusScope.of(context).requestFocus(_subQtyFocus);
-                      },
-                    ),
-                  ),
-                  SizedBox(
-  width: constraints.maxWidth / columns - 20,
-  child: CustomTextField(
-    title: "Digital of Formal",
-    hintText: "Format Digit",
-    controller: _formaldigitController,
-    isValidate: true,
-    validator: (value) =>
-        value == null || value.isEmpty ? "Format Qty" : null,
-    focusNode: _subQtyFormat,
-    textInputAction: TextInputAction.next,
-    onEditingComplete: () {
-      FocusScope.of(context).requestFocus(_subQtyFormat);
-    },
-  ),
-),
+                              setState(() {
+                                _formaldigitController.text =
+                                    formalDigit.toString();
+                              });
+                            },
+                            focusNode: _subQtyFocus,
+                            textInputAction: TextInputAction.next,
+                            onEditingComplete: () {
+                              FocusScope.of(context).requestFocus(_subQtyFocus);
+                            },
+                          ),
+                        )
+                      : SizedBox(),
+                  selectedPaymentType == 0
+                      ? SizedBox(
+                          width: constraints.maxWidth / columns - 20,
+                          child: CustomTextField(
+                            title: "Digital of Formal",
+                            hintText: "Format Digit",
+                            controller: _formaldigitController,
+                            isValidate: true,
+                            validator: (value) => value == null || value.isEmpty
+                                ? "Format Qty"
+                                : null,
+                            focusNode: _subQtyFormat,
+                            textInputAction: TextInputAction.next,
+                            onEditingComplete: () {
+                              FocusScope.of(context)
+                                  .requestFocus(_subQtyFormat);
+                            },
+                          ),
+                        )
+                      : SizedBox(),
 
-                  SizedBox(
-                    width: constraints.maxWidth / columns - 20,
-                    child: SearchableDropdown<master.Units>(
-                      hintText: "Sub unit",
-                      items: getAllMasterListModel!.info!.units!,
-                      itemLabel: (group) => group.unitId ?? "",
-                      onChanged: (group) {
-                        if (group != null) {
-                          _unitCode = group.unitCode; 
-                        }
-                      },
-                      focusNode: _itemUnitCodeFocus,
-                      onEditingComplete: () => _fieldFocusChange(
-                        context,
-                        _itemUnitCodeFocus,
-                        _itemMakeCodeFocus,
-                      ),
-                      addPage: Addunitscreen(
-                        onSaved: (success) {
-                          if (success) {
-                            _loadList();
-                            Navigator.pop(context, true);
-                          }
-                        },
-                      ),
-                      addTooltip: "Add Unit",
-                    ),
-                  ),
+                  selectedPaymentType == 0
+                      ? SizedBox(
+                          width: constraints.maxWidth / columns - 20,
+                          child: SearchableDropdown<master.Units>(
+                            hintText: "Sub unit",
+                            items: getAllMasterListModel!.info!.units!,
+                            itemLabel: (group) => group.unitId ?? "",
+                            onChanged: (group) {
+                              if (group != null) {
+                                _unitCode = group.unitCode;
+                              }
+                            },
+                            focusNode: _itemUnitCodeFocus,
+                            onEditingComplete: () => _fieldFocusChange(
+                              context,
+                              _itemUnitCodeFocus,
+                              _itemMakeCodeFocus,
+                            ),
+                            addPage: Addunitscreen(
+                              onSaved: (success) {
+                                if (success) {
+                                  _loadList();
+                                  Navigator.pop(context, true);
+                                }
+                              },
+                            ),
+                            addTooltip: "Add Unit",
+                          ),
+                        )
+                      : SizedBox(),
 
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  const Divider(),
-
-                  SizedBox(
-                    width: constraints.maxWidth,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        selectedPaymentType == 0
-                            ? Flexible(
+                  selectedPaymentType == 0
+                      ? SizedBox(
+                          width: constraints.maxWidth,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              selectedPaymentType == 0
+                                  ? Flexible(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          CustomCheckbox(
+                                            label: "Is Batch Number Required",
+                                            value: _isBatchNumbeRequired,
+                                            onChanged: (val) {
+                                              setState(() {
+                                                _isBatchNumbeRequired =
+                                                    val ?? false;
+                                              });
+                                            },
+                                          ),
+                                        ],
+                                      ),
+                                    )
+                                  : const SizedBox(),
+                              const SizedBox(width: 20),
+                              Flexible(
                                 child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     CustomCheckbox(
-                                      label: "Is Batch Number Required",
-                                      value: _isBatchNumbeRequired,
+                                      label: "Is  Narcotic Item",
+                                      value: _isNarocotic,
                                       onChanged: (val) {
                                         setState(() {
-                                          _isBatchNumbeRequired = val ?? false;
+                                          _isNarocotic = val ?? false;
                                         });
                                       },
                                     ),
                                   ],
                                 ),
-                              )
-                            : const SizedBox(),
-                        const SizedBox(width: 20),
-                        Flexible(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              CustomCheckbox(
-                                label: "Is  Narcotic Item",
-                                value: _isNarocotic,
-                                onChanged: (val) {
-                                  setState(() {
-                                    _isNarocotic = val ?? false;
-                                  });
-                                },
+                              ),
+                              const SizedBox(width: 20),
+                              Flexible(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    CustomCheckbox(
+                                      label: "Scheduled Item",
+                                      value: _nonScheduledItem,
+                                      onChanged: (val) {
+                                        setState(() {
+                                          _nonScheduledItem = val ?? false;
+                                        });
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 20),
+                              Flexible(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    CustomCheckbox(
+                                      label: "Expiry Required",
+                                      value: _expiryRequired,
+                                      onChanged: (val) {
+                                        setState(() {
+                                          _expiryRequired = val ?? false;
+                                        });
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Flexible(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    CustomCheckbox(
+                                      label: "MFGDateRequired",
+                                      value: _ismfgreatured,
+                                      onChanged: (val) {
+                                        setState(() {
+                                          _ismfgreatured = val ?? false;
+                                        });
+                                      },
+                                    ),
+                                  ],
+                                ),
                               ),
                             ],
                           ),
-                        ),
-                        const SizedBox(width: 20),
-                        Flexible(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              CustomCheckbox(
-                                label: "Scheduled Item",
-                                value: _nonScheduledItem,
-                                onChanged: (val) {
-                                  setState(() {
-                                    _nonScheduledItem = val ?? false;
-                                  });
-                                },
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 20),
-                        Flexible(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              CustomCheckbox(
-                                label: "Expiry Required",
-                                value: _expiryRequired,
-                                onChanged: (val) {
-                                  setState(() {
-                                    _expiryRequired = val ?? false;
-                                  });
-                                },
-                              ),
-                            ],
-                          ),
-                        ),
-                        Flexible(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              CustomCheckbox(
-                                label: "MFGDateRequired",
-                                value: _ismfgreatured,
-                                onChanged: (val) {
-                                  setState(() {
-                                    _ismfgreatured = val ?? false;
-                                  });
-                                },
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                        )
+                      : SizedBox(),
                   _expiryRequired
                       ? SizedBox(
                           width: constraints.maxWidth / columns - 30,
@@ -1238,25 +1316,25 @@ void _handleResponse(bool isSuccess, String? error) {
                           width: 0,
                         ),
 
-                  // SizedBox(
-                  //   width: constraints.maxWidth / columns - 20,
-                  //   child: CustomTextField(
-                  //     title: "Minimum Stock Quantity",
-                  //     hintText: "Enter Minimum Stock Quantity",
-                  //     controller: _minimumStockQtyController,
-                  //     isValidate: true,
-                  //     validator: (value) => value == null || value.isEmpty
-                  //         ? "Enter Minimum Stock Quantity"
-                  //         : null,
-                  //     focusNode: _minimumStockQtyFocus,
-                  //     isNumeric: true,
-                  //     textInputAction: TextInputAction.next,
-                  //     onEditingComplete: () {
-                  //       FocusScope.of(context)
-                  //           .requestFocus(_minimumStockQtyFocus);
-                  //     },
-                  //   ),
-                  // ),
+                  SizedBox(
+                    width: constraints.maxWidth / columns - 20,
+                    child: CustomTextField(
+                      title: "Minimum Stock Quantity",
+                      hintText: "Enter Minimum Stock Quantity",
+                      controller: _minimumStockQtyController,
+                      isValidate: true,
+                      // validator: (value) => value == null || value.isEmpty
+                      //     ? "Enter Minimum Stock Quantity"
+                      //     : null,
+                      focusNode: _minimumStockQtyFocus,
+                      isNumeric: true,
+                      textInputAction: TextInputAction.next,
+                      onEditingComplete: () {
+                        FocusScope.of(context)
+                            .requestFocus(_minimumStockQtyFocus);
+                      },
+                    ),
+                  ),
                   // SizedBox(
                   //   width: constraints.maxWidth / columns - 20,
                   //   child: CustomTextField(
@@ -1318,20 +1396,21 @@ void _handleResponse(bool isSuccess, String? error) {
                       hintText: "HSN Code",
                       items: getAllMasterListModel!.info!.hsnMasters!,
                       itemLabel: (group) => group.hsnName ?? "",
-                      initialValue: _selectHSN,  
+                      initialValue: _selectHSN,
                       onChanged: (group) {
                         setState(() {
-                         _hsntaxCode = group.hsnCode; 
-                           _selectHSN = group;
+                          _hsntaxCode = group.hsnCode;
+                          _selectHSN = group;
 
-                            final int itemGSTCode = group.hsnCode ?? 0; 
+                          final int itemGSTCode = group.hsnCode ?? 0;
                           _gsttaxCode = itemGSTCode;
-                          _selectgst = getAllMasterListModel?.info?.taxMasters?.firstWhere(
-                                (g) => g.taxCode == itemGSTCode,
-                                orElse: () => master.TaxMasters(taxCode: itemGSTCode, taxName: 'Unknown Group'),
-                              );
+                          _selectgst = getAllMasterListModel?.info?.taxMasters
+                              ?.firstWhere(
+                            (g) => g.taxCode == itemGSTCode,
+                            orElse: () => master.TaxMasters(
+                                taxCode: itemGSTCode, taxName: 'Unknown Group'),
+                          );
                         });
-                       
                       },
                       // focusNode: _itemUnitCodeFocus,
                       //               onEditingComplete: () => _fieldFocusChange(
@@ -1341,7 +1420,7 @@ void _handleResponse(bool isSuccess, String? error) {
                       //               ),
 
                       addPage: AddHnsMasterPage(
-                       onSaved: (success) async {
+                        onSaved: (success) async {
                           if (success) {
                             Navigator.pop(context, true);
                             await _loadList();
@@ -1351,20 +1430,18 @@ void _handleResponse(bool isSuccess, String? error) {
                       addTooltip: "Add HSN",
                     ),
                   ),
-SizedBox(
+                  SizedBox(
                     width: constraints.maxWidth / columns - 20,
-                    child: SearchableDropdown<master.TaxMasters>( 
+                    child: SearchableDropdown<master.TaxMasters>(
                       hintText: "Choose a GST",
                       items: getAllMasterListModel!.info!.taxMasters!,
                       itemLabel: (group) => group.taxName ?? "",
-                      initialValue: _selectgst,  
+                      initialValue: _selectgst,
                       onChanged: (group) {
                         setState(() {
-                         _hsntaxCode = group.taxCode; 
-                           _selectgst = group;
- 
+                          _hsntaxCode = group.taxCode;
+                          _selectgst = group;
                         });
-                       
                       },
                       // focusNode: _itemUnitCodeFocus,
                       //               onEditingComplete: () => _fieldFocusChange(
@@ -1372,8 +1449,6 @@ SizedBox(
                       //                 _itemUnitCodeFocus,
                       //                 _itemMakeCodeFocus,
                       //               ),
-
-                     
                     ),
                   ),
                   // SizedBox(
@@ -1388,12 +1463,12 @@ SizedBox(
                   //                   Text("${e.taxName} (${e.taxPercentage}%)"),
                   //             ))
                   //         .toList(),
-                  //     initialValue: _selectHSN,  
+                  //     initialValue: _selectHSN,
                   //     onChanged: (value) {
                   //       setState(() {
-                  //        _gsttaxCode = value.ta; 
+                  //        _gsttaxCode = value.ta;
                   //          _selectHSN = group;
-                           
+
                   //         _hsntaxCode = value;
                   //         //  _taxCode = value;
                   //       });
@@ -1423,23 +1498,23 @@ SizedBox(
                   SizedBox(
                     width: constraints.maxWidth / columns - 30,
                     child: CustomDropdownField<int>(
-                    title: "Price Taken From",
+                      title: "Price Taken From",
                       hintText: "Price Taken From",
-                     items: const [
+                      items: const [
                         DropdownMenuItem(value: 0, child: Text("Purchase")),
                         DropdownMenuItem(value: 1, child: Text("Master")),
                       ],
                       controller: pricetakenfromController,
-                    initialValue: priceTakenFrom,
-                    onChanged: (val) {
-                      setState(() => priceTakenFrom = val ?? 0);
-                    },
-                    focusNode: _priceTakenFromFocus,
+                      initialValue: priceTakenFrom,
+                      onChanged: (val) {
+                        setState(() => priceTakenFrom = val ?? 0);
+                      },
+                      focusNode: _priceTakenFromFocus,
                       onEditingComplete: () {
                         _fieldFocusChange(
                             context, _priceTakenFromFocus, _itemGroupFocus);
                       },
-                  ),
+                    ),
                   ),
                   // SizedBox(
                   //   width: constraints.maxWidth / columns - 30,
@@ -1469,9 +1544,9 @@ SizedBox(
                       hintText: "Enter Purchase Rate",
                       controller: _purchaseRateController,
                       isValidate: true,
-                      validator: (value) => value == null || value.isEmpty
-                          ? "Enter Purchase Rate"
-                          : null,
+                      // validator: (value) => value == null || value.isEmpty
+                      //     ? "Enter Purchase Rate"
+                      //     : null,
                       focusNode: _purchaseRateFocus,
                       isNumeric: true,
                       textInputAction: TextInputAction.next,
@@ -1487,9 +1562,9 @@ SizedBox(
                       hintText: "Enter Purchase Rate WithTax",
                       controller: _purchaseRateWTaxController,
                       isValidate: true,
-                      validator: (value) => value == null || value.isEmpty
-                          ? "Enter Purchase Rate With Tax"
-                          : null,
+                      // validator: (value) => value == null || value.isEmpty
+                      //     ? "Enter Purchase Rate With Tax"
+                      //     : null,
                       focusNode: _purchaseRateWTaxFocus,
                       isNumeric: true,
                       textInputAction: TextInputAction.next,
@@ -1499,10 +1574,7 @@ SizedBox(
                       },
                     ),
                   ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  const Divider(),
+
                   SizedBox(
                     width: constraints.maxWidth / columns - 20,
                     child: CustomTextField(
@@ -1510,9 +1582,9 @@ SizedBox(
                       hintText: "Enter Sales Rate",
                       controller: _salesRateController,
                       isValidate: true,
-                      validator: (value) => value == null || value.isEmpty
-                          ? "Enter Sales Rate "
-                          : null,
+                      // validator: (value) => value == null || value.isEmpty
+                      //     ? "Enter Sales Rate "
+                      //     : null,
                       focusNode: _salesRateFocus,
                       isNumeric: true,
                       textInputAction: TextInputAction.next,
@@ -1528,9 +1600,9 @@ SizedBox(
                       hintText: "Enter MRP Rate",
                       controller: _mRPRateController,
                       isValidate: true,
-                      validator: (value) => value == null || value.isEmpty
-                          ? "Enter MRP Rate"
-                          : null,
+                      // validator: (value) => value == null || value.isEmpty
+                      //     ? "Enter MRP Rate"
+                      //     : null,
                       focusNode: _mRPRateFocus,
                       isNumeric: true,
                       textInputAction: TextInputAction.next,
@@ -1539,10 +1611,7 @@ SizedBox(
                       },
                     ),
                   ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  const Divider(),
+
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.end,
@@ -1567,46 +1636,46 @@ SizedBox(
                     ],
                   ),
 
-                  _isDiscountReq
-                      ? SizedBox(
-                          width: constraints.maxWidth / columns - 20,
-                          child: CustomTextField(
-                            title: "Discount %",
-                            hintText: "Enter Discount Percentage",
-                            controller: _itemDiscountPercentageController,
-                            isValidate: true,
-                            validator: (value) => value == null || value.isEmpty
-                                ? "Enter Discount Percentage"
-                                : null,
-                            focusNode: _itemDiscountPercentageFocus,
-                            isNumeric: true,
-                            textInputAction: TextInputAction.next,
-                            onEditingComplete: () {
-                              FocusScope.of(context)
-                                  .requestFocus(_itemDiscountPercentageFocus);
-                            },
-                          ))
-                      : SizedBox(),
-                  _isDiscountReq
-                      ? SizedBox(
-                          width: constraints.maxWidth / columns - 20,
-                          child: CustomTextField(
-                            title: "Discount Value",
-                            hintText: "Enter Discount value",
-                            controller: _itemDiscountValueController,
-                            isValidate: true,
-                            validator: (value) => value == null || value.isEmpty
-                                ? "Enter Discount Value"
-                                : null,
-                            focusNode: _itemDiscountValueFocus,
-                            isNumeric: true,
-                            textInputAction: TextInputAction.next,
-                            onEditingComplete: () {
-                              FocusScope.of(context)
-                                  .requestFocus(_itemDiscountValueFocus);
-                            },
-                          ))
-                      : SizedBox(),
+                  // _isDiscountReq
+                  //     ? SizedBox(
+                  //         width: constraints.maxWidth / columns - 20,
+                  //         child: CustomTextField(
+                  //           title: "Discount %",
+                  //           hintText: "Enter Discount Percentage",
+                  //           controller: _itemDiscountPercentageController,
+                  //           isValidate: true,
+                  //           // validator: (value) => value == null || value.isEmpty
+                  //           //     ? "Enter Discount Percentage"
+                  //           //     : null,
+                  //           focusNode: _itemDiscountPercentageFocus,
+                  //           isNumeric: true,
+                  //           textInputAction: TextInputAction.next,
+                  //           onEditingComplete: () {
+                  //             FocusScope.of(context)
+                  //                 .requestFocus(_itemDiscountPercentageFocus);
+                  //           },
+                  //         ))
+                  //     : SizedBox(),
+                  // _isDiscountReq
+                  //     ? SizedBox(
+                  //         width: constraints.maxWidth / columns - 20,
+                  //         child: CustomTextField(
+                  //           title: "Discount Value",
+                  //           hintText: "Enter Discount value",
+                  //           controller: _itemDiscountValueController,
+                  //           isValidate: true,
+                  //           // validator: (value) => value == null || value.isEmpty
+                  //           //     ? "Enter Discount Value"
+                  //           //     : null,
+                  //           focusNode: _itemDiscountValueFocus,
+                  //           isNumeric: true,
+                  //           textInputAction: TextInputAction.next,
+                  //           onEditingComplete: () {
+                  //             FocusScope.of(context)
+                  //                 .requestFocus(_itemDiscountValueFocus);
+                  //           },
+                  //         ))
+                  //     : SizedBox(),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -1620,36 +1689,7 @@ SizedBox(
                       ),
                     ],
                   ),
-                  SizedBox(
-                    // width: constraints.maxWidth,
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Text("Product Status"),
-                            SizedBox(
-                              width: 10,
-                            ),
-                            CustomSwitch(
-                              value: _activeStatus,
-                              title: "Active Status",
-                              onChanged: (val) {
-                                setState(() {
-                                  _activeStatus = val;
-                                });
-                              },
-                            ),
-                          ],
-                        ),
-                        const SizedBox(
-                          width: 20,
-                        ),
-                      ],
-                    ),
-                  ),
+
                   // SizedBox(
                   //   width: constraints.maxWidth / columns - 20,
                   //   child: CustomTextField(

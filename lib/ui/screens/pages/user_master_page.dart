@@ -21,7 +21,7 @@ class UserMasterPage extends StatefulWidget {
 }
 
 class _UserMasterPageState extends State<UserMasterPage> {
-   Info? editingUnit;
+   UserInfo? editingUnit;
   bool refreshList = false;
 
   void _onSaved(bool success) {
@@ -33,7 +33,7 @@ class _UserMasterPageState extends State<UserMasterPage> {
     }
   }
 
-  void _showAddEditBottomSheet(Info? unit) {
+  void _showAddEditBottomSheet(UserInfo? unit) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true, // ensures full-screen height
@@ -73,7 +73,7 @@ class _UserMasterPageState extends State<UserMasterPage> {
                 refreshList: refreshList,
                 onEdit: (country) {
                   _showAddEditBottomSheet(
-                      country as Info?); // ✅ open bottom sheet for edit
+                      country as UserInfo?); // ✅ open bottom sheet for edit
                 },
               ),
             )

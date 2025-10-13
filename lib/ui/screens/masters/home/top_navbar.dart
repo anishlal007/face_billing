@@ -1,7 +1,18 @@
+// import 'dart:nativewrappers/_internal/vm/lib/async_patch.dart';
+
+// import 'package:facebilling/core/colors.dart';
+// import 'package:flutter/material.dart';
+// import 'package:intl/intl.dart';
+// import '../../../../core/preference_helper.dart';
+// import '../../pages/login_page.dart';
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+
+import '../../../../core/colors.dart';
 import '../../../../core/preference_helper.dart';
 import '../../pages/login_page.dart';
-
 class TopNavBar extends StatefulWidget implements PreferredSizeWidget {
   final String title;
   final bool isMenuCollapsed;
@@ -23,11 +34,18 @@ class TopNavBar extends StatefulWidget implements PreferredSizeWidget {
 
 class _TopNavBarState extends State<TopNavBar> {
   String? _username;
+  String _dateTime = ""; 
+  bool get isMobile => false; // Example flag
 
+  Timer? _timer;
+  
   @override
   void initState() {
     super.initState();
     _loadUsername();
+     _updateTime(); // initial value
+    // ⏰ Update every second
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) => _updateTime());
   }
 
   Future<void> _loadUsername() async {
@@ -37,40 +55,77 @@ class _TopNavBarState extends State<TopNavBar> {
     });
   }
 
+
+ 
+
+  void _updateTime() {
+    final now = DateTime.now();
+    final formatted = DateFormat('dd-MM-yyyy  hh:mm a').format(now); // 12-hour format with AM/PM
+    setState(() {
+      _dateTime = formatted;
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();  
+    super.dispose();
+  }
+
+
   @override
   Widget build(BuildContext context) {
     final isMobile = MediaQuery.of(context).size.width < 800;
     return AppBar(
       scrolledUnderElevation: 0.0,
-      backgroundColor: Colors.white,
+      backgroundColor: white,
       title: Row(
         children: [
-           Text(_username!, style: TextStyle(color: Colors.black)),
+           Text(_username ?? "", style: TextStyle(color: black)),
           const SizedBox(width: 30),
           if (!isMobile)
             IconButton(
               icon: Icon(
                 widget.isMenuCollapsed ? Icons.menu_open : Icons.menu,
-                color: Colors.black,
+                color: black,
               ),
               onPressed: widget.onToggleMenu,
             ),
           const SizedBox(width: 100),
-          Text(widget.title, style: const TextStyle(color: Colors.black)),
+          Text(widget.title, style: const TextStyle(color: black)),
         ],
       ),
       actions: [
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text("Manoj Eye Hospital", style: TextStyle(
+                  color:black,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),),
+                // current Date and Time
+         Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 0),
+            child: Text(
+              _dateTime,
+              style: const TextStyle(color: black, fontSize: 13),
+            ),
+          ),
+          ],
+        ),
+        
         IconButton(
           onPressed: () {},
-          icon: const Icon(Icons.search, color: Colors.black),
+          icon: const Icon(Icons.search, color: black),
         ),
         IconButton(
           onPressed: () {},
-          icon: const Icon(Icons.notifications, color: Colors.black),
+          icon: const Icon(Icons.notifications, color: black),
         ),
         IconButton(
           onPressed: () {},
-          icon: const Icon(Icons.settings, color: Colors.black),
+          icon: const Icon(Icons.settings, color: black),
         ),
         // 👇 Logout button
         IconButton(
@@ -82,7 +137,7 @@ class _TopNavBarState extends State<TopNavBar> {
               (route) => false,
             );
           },
-          icon: const Icon(Icons.logout, color: Colors.black),
+          icon: const Icon(Icons.logout, color: black),
         ),
 
         // 👇 Display Username

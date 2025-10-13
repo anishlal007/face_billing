@@ -10,7 +10,13 @@ import '../masters/product_master/product_master_list_screen.dart';
 import '../masters/sales_master/sales_list_page.dart';
 
 class ProductListMasterMaster extends StatefulWidget {
-  const ProductListMasterMaster({super.key});
+  final bool refreshList;
+  final Function(Info) onEdit;
+  const ProductListMasterMaster({
+    super.key,
+    required this.refreshList,
+    required this.onEdit,
+  });
 
   @override
   State<ProductListMasterMaster> createState() =>

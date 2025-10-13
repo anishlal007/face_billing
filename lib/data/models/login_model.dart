@@ -29,7 +29,7 @@ class User {
   int? userCode;
   String? userId;
   String? userName;
-  String? userType;
+  int? userType;
 
   User({this.userCode, this.userId, this.userName, this.userType});
 

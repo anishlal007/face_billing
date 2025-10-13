@@ -1,0 +1,46 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "C:/Users/AK/Desktop/flutter git/face billing/face_billing/build/windows/x64/pdfium-download/CMakeFiles/pdfium-download"
+		},
+		{
+			"file" : "C:/Users/AK/Desktop/flutter git/face billing/face_billing/build/windows/x64/pdfium-download/CMakeFiles/1ddf60ebc463dbfd59fafbd000a62568/pdfium-download.rule"
+		},
+		{
+			"file" : "C:/Users/AK/Desktop/flutter git/face billing/face_billing/build/windows/x64/pdfium-download/CMakeFiles/254811fcf16e3eb015a47ae1e7d926d2/pdfium-download-complete.rule"
+		},
+		{
+			"file" : "C:/Users/AK/Desktop/flutter git/face billing/face_billing/build/windows/x64/pdfium-download/CMakeFiles/84fa5ad8e7f641d7fb384caedcc43d6a/pdfium-download-build.rule"
+		},
+		{
+			"file" : "C:/Users/AK/Desktop/flutter git/face billing/face_billing/build/windows/x64/pdfium-download/CMakeFiles/84fa5ad8e7f641d7fb384caedcc43d6a/pdfium-download-configure.rule"
+		},
+		{
+			"file" : "C:/Users/AK/Desktop/flutter git/face billing/face_billing/build/windows/x64/pdfium-download/CMakeFiles/84fa5ad8e7f641d7fb384caedcc43d6a/pdfium-download-download.rule"
+		},
+		{
+			"file" : "C:/Users/AK/Desktop/flutter git/face billing/face_billing/build/windows/x64/pdfium-download/CMakeFiles/84fa5ad8e7f641d7fb384caedcc43d6a/pdfium-download-install.rule"
+		},
+		{
+			"file" : "C:/Users/AK/Desktop/flutter git/face billing/face_billing/build/windows/x64/pdfium-download/CMakeFiles/84fa5ad8e7f641d7fb384caedcc43d6a/pdfium-download-mkdir.rule"
+		},
+		{
+			"file" : "C:/Users/AK/Desktop/flutter git/face billing/face_billing/build/windows/x64/pdfium-download/CMakeFiles/84fa5ad8e7f641d7fb384caedcc43d6a/pdfium-download-patch.rule"
+		},
+		{
+			"file" : "C:/Users/AK/Desktop/flutter git/face billing/face_billing/build/windows/x64/pdfium-download/CMakeFiles/84fa5ad8e7f641d7fb384caedcc43d6a/pdfium-download-test.rule"
+		},
+		{
+			"file" : "C:/Users/AK/Desktop/flutter git/face billing/face_billing/build/windows/x64/pdfium-download/CMakeFiles/84fa5ad8e7f641d7fb384caedcc43d6a/pdfium-download-update.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"pdfium-download"
+		],
+		"name" : "pdfium-download"
+	}
+}

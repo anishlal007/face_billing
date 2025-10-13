@@ -1,4 +1,3 @@
-
 import 'package:facebilling/core/const.dart';
 import 'package:flutter/material.dart';
 
@@ -17,25 +16,32 @@ class WebmailLoginScreen extends StatefulWidget {
 }
 
 class _WebmailLoginScreenState extends State<WebmailLoginScreen> {
-
-
   @override
   Widget build(BuildContext context) {
     // LayoutBuilder checks the screen constraints (width)
     return Scaffold(
       backgroundColor: white,
-      body: Center(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            // Check if the screen is wide enough for the two-column layout (Web/Desktop)
-            if (constraints.maxWidth > 600) {
-              return _buildWebLayout(context);
-            }
-            // For narrower screens (Mobile/Tablet), use a single column
-            else {
-              return _buildMobileLayout(context);
-            }
-          },
+      body: Container(
+        decoration: BoxDecoration(
+        image: const DecorationImage(
+        image: AssetImage('assets/eye_background.png'),  
+        fit: BoxFit.cover, 
+      ),
+       
+      ),
+        child: Center(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              // Check if the screen is wide enough for the two-column layout (Web/Desktop)
+              if (constraints.maxWidth > 600) {
+                return _buildWebLayout(context);
+              }
+              // For narrower screens (Mobile/Tablet), use a single column
+              else {
+                return _buildMobileLayout(context);
+              }
+            },
+          ),
         ),
       ),
     );
@@ -47,11 +53,15 @@ class _WebmailLoginScreenState extends State<WebmailLoginScreen> {
       // The main card container for the web version
       constraints: const BoxConstraints(maxWidth: 800, maxHeight: 500),
       decoration: BoxDecoration(
+      //   image: const DecorationImage(
+      //   image: AssetImage('assets/eye_background.png'),  
+      //   fit: BoxFit.cover, 
+      // ),
         color: white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: const [
           BoxShadow(
-            color:black,
+            color: black,
             blurRadius: 20,
             offset: Offset(0, 5),
           ),
@@ -141,8 +151,8 @@ class _WebmailLoginFormState extends State<_WebmailLoginForm> {
       // ✅ Save login data and token
       await SharedPreferenceHelper.setUser(response.data!.user!);
       await SharedPreferenceHelper.setToken(response.data!.token!);
-      String? token=await SharedPreferenceHelper.getToken();
-      globalToken.value=token;
+      String? token = await SharedPreferenceHelper.getToken();
+      globalToken.value = token;
       print("globalToken.value");
       print(globalToken.value);
 
@@ -168,26 +178,25 @@ class _WebmailLoginFormState extends State<_WebmailLoginForm> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           const Text(
-            'Welcome To Billing App',
+            'Simplify Your Finances with Ease',
             style: TextStyle(
-              fontSize: 24,
+              fontSize: 18,
               fontWeight: FontWeight.bold,
               color: primary,
             ),
           ),
           const SizedBox(height: 30),
-
           TextFormField(
             controller: _userIdController,
             decoration: const InputDecoration(
               hintText: 'User Name',
               border: UnderlineInputBorder(),
             ),
-            validator: (value) =>
-                value == null || value.isEmpty ? 'Please enter User Name' : null,
+            validator: (value) => value == null || value.isEmpty
+                ? 'Please enter User Name'
+                : null,
           ),
           const SizedBox(height: 20),
-
           TextFormField(
             controller: _passwordController,
             obscureText: true,
@@ -199,20 +208,20 @@ class _WebmailLoginFormState extends State<_WebmailLoginForm> {
                 value == null || value.isEmpty ? 'Please enter password' : null,
           ),
           const SizedBox(height: 40),
-TextButton(
-  onPressed: () {
-   _userIdController.text = "admin";
-   _passwordController.text = "B976ZUX5";
-  },
-  child: Text(
-    'Click Me for Demo Login',
-    style: TextStyle(
-      fontSize: 12,
-      color: primary,
-    ),
-  ),
-),
- const SizedBox(height: 40),
+          TextButton(
+            onPressed: () {
+              _userIdController.text = "admin";
+              _passwordController.text = "B976ZUX5";
+            },
+            child: Text(
+              'Click Me for Demo Login',
+              style: TextStyle(
+                fontSize: 12,
+                color: primary,
+              ),
+            ),
+          ),
+          const SizedBox(height: 40),
           ElevatedButton(
             onPressed: _isLoading ? null : _handleLogin,
             style: ElevatedButton.styleFrom(
@@ -235,6 +244,7 @@ TextButton(
     );
   }
 }
+
 // Widget for the left purple panel on web/desktop
 class _PurplePanel extends StatelessWidget {
   const _PurplePanel();
@@ -250,17 +260,16 @@ class _PurplePanel extends StatelessWidget {
         children: [
           // Placeholder for the logo (JD logo in the image)
           Center(
-  child: Text(
-    'FACE BILLING',
-    textAlign: TextAlign.center,
-    style: TextStyle(
-      fontSize: 72,
-      fontWeight: FontWeight.w900,
-      color: white,
-    ),
-  ),
-)
-,
+            child: Text(
+              'Manoj Eye Hospital',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 72,
+                fontWeight: FontWeight.w900,
+                color: white,
+              ),
+            ),
+          ),
           // Links at the bottom
           Positioned(
             left: 20,
@@ -303,20 +312,3 @@ class _TermsAndPolicyLinks extends StatelessWidget {
   }
 }
 
-// Main function to run the app
-// void main() {
-//   runApp(const MyApp());
-// }
-//
-// class MyApp extends StatelessWidget {
-//   const MyApp({super.key});
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return const MaterialApp(
-//       debugShowCheckedModeBanner: false,
-//       title: 'Webmail Login UI',
-//       home: WebmailLoginScreen(),
-//     );
-//   }
-// }
