@@ -94,19 +94,41 @@ Future<ApiResponse<bool>> uploadProductExcelFile() async {
     }
   }
 
-  Future<ApiResponse<ProductMasterListModel>> getProductServiceSearch(String q) async {
-    try {
-      final response = await _dio.get("item/search?q=$q");
+Future<ApiResponse<ProductMasterListModel>> getProductServiceSearch(String q) async {
+  try {
+    final response = await _dio.get("item/search?q=$q");
 
-      final responseData = response.data;
+    // ✅ Print the raw response
+    print("===== Raw API Response =====");
+    print(response.data);
 
-      final countryResponse = ProductMasterListModel.fromJson(responseData);
-
-      return ApiResponse(data: countryResponse);
-    } catch (e) {
-      return ApiResponse(error: e.toString());
+    // Make sure response data is not null
+    final responseData = response.data;
+    if (responseData == null) {
+      print("Response data is null!");
+      return ApiResponse(error: "Response data is null");
     }
+
+    // ✅ Print responseData type
+    print("Response type: ${responseData.runtimeType}");
+
+    // Parse to your model
+    final productResponse = ProductMasterListModel.fromJson(responseData);
+
+    // ✅ Print parsed info list
+    print("Parsed Info list length: ${productResponse.info?.length}");
+    if (productResponse.info != null) {
+      for (var item in productResponse.info!) {
+        print("Item: ${item.itemName}, Code: ${item.itemCode}");
+      }
+    }
+
+    return ApiResponse(data: productResponse);
+  } catch (e) {
+    print("Error in getProductServiceSearch: $e");
+    return ApiResponse(error: e.toString());
   }
+}
 
   /// INFO Country (GET) -> /countrymaster/{id}
   Future<ApiResponse<ProductMasterListModel>> getProductServiceById(String id) async {

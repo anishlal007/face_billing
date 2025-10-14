@@ -463,856 +463,1052 @@ void _handleResponse(bool success, String? error) {
         padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text("Company Code"),
-                   const Divider(), 
-                  CustomTextField(
-                title: "Co Code",
-                hintText: "Enter Co Code",
-                controller: coCodeController,
-                prefixIcon: Icons.business,
-                isValidate: true,
-                validator: (value) =>
-                    value == null || value.isEmpty ? "Enter Co Code" : null,
-                focusNode: coCodeFocus,
-                textInputAction: TextInputAction.next,
-                onEditingComplete: () {
-                  FocusScope.of(context)
-                      .requestFocus(finYearCodeFocus);
-                },
+          child:  LayoutBuilder(builder: (context, constraints) {
+                          int columns = 1; // default mobile
+              if (constraints.maxWidth > 1200) {
+                columns = 4;
+              } else if (constraints.maxWidth > 800) {
+                columns = 3;
+              }
+              return Wrap(
+                spacing: 16,
+                runSpacing: 16,
+                children: [
+ const SectionRow(title: "Company Code"),
+     // const Divider(), 
+     SizedBox( width: constraints.maxWidth / columns - 20,
+       child: CustomTextField(
+                       title: "Co Code",
+                       hintText: "Enter Co Code",
+                       controller: coCodeController,
+                       prefixIcon: Icons.business,
+                       isValidate: true,
+                       validator: (value) =>
+         value == null || value.isEmpty ? "Enter Co Code" : null,
+                       focusNode: coCodeFocus,
+                       textInputAction: TextInputAction.next,
+                       onEditingComplete: () {
+       FocusScope.of(context)
+           .requestFocus(finYearCodeFocus);
+                       },
+                     ),
+     ),
+ const SizedBox(height: 12),
+    
+      const Divider(), 
+          const SectionRow(title: "Financial Year"),
+ SizedBox(
+    width: constraints.maxWidth / columns - 20,
+   child: CustomTextField(
+     title: "Financial Year Code",
+     hintText: "Enter Fin Year Code",
+     controller: finYearCodeController,
+     prefixIcon: Icons.calendar_today,
+     isValidate: true,
+     validator: (value) =>
+         value == null || value.isEmpty ? "Enter Fin Year Code" : null,
+     focusNode: finYearCodeFocus,
+     textInputAction: TextInputAction.next,
+     onEditingComplete: () {
+       FocusScope.of(context)
+           .requestFocus(custIdPrefixFocus);
+     },
+   ),
+ ),
+ const SizedBox(height: 12),
+  
+      const Divider(), 
+        const SectionRow(title: "Patient Id"),
+ SizedBox(
+    width: constraints.maxWidth / columns - 20,
+   child: CustomTextField(
+     title: "Patient ID Prefix",
+     hintText: "Enter Patient ID Prefix",
+     controller: custIdPrefixController,
+     prefixIcon: Icons.calendar_today,
+     isValidate: true,
+     validator: (value) =>
+         value == null || value.isEmpty ? "Enter Patient ID Prefix" : null,
+     focusNode: finYearCodeFocus,
+     textInputAction: TextInputAction.next,
+     onEditingComplete: () {
+       FocusScope.of(context)
+           .requestFocus(custIdFocus);
+     },
+   ),
+ ),
+ const SizedBox(height: 12),
+ SizedBox(
+    width: constraints.maxWidth / columns - 20,
+   child: CustomTextField(
+     title: "Patient ID ",
+     hintText: "Enter Patient ID ",
+     controller: custIdController,
+     prefixIcon: Icons.calendar_today,
+     isValidate: true,
+     validator: (value) =>
+         value == null || value.isEmpty ? "Enter Patient ID" : null,
+     focusNode: finYearCodeFocus,
+     textInputAction: TextInputAction.next,
+     onEditingComplete: () {
+       FocusScope.of(context)
+           .requestFocus(custIdSuffixFocus);
+     },
+   ),
+ ),
+        const SizedBox(height: 12),
+ SizedBox(
+    width: constraints.maxWidth / columns - 20,
+   child: CustomTextField(
+     title: "Patient ID Sufix",
+     hintText: "Enter Patient ID Sufix",
+     controller: custIdSuffixController,
+     prefixIcon: Icons.calendar_today,
+     isValidate: true,
+     validator: (value) =>
+         value == null || value.isEmpty ? "Enter Patient ID Sufix" : null,
+     focusNode: finYearCodeFocus,
+     textInputAction: TextInputAction.next,
+     onEditingComplete: () {
+       FocusScope.of(context)
+           .requestFocus(custIdFormalDigitFocus);
+     },
+   ),
+ ),
+ const SizedBox(height: 12),
+ SizedBox(
+    width: constraints.maxWidth / columns - 20,
+   child: CustomTextField(
+     title: "Patient ID Formal Digit",
+     hintText: "Enter Patient ID Formal Digit",
+     controller: custIdFormalDigitController,
+     prefixIcon: Icons.calendar_today,
+     isValidate: true,
+     validator: (value) =>
+         value == null || value.isEmpty ? "Enter Patient ID Formal Digit" : null,
+     focusNode: finYearCodeFocus,
+     textInputAction: TextInputAction.next,
+     onEditingComplete: () {
+       FocusScope.of(context)
+           .requestFocus(custIdFormalDigitFocus);
+     },
+   ),
+ ),
+ const SizedBox(height: 12),
+  
+      const Divider(), 
+      const SectionRow(title: "Supplier Code"),
+     SizedBox(
+        width: constraints.maxWidth / columns - 20,
+       child: CustomTextField(
+               title: "Supplier ID Prefix",
+               hintText: "Enter Supplier ID Prefix",
+               prefixIcon: Icons.person_outline,
+               controller: supIdPrefixController,
+               focusNode: supIdPrefixFocus,
+               isValidate: true,
+               textInputAction: TextInputAction.next,
+               onEditingComplete: () {
+                 FocusScope.of(context).requestFocus(supIdFocus);
+               },
+             ),
+     ),
+          const SizedBox(height: 12),
+       SizedBox(
+          width: constraints.maxWidth / columns - 20,
+         child: CustomTextField(
+           title: "Supplier ID",
+           hintText: "Enter Supplier ID",
+           prefixIcon: Icons.badge,
+           controller: supIdController,
+           focusNode: supIdFocus,
+           isValidate: true,
+           textInputAction: TextInputAction.next,
+           onEditingComplete: () {
+             FocusScope.of(context).requestFocus(supIdSuffixFocus);
+           },
+         ),
+       ),
+          const SizedBox(height: 12),
+       SizedBox(
+          width: constraints.maxWidth / columns - 20,
+         child: CustomTextField(
+           title: "Supplier ID Suffix",
+           hintText: "Enter Supplier ID Suffix",
+           prefixIcon: Icons.confirmation_num,
+           controller: supIdSuffixController,
+           focusNode: supIdSuffixFocus,
+           isValidate: true,
+           textInputAction: TextInputAction.next,
+           onEditingComplete: () {
+             FocusScope.of(context).requestFocus(supIdFormalDigitFocus);
+           },
+         ),
+       ),
+          const SizedBox(height: 12),
+       SizedBox(
+          width: constraints.maxWidth / columns - 20,
+         child: CustomTextField(
+           title: "Supplier ID Formal Digit",
+           hintText: "Enter Supplier ID Formal Digit",
+           prefixIcon: Icons.format_list_numbered,
+           controller: supIdFormalDigitController,
+           focusNode: supIdFormalDigitFocus,
+           isValidate: true,
+           textInputAction: TextInputAction.next,
+           onEditingComplete: () {
+             FocusScope.of(context).requestFocus(productIdPrefixFocus);
+           },
+         ),
+       ),
+          const SizedBox(height: 12),
+          const Divider(),
+           const SectionRow(title: "Product Code"),
+     
+       SizedBox(
+          width: constraints.maxWidth / columns - 20,
+         child: CustomTextField(
+           title: "Product ID Prefix",
+           hintText: "Enter Product ID Prefix",
+           prefixIcon: Icons.category,
+           controller: productIdPrefixController,
+           focusNode: productIdPrefixFocus,
+           isValidate: true,
+           textInputAction: TextInputAction.done,
+           onEditingComplete: () {
+             FocusScope.of(context).requestFocus(productIdFocus);
+           },
+         ),
+       ),
+          const SizedBox(height: 12),
+        SizedBox(
+          width: constraints.maxWidth / columns - 20,
+          child: CustomTextField(
+           title: "Product ID",
+           hintText: "Enter Product ID",
+           prefixIcon: Icons.confirmation_num,
+           controller: productIdController,
+           focusNode: productIdFocus,
+           isValidate: true,
+           textInputAction: TextInputAction.next,
+           onEditingComplete: () {
+             FocusScope.of(context).requestFocus(productIdFormalDigitFocus);
+           },
+  ),
+        ),
+          const SizedBox(height: 12),
+       SizedBox(
+          width: constraints.maxWidth / columns - 20,
+         child: CustomTextField(
+           title: "Product ID Formal Digit",
+           hintText: "Enter Product ID Formal Digit",
+           prefixIcon: Icons.format_list_numbered,
+           controller: productIdFormalDigitController,
+           focusNode: productIdFormalDigitFocus,
+           isValidate: true,
+           textInputAction: TextInputAction.next,
+           onEditingComplete: () {
+             FocusScope.of(context).requestFocus(purNoPrefixFocus);
+           },
+         ),
+       ),
+          const SizedBox(height: 12),
+       SizedBox(
+          width: constraints.maxWidth / columns - 20,
+         child: CustomTextField(
+           title: "Purchase No Prefix",
+           hintText: "Enter Purchase No Prefix",
+           prefixIcon: Icons.add_box,
+           controller: purNoPrefixController,
+           focusNode: purNoPrefixFocus,
+           isValidate: true,
+           textInputAction: TextInputAction.next,
+           onEditingComplete: () {
+             FocusScope.of(context).requestFocus(purchaseNoFocus);
+           },
+         ),
+       ),
+          const SizedBox(height: 12),
+          
+      const Divider(), 
+       const SectionRow(title: "Purchase Code"),
+       SizedBox(
+          width: constraints.maxWidth / columns - 20,
+         child: CustomTextField(
+           title: "Purchase No",
+           hintText: "Enter Purchase No",
+           prefixIcon: Icons.list_alt,
+           controller: purchaseNoController,
+           focusNode: purchaseNoFocus,
+           isValidate: true,
+           textInputAction: TextInputAction.next,
+           onEditingComplete: () {
+             FocusScope.of(context).requestFocus(purNoSuffixFocus);
+           },
+         ),
+       ),
+          const SizedBox(height: 12),
+       SizedBox(
+          width: constraints.maxWidth / columns - 20,
+         child: CustomTextField(
+           title: "Purchase No Suffix",
+           hintText: "Enter Purchase No Suffix",
+           prefixIcon: Icons.confirmation_num_outlined,
+           controller: purNoSuffixController,
+           focusNode: purNoSuffixFocus,
+           isValidate: true,
+           textInputAction: TextInputAction.next,
+           onEditingComplete: () {
+             FocusScope.of(context).requestFocus(purNoFormalDigitFocus);
+           },
+         ),
+       ),
+          const SizedBox(height: 12),
+       SizedBox(
+          width: constraints.maxWidth / columns - 20,
+         child: CustomTextField(
+           title: "Purchase No Formal Digit",
+           hintText: "Enter Purchase No Formal Digit",
+           prefixIcon: Icons.format_list_numbered_rtl,
+           controller: purNoFormalDigitController,
+           focusNode: purNoFormalDigitFocus,
+           isValidate: true,
+           textInputAction: TextInputAction.done,
+           onEditingComplete: () {
+             FocusScope.of(context).requestFocus(salesNoPrefixFocus);
+           },
+         ),
+       ),
+       
+       const SizedBox(height: 20,),
+   
+      const Divider(),
+           const  SectionRow(title: "Sales Rate"), 
+        SizedBox(
+          width: constraints.maxWidth / columns - 20,
+          child: CustomTextField(
+  title: "Sales No Prefix",
+  hintText: "Enter Sales No Prefix",
+  prefixIcon: Icons.sell,
+  controller: salesNoPrefixController,
+  focusNode: salesNoPrefixFocus,
+  isValidate: true,
+  textInputAction: TextInputAction.next,
+  onEditingComplete: () {
+           FocusScope.of(context).requestFocus(salesNoFocus);
+  },
               ),
-              const SizedBox(height: 12),
-       const Text("Financial Year"),
-                   const Divider(), 
-              CustomTextField(
-                title: "Financial Year Code",
-                hintText: "Enter Fin Year Code",
-                controller: finYearCodeController,
-                prefixIcon: Icons.calendar_today,
-                isValidate: true,
-                validator: (value) =>
-                    value == null || value.isEmpty ? "Enter Fin Year Code" : null,
-                focusNode: finYearCodeFocus,
-                textInputAction: TextInputAction.next,
-                onEditingComplete: () {
-                  FocusScope.of(context)
-                      .requestFocus(custIdPrefixFocus);
-                },
-              ),
-              const SizedBox(height: 12),
-               const Text("Patient Id"),
-                   const Divider(), 
-              CustomTextField(
-                title: "Patient ID Prefix",
-                hintText: "Enter Patient ID Prefix",
-                controller: custIdPrefixController,
-                prefixIcon: Icons.calendar_today,
-                isValidate: true,
-                validator: (value) =>
-                    value == null || value.isEmpty ? "Enter Patient ID Prefix" : null,
-                focusNode: finYearCodeFocus,
-                textInputAction: TextInputAction.next,
-                onEditingComplete: () {
-                  FocusScope.of(context)
-                      .requestFocus(custIdFocus);
-                },
-              ),
-              const SizedBox(height: 12),
-              CustomTextField(
-                title: "Patient ID ",
-                hintText: "Enter Patient ID ",
-                controller: custIdController,
-                prefixIcon: Icons.calendar_today,
-                isValidate: true,
-                validator: (value) =>
-                    value == null || value.isEmpty ? "Enter Patient ID" : null,
-                focusNode: finYearCodeFocus,
-                textInputAction: TextInputAction.next,
-                onEditingComplete: () {
-                  FocusScope.of(context)
-                      .requestFocus(custIdSuffixFocus);
-                },
-              ),
-       const SizedBox(height: 12),
-              CustomTextField(
-                title: "Patient ID Sufix",
-                hintText: "Enter Patient ID Sufix",
-                controller: custIdSuffixController,
-                prefixIcon: Icons.calendar_today,
-                isValidate: true,
-                validator: (value) =>
-                    value == null || value.isEmpty ? "Enter Patient ID Sufix" : null,
-                focusNode: finYearCodeFocus,
-                textInputAction: TextInputAction.next,
-                onEditingComplete: () {
-                  FocusScope.of(context)
-                      .requestFocus(custIdFormalDigitFocus);
-                },
-              ),
-              const SizedBox(height: 12),
-              CustomTextField(
-                title: "Patient ID Formal Digit",
-                hintText: "Enter Patient ID Formal Digit",
-                controller: custIdFormalDigitController,
-                prefixIcon: Icons.calendar_today,
-                isValidate: true,
-                validator: (value) =>
-                    value == null || value.isEmpty ? "Enter Patient ID Formal Digit" : null,
-                focusNode: finYearCodeFocus,
-                textInputAction: TextInputAction.next,
-                onEditingComplete: () {
-                  FocusScope.of(context)
-                      .requestFocus(custIdFormalDigitFocus);
-                },
-              ),
-              const SizedBox(height: 12),
-               const Text("Supplier Code"),
-                   const Divider(), 
-                  CustomTextField(
-        title: "Supplier ID Prefix",
-        hintText: "Enter Supplier ID Prefix",
-        prefixIcon: Icons.person_outline,
-        controller: supIdPrefixController,
-        focusNode: supIdPrefixFocus,
-        isValidate: true,
-        textInputAction: TextInputAction.next,
-        onEditingComplete: () {
-          FocusScope.of(context).requestFocus(supIdFocus);
-        },
-      ),
-         const SizedBox(height: 12),
-      CustomTextField(
-        title: "Supplier ID",
-        hintText: "Enter Supplier ID",
-        prefixIcon: Icons.badge,
-        controller: supIdController,
-        focusNode: supIdFocus,
-        isValidate: true,
-        textInputAction: TextInputAction.next,
-        onEditingComplete: () {
-          FocusScope.of(context).requestFocus(supIdSuffixFocus);
-        },
-      ),
-         const SizedBox(height: 12),
-      CustomTextField(
-        title: "Supplier ID Suffix",
-        hintText: "Enter Supplier ID Suffix",
-        prefixIcon: Icons.confirmation_num,
-        controller: supIdSuffixController,
-        focusNode: supIdSuffixFocus,
-        isValidate: true,
-        textInputAction: TextInputAction.next,
-        onEditingComplete: () {
-          FocusScope.of(context).requestFocus(supIdFormalDigitFocus);
-        },
-      ),
-         const SizedBox(height: 12),
-      CustomTextField(
-        title: "Supplier ID Formal Digit",
-        hintText: "Enter Supplier ID Formal Digit",
-        prefixIcon: Icons.format_list_numbered,
-        controller: supIdFormalDigitController,
-        focusNode: supIdFormalDigitFocus,
-        isValidate: true,
-        textInputAction: TextInputAction.next,
-        onEditingComplete: () {
-          FocusScope.of(context).requestFocus(productIdPrefixFocus);
-        },
-      ),
-         const SizedBox(height: 12),
-          const Text("Product Code"),
-                   const Divider(), 
-      CustomTextField(
-        title: "Product ID Prefix",
-        hintText: "Enter Product ID Prefix",
-        prefixIcon: Icons.category,
-        controller: productIdPrefixController,
-        focusNode: productIdPrefixFocus,
-        isValidate: true,
-        textInputAction: TextInputAction.done,
-        onEditingComplete: () {
-          FocusScope.of(context).requestFocus(productIdFocus);
-        },
-      ),
-         const SizedBox(height: 12),
-       CustomTextField(
-        title: "Product ID",
-        hintText: "Enter Product ID",
-        prefixIcon: Icons.confirmation_num,
-        controller: productIdController,
-        focusNode: productIdFocus,
-        isValidate: true,
-        textInputAction: TextInputAction.next,
-        onEditingComplete: () {
-          FocusScope.of(context).requestFocus(productIdFormalDigitFocus);
-        },
-      ),
-         const SizedBox(height: 12),
-      CustomTextField(
-        title: "Product ID Formal Digit",
-        hintText: "Enter Product ID Formal Digit",
-        prefixIcon: Icons.format_list_numbered,
-        controller: productIdFormalDigitController,
-        focusNode: productIdFormalDigitFocus,
-        isValidate: true,
-        textInputAction: TextInputAction.next,
-        onEditingComplete: () {
-          FocusScope.of(context).requestFocus(purNoPrefixFocus);
-        },
-      ),
-         const SizedBox(height: 12),
-      CustomTextField(
-        title: "Purchase No Prefix",
-        hintText: "Enter Purchase No Prefix",
-        prefixIcon: Icons.add_box,
-        controller: purNoPrefixController,
-        focusNode: purNoPrefixFocus,
-        isValidate: true,
-        textInputAction: TextInputAction.next,
-        onEditingComplete: () {
-          FocusScope.of(context).requestFocus(purchaseNoFocus);
-        },
-      ),
-         const SizedBox(height: 12),
-          const Text("Purchase Code"),
-                   const Divider(), 
-      CustomTextField(
-        title: "Purchase No",
-        hintText: "Enter Purchase No",
-        prefixIcon: Icons.list_alt,
-        controller: purchaseNoController,
-        focusNode: purchaseNoFocus,
-        isValidate: true,
-        textInputAction: TextInputAction.next,
-        onEditingComplete: () {
-          FocusScope.of(context).requestFocus(purNoSuffixFocus);
-        },
-      ),
-         const SizedBox(height: 12),
-      CustomTextField(
-        title: "Purchase No Suffix",
-        hintText: "Enter Purchase No Suffix",
-        prefixIcon: Icons.confirmation_num_outlined,
-        controller: purNoSuffixController,
-        focusNode: purNoSuffixFocus,
-        isValidate: true,
-        textInputAction: TextInputAction.next,
-        onEditingComplete: () {
-          FocusScope.of(context).requestFocus(purNoFormalDigitFocus);
-        },
-      ),
-         const SizedBox(height: 12),
-      CustomTextField(
-        title: "Purchase No Formal Digit",
-        hintText: "Enter Purchase No Formal Digit",
-        prefixIcon: Icons.format_list_numbered_rtl,
-        controller: purNoFormalDigitController,
-        focusNode: purNoFormalDigitFocus,
-        isValidate: true,
-        textInputAction: TextInputAction.done,
-        onEditingComplete: () {
-          FocusScope.of(context).requestFocus(salesNoPrefixFocus);
-        },
-      ),
+        ),
+     const SizedBox(height: 20),
+     SizedBox(
+        width: constraints.maxWidth / columns - 20,
+       child: CustomTextField(
+         title: "Sales No",
+         hintText: "Enter Sales No",
+         prefixIcon: Icons.confirmation_num,
+         controller: salesNoController,
+         focusNode: salesNoFocus,
+         isValidate: true,
+         textInputAction: TextInputAction.next,
+         onEditingComplete: () {
+           FocusScope.of(context).requestFocus(salesNoSuffixFocus);
+         },
+       ),
+     ),
+     const SizedBox(height: 20),
+     SizedBox(
+        width: constraints.maxWidth / columns - 20,
+       child: CustomTextField(
+         title: "Sales No Suffix",
+         hintText: "Enter Sales No Suffix",
+         prefixIcon: Icons.confirmation_num_outlined,
+         controller: salesNoSuffixController,
+         focusNode: salesNoSuffixFocus,
+         isValidate: true,
+         textInputAction: TextInputAction.next,
+         onEditingComplete: () {
+           FocusScope.of(context).requestFocus(salesNoFormalDigitFocus);
+         },
+       ),
+     ),
+     const SizedBox(height: 20),
+     SizedBox(
+        width: constraints.maxWidth / columns - 20,
+       child: CustomTextField(
+         title: "Sales No Formal Digit",
+         hintText: "Enter Sales No Formal Digit",
+         prefixIcon: Icons.format_list_numbered,
+         controller: salesNoFormalDigitController,
+         focusNode: salesNoFormalDigitFocus,
+         isValidate: true,
+         textInputAction: TextInputAction.done,
+         onEditingComplete: () {
+           FocusScope.of(context).requestFocus(purNo2PrefixFocus);
+         },
+       ),
+     ),
+     const SizedBox(height: 20),
       
-      const SizedBox(height: 20,),
-       const Text("Sales Rate"),
-                   const Divider(), 
-       CustomTextField(
-      title: "Sales No Prefix",
-      hintText: "Enter Sales No Prefix",
-      prefixIcon: Icons.sell,
-      controller: salesNoPrefixController,
-      focusNode: salesNoPrefixFocus,
-      isValidate: true,
-      textInputAction: TextInputAction.next,
-      onEditingComplete: () {
-        FocusScope.of(context).requestFocus(salesNoFocus);
-      },
-    ),
-    const SizedBox(height: 20),
-    CustomTextField(
-      title: "Sales No",
-      hintText: "Enter Sales No",
-      prefixIcon: Icons.confirmation_num,
-      controller: salesNoController,
-      focusNode: salesNoFocus,
-      isValidate: true,
-      textInputAction: TextInputAction.next,
-      onEditingComplete: () {
-        FocusScope.of(context).requestFocus(salesNoSuffixFocus);
-      },
-    ),
-    const SizedBox(height: 20),
-    CustomTextField(
-      title: "Sales No Suffix",
-      hintText: "Enter Sales No Suffix",
-      prefixIcon: Icons.confirmation_num_outlined,
-      controller: salesNoSuffixController,
-      focusNode: salesNoSuffixFocus,
-      isValidate: true,
-      textInputAction: TextInputAction.next,
-      onEditingComplete: () {
-        FocusScope.of(context).requestFocus(salesNoFormalDigitFocus);
-      },
-    ),
-    const SizedBox(height: 20),
-    CustomTextField(
-      title: "Sales No Formal Digit",
-      hintText: "Enter Sales No Formal Digit",
-      prefixIcon: Icons.format_list_numbered,
-      controller: salesNoFormalDigitController,
-      focusNode: salesNoFormalDigitFocus,
-      isValidate: true,
-      textInputAction: TextInputAction.done,
-      onEditingComplete: () {
-        FocusScope.of(context).requestFocus(purNo2PrefixFocus);
-      },
-    ),
-    const SizedBox(height: 20),
-     const Text("Purchase 2 Code"),
-                   const Divider(), 
-     CustomTextField(
-      title: "Purchase No 2 Prefix",
-      hintText: "Enter Purchase No 2 Prefix",
-      prefixIcon: Icons.add_box,
-      controller: purNo2PrefixController,
-      focusNode: purNo2PrefixFocus,
-      isValidate: true,
-      textInputAction: TextInputAction.next,
-      onEditingComplete: () {
-        FocusScope.of(context).requestFocus(purchaseNo2Focus);
-      },
-    ),
-    const SizedBox(height: 20),
-    CustomTextField(
-      title: "Purchase No 2",
-      hintText: "Enter Purchase No 2",
-      prefixIcon: Icons.list_alt,
-      controller: purchaseNo2Controller,
-      focusNode: purchaseNo2Focus,
-      isValidate: true,
-      textInputAction: TextInputAction.next,
-      onEditingComplete: () {
-        FocusScope.of(context).requestFocus(purNo2SuffixFocus);
-      },
-    ),
-    const SizedBox(height: 20),
-    CustomTextField(
-      title: "Purchase No 2 Suffix",
-      hintText: "Enter Purchase No 2 Suffix",
-      prefixIcon: Icons.confirmation_num_outlined,
-      controller: purNo2SuffixController,
-      focusNode: purNo2SuffixFocus,
-      isValidate: true,
-      textInputAction: TextInputAction.next,
-      onEditingComplete: () {
-        FocusScope.of(context).requestFocus(purNo2FormalDigitFocus);
-      },
-    ),
-    const SizedBox(height: 20),
-    CustomTextField(
-      title: "Purchase No 2 Formal Digit",
-      hintText: "Enter Purchase No 2 Formal Digit",
-      prefixIcon: Icons.format_list_numbered,
-      controller: purNo2FormalDigitController,
-      focusNode: purNo2FormalDigitFocus,
-      isValidate: true,
-      textInputAction: TextInputAction.next,
-      onEditingComplete: () {
-        FocusScope.of(context).requestFocus(purOrderNoPrefixFocus);
-      },
-    ),
-    const SizedBox(height: 20),
-     const Text("Purchase Order Code"),
-                   const Divider(), 
-    CustomTextField(
-      title: "Purchase Order No Prefix",
-      hintText: "Enter Purchase Order No Prefix",
-      prefixIcon: Icons.add_business,
-      controller: purOrderNoPrefixController,
-      focusNode: purOrderNoPrefixFocus,
-      isValidate: true,
-      textInputAction: TextInputAction.next,
-      onEditingComplete: () {
-        FocusScope.of(context).requestFocus(purchaseOderNoFocus);
-      },
-    ),
-    const SizedBox(height: 20),
-    CustomTextField(
-      title: "Purchase Order No",
-      hintText: "Enter Purchase Order No",
-      prefixIcon: Icons.list,
-      controller: purchaseOderNoController,
-      focusNode: purchaseOderNoFocus,
-      isValidate: true,
-      textInputAction: TextInputAction.next,
-      onEditingComplete: () {
-        FocusScope.of(context).requestFocus(purOrderNoSuffixFocus);
-      },
-    ),
-    const SizedBox(height: 20),
-    CustomTextField(
-      title: "Purchase Order No Suffix",
-      hintText: "Enter Purchase Order No Suffix",
-      prefixIcon: Icons.confirmation_num,
-      controller: purOrderNoSuffixController,
-      focusNode: purOrderNoSuffixFocus,
-      isValidate: true,
-      textInputAction: TextInputAction.next,
-      onEditingComplete: () {
-        FocusScope.of(context).requestFocus(purOrderNoFormalDigitFocus);
-      },
-    ),
-    const SizedBox(height: 20),
-    CustomTextField(
-      title: "Purchase Order No Formal Digit",
-      hintText: "Enter Purchase Order No Formal Digit",
-      prefixIcon: Icons.format_list_numbered_rtl,
-      controller: purOrderNoFormalDigitController,
-      focusNode: purOrderNoFormalDigitFocus,
-      isValidate: true,
-      textInputAction: TextInputAction.next,
-      onEditingComplete: () {
-        FocusScope.of(context).requestFocus(purOrderNo2PrefixFocus);
-      },
-    ),
-    const SizedBox(height: 20),
-     const Text("Purchase Order 2 Code"),
-                   const Divider(), 
-    CustomTextField(
-      title: "Purchase Order No 2 Prefix",
-      hintText: "Enter Purchase Order No 2 Prefix",
-      prefixIcon: Icons.add_box,
-      controller: purOrderNo2PrefixController,
-      focusNode: purOrderNo2PrefixFocus,
-      isValidate: true,
-      textInputAction: TextInputAction.next,
-      onEditingComplete: () {
-        FocusScope.of(context).requestFocus(purchaseOrderNo2Focus);
-      },
-    ),
-    const SizedBox(height: 20),
-    CustomTextField(
-      title: "Purchase Order No 2",
-      hintText: "Enter Purchase Order No 2",
-      prefixIcon: Icons.list_alt,
-      controller: purchaseOrderNo2Controller,
-      focusNode: purchaseOrderNo2Focus,
-      isValidate: true,
-      textInputAction: TextInputAction.next,
-      onEditingComplete: () {
-        FocusScope.of(context).requestFocus(purOrderNo2SuffixFocus);
-      },
-    ),
-    const SizedBox(height: 20),
-    CustomTextField(
-      title: "Purchase Order No 2 Suffix",
-      hintText: "Enter Purchase Order No 2 Suffix",
-      prefixIcon: Icons.confirmation_num_outlined,
-      controller: purOrderNo2SuffixController,
-      focusNode: purOrderNo2SuffixFocus,
-      isValidate: true,
-      textInputAction: TextInputAction.next,
-      onEditingComplete: () {
-        FocusScope.of(context).requestFocus(purOrderNo2FormalDigitFocus);
-      },
-    ),
-    const SizedBox(height: 20),
-    CustomTextField(
-      title: "Purchase Order No 2 Formal Digit",
-      hintText: "Enter Purchase Order No 2 Formal Digit",
-      prefixIcon: Icons.format_list_numbered,
-      controller: purOrderNo2FormalDigitController,
-      focusNode: purOrderNo2FormalDigitFocus,
-      isValidate: true,
-      textInputAction: TextInputAction.done,
-      onEditingComplete: () {
-        FocusScope.of(context).requestFocus(quoNoPrefixFocus);
-      },
-    ),
-    const SizedBox(height: 20),
-     const Text("Quotation Code"),
-                   const Divider(), 
-      CustomTextField(
-      title: "Quotation No Prefix",
-      hintText: "Enter Quotation No Prefix",
-      prefixIcon: Icons.description,
-      controller: quoNoPrefixController,
-      focusNode: quoNoPrefixFocus,
-      isValidate: true,
-      textInputAction: TextInputAction.next,
-      onEditingComplete: () {
-        FocusScope.of(context).requestFocus(quotationNoFocus);
-      },
-    ),
-    const SizedBox(height: 20),
-    CustomTextField(
-      title: "Quotation No",
-      hintText: "Enter Quotation No",
-      prefixIcon: Icons.confirmation_num,
-      controller: quotationNoController,
-      focusNode: quotationNoFocus,
-      isValidate: true,
-      textInputAction: TextInputAction.next,
-      onEditingComplete: () {
-        FocusScope.of(context).requestFocus(quoNoSuffixFocus);
-      },
-    ),
-    const SizedBox(height: 20),
-    CustomTextField(
-      title: "Quotation No Suffix",
-      hintText: "Enter Quotation No Suffix",
-      prefixIcon: Icons.confirmation_num_outlined,
-      controller: quoNoSuffixController,
-      focusNode: quoNoSuffixFocus,
-      isValidate: true,
-      textInputAction: TextInputAction.next,
-      onEditingComplete: () {
-        FocusScope.of(context).requestFocus(quoNoFormalDigitFocus);
-      },
-    ),
-    const SizedBox(height: 20),
-    CustomTextField(
-      title: "Quotation No Formal Digit",
-      hintText: "Enter Quotation No Formal Digit",
-      prefixIcon: Icons.format_list_numbered,
-      controller: quoNoFormalDigitController,
-      focusNode: quoNoFormalDigitFocus,
-      isValidate: true,
-      textInputAction: TextInputAction.next,
-      onEditingComplete: () {
-        FocusScope.of(context).requestFocus(quoNo2PrefixFocus);
-      },
-    ),
-    const SizedBox(height: 20),
-     const Text("Quotation 2 Code"),
-                   const Divider(), 
-    CustomTextField(
-      title: "Quotation No 2 Prefix",
-      hintText: "Enter Quotation No 2 Prefix",
-      prefixIcon: Icons.description_outlined,
-      controller: quoNo2PrefixController,
-      focusNode: quoNo2PrefixFocus,
-      isValidate: true,
-      textInputAction: TextInputAction.next,
-      onEditingComplete: () {
-        FocusScope.of(context).requestFocus(quotationNo2Focus);
-      },
-    ),
-    const SizedBox(height: 20),
-    CustomTextField(
-      title: "Quotation No 2",
-      hintText: "Enter Quotation No 2",
-      prefixIcon: Icons.confirmation_num,
-      controller: quotationNo2Controller,
-      focusNode: quotationNo2Focus,
-      isValidate: true,
-      textInputAction: TextInputAction.next,
-      onEditingComplete: () {
-        FocusScope.of(context).requestFocus(quoNo2SuffixFocus);
-      },
-    ),
-    const SizedBox(height: 20),
-    CustomTextField(
-      title: "Quotation No 2 Suffix",
-      hintText: "Enter Quotation No 2 Suffix",
-      prefixIcon: Icons.confirmation_num_outlined,
-      controller: quoNo2SuffixController,
-      focusNode: quoNo2SuffixFocus,
-      isValidate: true,
-      textInputAction: TextInputAction.next,
-      onEditingComplete: () {
-        FocusScope.of(context).requestFocus(quoNo2FormalDigitFocus);
-      },
-    ),
-    const SizedBox(height: 20),
-    CustomTextField(
-      title: "Quotation No 2 Formal Digit",
-      hintText: "Enter Quotation No 2 Formal Digit",
-      prefixIcon: Icons.format_list_numbered,
-      controller: quoNo2FormalDigitController,
-      focusNode: quoNo2FormalDigitFocus,
-      isValidate: true,
-      textInputAction: TextInputAction.next,
-      onEditingComplete: () {
-        FocusScope.of(context).requestFocus(salesNo2PrefixFocus);
-      },
-    ),
-    const SizedBox(height: 20),
-     const Text("Sales 2 Code"),
-                   const Divider(), 
-    CustomTextField(
-      title: "Sales No 2 Prefix",
-      hintText: "Enter Sales No 2 Prefix",
-      prefixIcon: Icons.sell,
-      controller: salesNo2PrefixController,
-      focusNode: salesNo2PrefixFocus,
-      isValidate: true,
-      textInputAction: TextInputAction.next,
-      onEditingComplete: () {
-        FocusScope.of(context).requestFocus(salesNo2Focus);
-      },
-    ),
-    const SizedBox(height: 20),
-    CustomTextField(
-      title: "Sales No 2",
-      hintText: "Enter Sales No 2",
-      prefixIcon: Icons.confirmation_num,
-      controller: salesNo2Controller,
-      focusNode: salesNo2Focus,
-      isValidate: true,
-      textInputAction: TextInputAction.next,
-      onEditingComplete: () {
-        FocusScope.of(context).requestFocus(salesNo2SuffixFocus);
-      },
-    ),
-    const SizedBox(height: 20),
-    CustomTextField(
-      title: "Sales No 2 Suffix",
-      hintText: "Enter Sales No 2 Suffix",
-      prefixIcon: Icons.confirmation_num_outlined,
-      controller: salesNo2SuffixController,
-      focusNode: salesNo2SuffixFocus,
-      isValidate: true,
-      textInputAction: TextInputAction.next,
-      onEditingComplete: () {
-        FocusScope.of(context).requestFocus(salesNo2FormalDigitFocus);
-      },
-    ),
-    const SizedBox(height: 20),
-    CustomTextField(
-      title: "Sales No 2 Formal Digit",
-      hintText: "Enter Sales No 2 Formal Digit",
-      prefixIcon: Icons.format_list_numbered,
-      controller: salesNo2FormalDigitController,
-      focusNode: salesNo2FormalDigitFocus,
-      isValidate: true,
-      textInputAction: TextInputAction.done,
-      onEditingComplete: () {
-        FocusScope.of(context).requestFocus(salesOrderNoPrefixFocus);
-      },
-    ),
-    const SizedBox(height: 20),
-     const Text("Sales Order Code"),
-                   const Divider(), 
-        CustomTextField(
-      title: "Sales Order No Prefix",
-      hintText: "Enter Sales Order No Prefix",
-      prefixIcon: Icons.sell,
-      controller: salesOrderNoPrefixController,
-      focusNode: salesOrderNoPrefixFocus,
-      isValidate: true,
-      textInputAction: TextInputAction.next,
-      onEditingComplete: () {
-        FocusScope.of(context).requestFocus(salesOrderNoFocus);
-      },
-    ),
-    const SizedBox(height: 20),
-    CustomTextField(
-      title: "Sales Order No",
-      hintText: "Enter Sales Order No",
-      prefixIcon: Icons.confirmation_num,
-      controller: salesOrderNoController,
-      focusNode: salesOrderNoFocus,
-      isValidate: true,
-      textInputAction: TextInputAction.next,
-      onEditingComplete: () {
-        FocusScope.of(context).requestFocus(salesOrderNoFormalDigitFocus);
-      },
-    ),
-    const SizedBox(height: 20),
-    CustomTextField(
-      title: "Sales Order No Formal Digit",
-      hintText: "Enter Sales Order No Formal Digit",
-      prefixIcon: Icons.format_list_numbered,
-      controller: salesOrderNoFormalDigitController,
-      focusNode: salesOrderNoFormalDigitFocus,
-      isValidate: true,
-      textInputAction: TextInputAction.next,
-      onEditingComplete: () {
-        FocusScope.of(context).requestFocus(salesOrderNoSuffixFocus);
-      },
-    ),
-    const SizedBox(height: 20),
-    CustomTextField(
-      title: "Sales Order No Suffix",
-      hintText: "Enter Sales Order No Suffix",
-      prefixIcon: Icons.confirmation_num_outlined,
-      controller: salesOrderNoSuffixController,
-      focusNode: salesOrderNoSuffixFocus,
-      isValidate: true,
-      textInputAction: TextInputAction.done,
-      onEditingComplete: () {
-        FocusScope.of(context).unfocus();
-      },
-    ),
-    const SizedBox(height: 20),
-      //                CustomSwitch(
-      //               value: _activeStatus,
-      //               title: "Active Status",
-      //               onChanged: (val) {
-      //                 setState(() {
-      //                   _activeStatus = val;
-      //                 });
-      //               },
-      //             ),
-      //             const SizedBox(height: 20,),
-      //             SearchDropdownField<Info>(
-      //               controller: _unitNameController,
-      //               hintText: "Area Name",
-      //               prefixIcon: Icons.search,
-      //               fetchItems: (q) async {
-      //                 final response = await _service.getAreaMasterSearch(q);
-      //                 if (response.isSuccess) {
-      //                   return (response.data?.info ?? []).whereType<Info>().toList();
-      //                 }
-      //                 return [];
-      //               },
-      //               displayString: (unit) => unit.areaName ?? "",
-      //               onSelected: (country) {
-      //                   if (country != null) {
-      //      setState(() {
-      //                   _unitIdController.text = country.areaCode.toString() ?? "";
-      //                   _unitNameController.text = country.areaName ?? "";
-      //                   // _createdUserController.text =
-      //                   //     country.createdUserCode?.toString() ?? userId.value!;
-      //                   _activeStatus = (country.activeStatus ?? 1) == 1;
-      //                   _isEditMode = true;
-      //                 });
+      const Divider(), 
+      const  SectionRow(title:"Purchase 2 Code"),
+      SizedBox(
+        width: constraints.maxWidth / columns - 20,
+        child: CustomTextField(
+         title: "Purchase No 2 Prefix",
+         hintText: "Enter Purchase No 2 Prefix",
+         prefixIcon: Icons.add_box,
+         controller: purNo2PrefixController,
+         focusNode: purNo2PrefixFocus,
+         isValidate: true,
+         textInputAction: TextInputAction.next,
+         onEditingComplete: () {
+           FocusScope.of(context).requestFocus(purchaseNo2Focus);
+         },
+            ),
+      ),
+     const SizedBox(height: 20),
+     SizedBox(
+        width: constraints.maxWidth / columns - 20,
+       child: CustomTextField(
+         title: "Purchase No 2",
+         hintText: "Enter Purchase No 2",
+         prefixIcon: Icons.list_alt,
+         controller: purchaseNo2Controller,
+         focusNode: purchaseNo2Focus,
+         isValidate: true,
+         textInputAction: TextInputAction.next,
+         onEditingComplete: () {
+           FocusScope.of(context).requestFocus(purNo2SuffixFocus);
+         },
+       ),
+     ),
+     const SizedBox(height: 20),
+     SizedBox(
+        width: constraints.maxWidth / columns - 20,
+       child: CustomTextField(
+         title: "Purchase No 2 Suffix",
+         hintText: "Enter Purchase No 2 Suffix",
+         prefixIcon: Icons.confirmation_num_outlined,
+         controller: purNo2SuffixController,
+         focusNode: purNo2SuffixFocus,
+         isValidate: true,
+         textInputAction: TextInputAction.next,
+         onEditingComplete: () {
+           FocusScope.of(context).requestFocus(purNo2FormalDigitFocus);
+         },
+       ),
+     ),
+     const SizedBox(height: 20),
+     SizedBox(
+        width: constraints.maxWidth / columns - 20,
+       child: CustomTextField(
+         title: "Purchase No 2 Formal Digit",
+         hintText: "Enter Purchase No 2 Formal Digit",
+         prefixIcon: Icons.format_list_numbered,
+         controller: purNo2FormalDigitController,
+         focusNode: purNo2FormalDigitFocus,
+         isValidate: true,
+         textInputAction: TextInputAction.next,
+         onEditingComplete: () {
+           FocusScope.of(context).requestFocus(purOrderNoPrefixFocus);
+         },
+       ),
+     ),
+     const SizedBox(height: 20),
       
-      //                 // ✅ Switch form into "Update mode"
-      //                 widget.onSaved(false);
-      //     }
-                  
-      //               },
-      //                onSubmitted: (typedValue) {
-      //     // ✅ User pressed enter or confirmed text without selecting
-      //     setState(() {
-      //       _unitIdController.clear(); // no id since not from API
-      //       _unitNameController.text = typedValue; 
-      //       print("_countryNameController.text");// use typed text
-      //       print(_unitNameController.text);// use typed text
-      //       _createdUserController.text = userId.value!;
-      //       _activeStatus = true;
-      //             _isEditMode = false;
-      //     });
-      //     widget.onSaved(false);
-      //   },
-      //             ),
+      const Divider(), 
+      const SectionRow(title:"Purchase Order Code"),
+     SizedBox(
+        width: constraints.maxWidth / columns - 20,
+       child: CustomTextField(
+         title: "Purchase Order No Prefix",
+         hintText: "Enter Purchase Order No Prefix",
+         prefixIcon: Icons.add_business,
+         controller: purOrderNoPrefixController,
+         focusNode: purOrderNoPrefixFocus,
+         isValidate: true,
+         textInputAction: TextInputAction.next,
+         onEditingComplete: () {
+           FocusScope.of(context).requestFocus(purchaseOderNoFocus);
+         },
+       ),
+     ),
+     const SizedBox(height: 20),
+     SizedBox(
+        width: constraints.maxWidth / columns - 20,
+       child: CustomTextField(
+         title: "Purchase Order No",
+         hintText: "Enter Purchase Order No",
+         prefixIcon: Icons.list,
+         controller: purchaseOderNoController,
+         focusNode: purchaseOderNoFocus,
+         isValidate: true,
+         textInputAction: TextInputAction.next,
+         onEditingComplete: () {
+           FocusScope.of(context).requestFocus(purOrderNoSuffixFocus);
+         },
+       ),
+     ),
+     const SizedBox(height: 20),
+     SizedBox(
+        width: constraints.maxWidth / columns - 20,
+       child: CustomTextField(
+         title: "Purchase Order No Suffix",
+         hintText: "Enter Purchase Order No Suffix",
+         prefixIcon: Icons.confirmation_num,
+         controller: purOrderNoSuffixController,
+         focusNode: purOrderNoSuffixFocus,
+         isValidate: true,
+         textInputAction: TextInputAction.next,
+         onEditingComplete: () {
+           FocusScope.of(context).requestFocus(purOrderNoFormalDigitFocus);
+         },
+       ),
+     ),
+     const SizedBox(height: 20),
+     SizedBox(
+        width: constraints.maxWidth / columns - 20,
+       child: CustomTextField(
+         title: "Purchase Order No Formal Digit",
+         hintText: "Enter Purchase Order No Formal Digit",
+         prefixIcon: Icons.format_list_numbered_rtl,
+         controller: purOrderNoFormalDigitController,
+         focusNode: purOrderNoFormalDigitFocus,
+         isValidate: true,
+         textInputAction: TextInputAction.next,
+         onEditingComplete: () {
+           FocusScope.of(context).requestFocus(purOrderNo2PrefixFocus);
+         },
+       ),
+     ),
+     const SizedBox(height: 20),
       
-      //             const SizedBox(height: 26),
-      //             // SwitchListTile(
-      //             //   value: _activeStatus,
-      //             //   title: const Text("Active Status"),
-      //             //   onChanged: (val) => setState(() => _activeStatus = val),
-      //             // ),
-           
-      //             CustomTextField(
-      //               title: "Area Code",
-      //               hintText: "Enter Area Code",
-      //               controller: _unitIdController,
-      //               prefixIcon: Icons.flag_circle,
-      //               isValidate: true,
-      //               validator: (value) =>
-      //                   value == null || value.isEmpty ? "Enter Area Code" : null,
-      //               focusNode: _unitIdFocus,
-      //               textInputAction: TextInputAction.next,
-      //               onEditingComplete: () {
-      //                 FocusScope.of(context).requestFocus(_unitNameFocus);
-      //               },
-      //             ),
-      //             const SizedBox(height: 16),
-      //             // CustomTextField(
-      //             //   title: "Area Name",
-      //             //   hintText: "Enter Area Name",
-      //             //   controller: _unitNameController,
-      //             //   prefixIcon: Icons.flag,
-      //             //   isValidate: true,
-      //             //   validator: (value) =>
-      //             //       value == null || value.isEmpty ? "Enter Area name" : null,
-      //             //   focusNode: _unitNameFocus,
-      //             //   textInputAction: TextInputAction.next,
-      //             //   onEditingComplete: () {
-      //             //     // FocusScope.of(context).requestFocus(_createdUserFocus);
-      //             //   },
-      //             // ),
-      //             // const SizedBox(height: 16),
-             
-      //             CustomDropdownField<int>(
-      //               title: "Select State",
-      //               hintText: "Choose State",
-      //               items: getAllMasterListModel!.info!.states!
-      //                   .map((e) => DropdownMenuItem<int>(
-      //                         value: e.stateCode, // 🔹 use taxCode as value
-      //                         child: Text("${e.stateName} "),
-      //                       ))
-      //                   .toList(),
-      //               // initialValue: _taxCode, // int? taxCode
-      //               onChanged: (value) {
-      //                 setState(() {
-      //                   _stateCode = value;
-      //                   //  _taxCode = value;
-      //                 });
+      const Divider(), 
+      const SectionRow(title: "Purchase Order 2 Code"),
+     SizedBox(
+        width: constraints.maxWidth / columns - 20,
+       child: CustomTextField(
+         title: "Purchase Order No 2 Prefix",
+         hintText: "Enter Purchase Order No 2 Prefix",
+         prefixIcon: Icons.add_box,
+         controller: purOrderNo2PrefixController,
+         focusNode: purOrderNo2PrefixFocus,
+         isValidate: true,
+         textInputAction: TextInputAction.next,
+         onEditingComplete: () {
+           FocusScope.of(context).requestFocus(purchaseOrderNo2Focus);
+         },
+       ),
+     ),
+     const SizedBox(height: 20),
+     SizedBox(
+        width: constraints.maxWidth / columns - 20,
+       child: CustomTextField(
+         title: "Purchase Order No 2",
+         hintText: "Enter Purchase Order No 2",
+         prefixIcon: Icons.list_alt,
+         controller: purchaseOrderNo2Controller,
+         focusNode: purchaseOrderNo2Focus,
+         isValidate: true,
+         textInputAction: TextInputAction.next,
+         onEditingComplete: () {
+           FocusScope.of(context).requestFocus(purOrderNo2SuffixFocus);
+         },
+       ),
+     ),
+     const SizedBox(height: 20),
+     SizedBox(
+        width: constraints.maxWidth / columns - 20,
+       child: CustomTextField(
+         title: "Purchase Order No 2 Suffix",
+         hintText: "Enter Purchase Order No 2 Suffix",
+         prefixIcon: Icons.confirmation_num_outlined,
+         controller: purOrderNo2SuffixController,
+         focusNode: purOrderNo2SuffixFocus,
+         isValidate: true,
+         textInputAction: TextInputAction.next,
+         onEditingComplete: () {
+           FocusScope.of(context).requestFocus(purOrderNo2FormalDigitFocus);
+         },
+       ),
+     ),
+     const SizedBox(height: 20),
+     SizedBox(
+        width: constraints.maxWidth / columns - 20,
+       child: CustomTextField(
+         title: "Purchase Order No 2 Formal Digit",
+         hintText: "Enter Purchase Order No 2 Formal Digit",
+         prefixIcon: Icons.format_list_numbered,
+         controller: purOrderNo2FormalDigitController,
+         focusNode: purOrderNo2FormalDigitFocus,
+         isValidate: true,
+         textInputAction: TextInputAction.done,
+         onEditingComplete: () {
+           FocusScope.of(context).requestFocus(quoNoPrefixFocus);
+         },
+       ),
+     ),
+     const SizedBox(height: 20),
       
-      //                 final selected = getAllMasterListModel!.info!.states!
-      //                     .firstWhere((c) => c.stateCode == value,
-      //                         orElse: () => master.States());
-      // stateCode=selected.stateCode;
-      //                 print("Selected GST %: ${selected.stateCode}");
-      //                 print("Selected TAX Code: ${selected.stateCode}");
-      //               },
-      //               isValidate: true,
-      //               validator: (value) =>
-      //                   value == null ? "Please select State" : null,
-      //               addPage: AddStateMasterPage(
-      //                 onSaved: (success) {
-      //                   if (success) {
-      //                     Navigator.pop(context, true);
-      //                   }
-      //                 },
-      //               ),
-      //               addTooltip: "Add State",
-      //             ),
-              // CustomTextField(
-              //   title: "Create User",
-              //   controller: _createdUserController,
-              //   prefixIcon: Icons.person,
-              //   isEdit: true,
-              //   // focusNode: _createdUserFocus,
-              //   textInputAction: TextInputAction.done,
-              //   onEditingComplete: _submit,
-              // ),
-              const SizedBox(height: 16),
-              // SwitchListTile(
-              //   value: _activeStatus,
-              //   title: const Text("Active Status"),
-              //   onChanged: (val) => setState(() => _activeStatus = val),
-              // ),
-              const SizedBox(height: 16),
-              if (_loading)
-                const CircularProgressIndicator()
-              else
-                GradientButton(
-                    text: _isEditMode ? "Update Area" : "Add Number initialize",
-                    onPressed: _submit),
-              if (_message != null) ...[
-                const SizedBox(height: 16),
-                Text(
-                  _message!,
-                  style: TextStyle(
-                    color: _message!.contains("successfully")
-                        ? Colors.green
-                        : Colors.red,
-                  ),
-                ),
-              ]
-            ],
-          ),
+      const Divider(),
+      const SectionRow(title: "Quotation Code"), 
+       SizedBox(
+          width: constraints.maxWidth / columns - 20,
+         child: CustomTextField(
+         title: "Quotation No Prefix",
+         hintText: "Enter Quotation No Prefix",
+         prefixIcon: Icons.description,
+         controller: quoNoPrefixController,
+         focusNode: quoNoPrefixFocus,
+         isValidate: true,
+         textInputAction: TextInputAction.next,
+         onEditingComplete: () {
+           FocusScope.of(context).requestFocus(quotationNoFocus);
+         },
+             ),
+       ),
+     const SizedBox(height: 20),
+     SizedBox(
+        width: constraints.maxWidth / columns - 20,
+       child: CustomTextField(
+         title: "Quotation No",
+         hintText: "Enter Quotation No",
+         prefixIcon: Icons.confirmation_num,
+         controller: quotationNoController,
+         focusNode: quotationNoFocus,
+         isValidate: true,
+         textInputAction: TextInputAction.next,
+         onEditingComplete: () {
+           FocusScope.of(context).requestFocus(quoNoSuffixFocus);
+         },
+       ),
+     ),
+     const SizedBox(height: 20),
+     SizedBox(
+        width: constraints.maxWidth / columns - 20,
+       child: CustomTextField(
+         title: "Quotation No Suffix",
+         hintText: "Enter Quotation No Suffix",
+         prefixIcon: Icons.confirmation_num_outlined,
+         controller: quoNoSuffixController,
+         focusNode: quoNoSuffixFocus,
+         isValidate: true,
+         textInputAction: TextInputAction.next,
+         onEditingComplete: () {
+           FocusScope.of(context).requestFocus(quoNoFormalDigitFocus);
+         },
+       ),
+     ),
+     const SizedBox(height: 20),
+     SizedBox(
+        width: constraints.maxWidth / columns - 20,
+       child: CustomTextField(
+         title: "Quotation No Formal Digit",
+         hintText: "Enter Quotation No Formal Digit",
+         prefixIcon: Icons.format_list_numbered,
+         controller: quoNoFormalDigitController,
+         focusNode: quoNoFormalDigitFocus,
+         isValidate: true,
+         textInputAction: TextInputAction.next,
+         onEditingComplete: () {
+           FocusScope.of(context).requestFocus(quoNo2PrefixFocus);
+         },
+       ),
+     ),
+     const SizedBox(height: 20),
+     
+      const Divider(),
+       const SectionRow(title:"Quotation 2 Code"), 
+     SizedBox(
+        width: constraints.maxWidth / columns - 20,
+       child: CustomTextField(
+         title: "Quotation No 2 Prefix",
+         hintText: "Enter Quotation No 2 Prefix",
+         prefixIcon: Icons.description_outlined,
+         controller: quoNo2PrefixController,
+         focusNode: quoNo2PrefixFocus,
+         isValidate: true,
+         textInputAction: TextInputAction.next,
+         onEditingComplete: () {
+           FocusScope.of(context).requestFocus(quotationNo2Focus);
+         },
+       ),
+     ),
+     const SizedBox(height: 20),
+     SizedBox(
+        width: constraints.maxWidth / columns - 20,
+       child: CustomTextField(
+         title: "Quotation No 2",
+         hintText: "Enter Quotation No 2",
+         prefixIcon: Icons.confirmation_num,
+         controller: quotationNo2Controller,
+         focusNode: quotationNo2Focus,
+         isValidate: true,
+         textInputAction: TextInputAction.next,
+         onEditingComplete: () {
+           FocusScope.of(context).requestFocus(quoNo2SuffixFocus);
+         },
+       ),
+     ),
+     const SizedBox(height: 20),
+     SizedBox(
+        width: constraints.maxWidth / columns - 20,
+       child: CustomTextField(
+         title: "Quotation No 2 Suffix",
+         hintText: "Enter Quotation No 2 Suffix",
+         prefixIcon: Icons.confirmation_num_outlined,
+         controller: quoNo2SuffixController,
+         focusNode: quoNo2SuffixFocus,
+         isValidate: true,
+         textInputAction: TextInputAction.next,
+         onEditingComplete: () {
+           FocusScope.of(context).requestFocus(quoNo2FormalDigitFocus);
+         },
+       ),
+     ),
+     const SizedBox(height: 20),
+     SizedBox(
+        width: constraints.maxWidth / columns - 20,
+       child: CustomTextField(
+         title: "Quotation No 2 Formal Digit",
+         hintText: "Enter Quotation No 2 Formal Digit",
+         prefixIcon: Icons.format_list_numbered,
+         controller: quoNo2FormalDigitController,
+         focusNode: quoNo2FormalDigitFocus,
+         isValidate: true,
+         textInputAction: TextInputAction.next,
+         onEditingComplete: () {
+           FocusScope.of(context).requestFocus(salesNo2PrefixFocus);
+         },
+       ),
+     ),
+     const SizedBox(height: 20),
+   
+      const Divider(),
+         const SectionRow(title: "Sales 2 Code"), 
+     SizedBox(
+        width: constraints.maxWidth / columns - 20,
+       child: CustomTextField(
+         title: "Sales No 2 Prefix",
+         hintText: "Enter Sales No 2 Prefix",
+         prefixIcon: Icons.sell,
+         controller: salesNo2PrefixController,
+         focusNode: salesNo2PrefixFocus,
+         isValidate: true,
+         textInputAction: TextInputAction.next,
+         onEditingComplete: () {
+           FocusScope.of(context).requestFocus(salesNo2Focus);
+         },
+       ),
+     ),
+     const SizedBox(height: 20),
+     SizedBox(
+           width: constraints.maxWidth / columns - 20,
+       child: CustomTextField(
+         title: "Sales No 2",
+         hintText: "Enter Sales No 2",
+         prefixIcon: Icons.confirmation_num,
+         controller: salesNo2Controller,
+         focusNode: salesNo2Focus,
+         isValidate: true,
+         textInputAction: TextInputAction.next,
+         onEditingComplete: () {
+           FocusScope.of(context).requestFocus(salesNo2SuffixFocus);
+         },
+       ),
+     ),
+     const SizedBox(height: 20),
+     SizedBox(
+        width: constraints.maxWidth / columns - 20,
+       child: CustomTextField(
+         title: "Sales No 2 Suffix",
+         hintText: "Enter Sales No 2 Suffix",
+         prefixIcon: Icons.confirmation_num_outlined,
+         controller: salesNo2SuffixController,
+         focusNode: salesNo2SuffixFocus,
+         isValidate: true,
+         textInputAction: TextInputAction.next,
+         onEditingComplete: () {
+           FocusScope.of(context).requestFocus(salesNo2FormalDigitFocus);
+         },
+       ),
+     ),
+     const SizedBox(height: 20),
+     SizedBox(
+        width: constraints.maxWidth / columns - 20,
+       child: CustomTextField(
+         title: "Sales No 2 Formal Digit",
+         hintText: "Enter Sales No 2 Formal Digit",
+         prefixIcon: Icons.format_list_numbered,
+         controller: salesNo2FormalDigitController,
+         focusNode: salesNo2FormalDigitFocus,
+         isValidate: true,
+         textInputAction: TextInputAction.done,
+         onEditingComplete: () {
+           FocusScope.of(context).requestFocus(salesOrderNoPrefixFocus);
+         },
+       ),
+     ),
+     const SizedBox(height: 20),
+      
+      const Divider(),
+      const SectionRow(title: "Sales Order Code"), 
+         SizedBox(
+            width: constraints.maxWidth / columns - 20,
+           child: CustomTextField(
+   title: "Sales Order No Prefix",
+   hintText: "Enter Sales Order No Prefix",
+   prefixIcon: Icons.sell,
+   controller: salesOrderNoPrefixController,
+   focusNode: salesOrderNoPrefixFocus,
+   isValidate: true,
+   textInputAction: TextInputAction.next,
+   onEditingComplete: () {
+           FocusScope.of(context).requestFocus(salesOrderNoFocus);
+   },
+ ),
+         ),
+     const SizedBox(height: 20),
+     SizedBox(
+        width: constraints.maxWidth / columns - 20,
+       child: CustomTextField(
+         title: "Sales Order No",
+         hintText: "Enter Sales Order No",
+         prefixIcon: Icons.confirmation_num,
+         controller: salesOrderNoController,
+         focusNode: salesOrderNoFocus,
+         isValidate: true,
+         textInputAction: TextInputAction.next,
+         onEditingComplete: () {
+           FocusScope.of(context).requestFocus(salesOrderNoFormalDigitFocus);
+         },
+       ),
+     ),
+     const SizedBox(height: 20),
+     SizedBox(
+        width: constraints.maxWidth / columns - 20,
+       child: CustomTextField(
+         title: "Sales Order No Formal Digit",
+         hintText: "Enter Sales Order No Formal Digit",
+         prefixIcon: Icons.format_list_numbered,
+         controller: salesOrderNoFormalDigitController,
+         focusNode: salesOrderNoFormalDigitFocus,
+         isValidate: true,
+         textInputAction: TextInputAction.next,
+         onEditingComplete: () {
+           FocusScope.of(context).requestFocus(salesOrderNoSuffixFocus);
+         },
+       ),
+     ),
+     const SizedBox(height: 20),
+     SizedBox(
+        width: constraints.maxWidth / columns - 20,
+       child: CustomTextField(
+         title: "Sales Order No Suffix",
+         hintText: "Enter Sales Order No Suffix",
+         prefixIcon: Icons.confirmation_num_outlined,
+         controller: salesOrderNoSuffixController,
+         focusNode: salesOrderNoSuffixFocus,
+         isValidate: true,
+         textInputAction: TextInputAction.done,
+         onEditingComplete: () {
+           FocusScope.of(context).unfocus();
+         },
+       ),
+     ),
+     const SizedBox(height: 20),
+       //                CustomSwitch(
+       //               value: _activeStatus,
+       //               title: "Active Status",
+       //               onChanged: (val) {
+       //                 setState(() {
+       //                   _activeStatus = val;
+       //                 });
+       //               },
+       //             ),
+       //             const SizedBox(height: 20,),
+       //             SearchDropdownField<Info>(
+       //               controller: _unitNameController,
+       //               hintText: "Area Name",
+       //               prefixIcon: Icons.search,
+       //               fetchItems: (q) async {
+       //                 final response = await _service.getAreaMasterSearch(q);
+       //                 if (response.isSuccess) {
+       //                   return (response.data?.info ?? []).whereType<Info>().toList();
+       //                 }
+       //                 return [];
+       //               },
+       //               displayString: (unit) => unit.areaName ?? "",
+       //               onSelected: (country) {
+       //                   if (country != null) {
+       //      setState(() {
+       //                   _unitIdController.text = country.areaCode.toString() ?? "";
+       //                   _unitNameController.text = country.areaName ?? "";
+       //                   // _createdUserController.text =
+       //                   //     country.createdUserCode?.toString() ?? userId.value!;
+       //                   _activeStatus = (country.activeStatus ?? 1) == 1;
+       //                   _isEditMode = true;
+       //                 });
+       
+       //                 // ✅ Switch form into "Update mode"
+       //                 widget.onSaved(false);
+       //     }
+     
+       //               },
+       //                onSubmitted: (typedValue) {
+       //     // ✅ User pressed enter or confirmed text without selecting
+       //     setState(() {
+       //       _unitIdController.clear(); // no id since not from API
+       //       _unitNameController.text = typedValue; 
+       //       print("_countryNameController.text");// use typed text
+       //       print(_unitNameController.text);// use typed text
+       //       _createdUserController.text = userId.value!;
+       //       _activeStatus = true;
+       //             _isEditMode = false;
+       //     });
+       //     widget.onSaved(false);
+       //   },
+       //             ),
+       
+       //             const SizedBox(height: 26),
+       //             // SwitchListTile(
+       //             //   value: _activeStatus,
+       //             //   title: const Text("Active Status"),
+       //             //   onChanged: (val) => setState(() => _activeStatus = val),
+       //             // ),
+            
+       //             CustomTextField(
+       //               title: "Area Code",
+       //               hintText: "Enter Area Code",
+       //               controller: _unitIdController,
+       //               prefixIcon: Icons.flag_circle,
+       //               isValidate: true,
+       //               validator: (value) =>
+       //                   value == null || value.isEmpty ? "Enter Area Code" : null,
+       //               focusNode: _unitIdFocus,
+       //               textInputAction: TextInputAction.next,
+       //               onEditingComplete: () {
+       //                 FocusScope.of(context).requestFocus(_unitNameFocus);
+       //               },
+       //             ),
+       //             const SizedBox(height: 16),
+       //             // CustomTextField(
+       //             //   title: "Area Name",
+       //             //   hintText: "Enter Area Name",
+       //             //   controller: _unitNameController,
+       //             //   prefixIcon: Icons.flag,
+       //             //   isValidate: true,
+       //             //   validator: (value) =>
+       //             //       value == null || value.isEmpty ? "Enter Area name" : null,
+       //             //   focusNode: _unitNameFocus,
+       //             //   textInputAction: TextInputAction.next,
+       //             //   onEditingComplete: () {
+       //             //     // FocusScope.of(context).requestFocus(_createdUserFocus);
+       //             //   },
+       //             // ),
+       //             // const SizedBox(height: 16),
+              
+       //             CustomDropdownField<int>(
+       //               title: "Select State",
+       //               hintText: "Choose State",
+       //               items: getAllMasterListModel!.info!.states!
+       //                   .map((e) => DropdownMenuItem<int>(
+       //                         value: e.stateCode, // 🔹 use taxCode as value
+       //                         child: Text("${e.stateName} "),
+       //                       ))
+       //                   .toList(),
+       //               // initialValue: _taxCode, // int? taxCode
+       //               onChanged: (value) {
+       //                 setState(() {
+       //                   _stateCode = value;
+       //                   //  _taxCode = value;
+       //                 });
+       
+       //                 final selected = getAllMasterListModel!.info!.states!
+       //                     .firstWhere((c) => c.stateCode == value,
+       //                         orElse: () => master.States());
+       // stateCode=selected.stateCode;
+       //                 print("Selected GST %: ${selected.stateCode}");
+       //                 print("Selected TAX Code: ${selected.stateCode}");
+       //               },
+       //               isValidate: true,
+       //               validator: (value) =>
+       //                   value == null ? "Please select State" : null,
+       //               addPage: AddStateMasterPage(
+       //                 onSaved: (success) {
+       //                   if (success) {
+       //                     Navigator.pop(context, true);
+       //                   }
+       //                 },
+       //               ),
+       //               addTooltip: "Add State",
+       //             ),
+ // CustomTextField(
+ //   title: "Create User",
+ //   controller: _createdUserController,
+ //   prefixIcon: Icons.person,
+ //   isEdit: true,
+ //   // focusNode: _createdUserFocus,
+ //   textInputAction: TextInputAction.done,
+ //   onEditingComplete: _submit,
+ // ),
+ const SizedBox(height: 16),
+ // SwitchListTile(
+ //   value: _activeStatus,
+ //   title: const Text("Active Status"),
+ //   onChanged: (val) => setState(() => _activeStatus = val),
+ // ),
+ const SizedBox(height: 16),
+ if (_loading)
+   const CircularProgressIndicator()
+ else
+   GradientButton(
+       text: _isEditMode ? "Update Area" : "Add Number initialize",
+       onPressed: _submit),
+ if (_message != null) ...[
+   const SizedBox(height: 16),
+   Text(
+     _message!,
+     style: TextStyle(
+       color: _message!.contains("successfully")
+           ? Colors.green
+           : Colors.red,
+     ),
+   ),
+ ],
+       
+                ]);
+          }),
+         
         ),
       ),
+    );
+  }
+}
+
+
+
+class SectionRow extends StatelessWidget {
+  final String title;
+
+  const SectionRow({super.key, required this.title});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Expanded(
+          child: Text(
+            title,
+            style: const TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

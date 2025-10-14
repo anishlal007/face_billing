@@ -26,10 +26,10 @@ class LoginModel {
 }
 
 class User {
-  int? userCode;
+  dynamic userCode;
   String? userId;
   String? userName;
-  int? userType;
+  dynamic userType;
 
   User({this.userCode, this.userId, this.userName, this.userType});
 
