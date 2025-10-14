@@ -1,44 +1,44 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <CustomBuild Include="C:\Users\AK\Desktop\flutter git\face billing\face_billing\build\windows\x64\pdfium-download\CMakeFiles\84fa5ad8e7f641d7fb384caedcc43d6a\pdfium-download-mkdir.rule">
+    <CustomBuild Include="C:\Users\AK\Desktop\flutter\face billing\face_billing\build\windows\x64\pdfium-download\CMakeFiles\22c921a78c99c73ce72aea4ae1424c11\pdfium-download-mkdir.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\Users\AK\Desktop\flutter git\face billing\face_billing\build\windows\x64\pdfium-download\CMakeFiles\84fa5ad8e7f641d7fb384caedcc43d6a\pdfium-download-download.rule">
+    <CustomBuild Include="C:\Users\AK\Desktop\flutter\face billing\face_billing\build\windows\x64\pdfium-download\CMakeFiles\22c921a78c99c73ce72aea4ae1424c11\pdfium-download-download.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\Users\AK\Desktop\flutter git\face billing\face_billing\build\windows\x64\pdfium-download\CMakeFiles\84fa5ad8e7f641d7fb384caedcc43d6a\pdfium-download-update.rule">
+    <CustomBuild Include="C:\Users\AK\Desktop\flutter\face billing\face_billing\build\windows\x64\pdfium-download\CMakeFiles\22c921a78c99c73ce72aea4ae1424c11\pdfium-download-update.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\Users\AK\Desktop\flutter git\face billing\face_billing\build\windows\x64\pdfium-download\CMakeFiles\84fa5ad8e7f641d7fb384caedcc43d6a\pdfium-download-patch.rule">
+    <CustomBuild Include="C:\Users\AK\Desktop\flutter\face billing\face_billing\build\windows\x64\pdfium-download\CMakeFiles\22c921a78c99c73ce72aea4ae1424c11\pdfium-download-patch.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\Users\AK\Desktop\flutter git\face billing\face_billing\build\windows\x64\pdfium-download\CMakeFiles\84fa5ad8e7f641d7fb384caedcc43d6a\pdfium-download-configure.rule">
+    <CustomBuild Include="C:\Users\AK\Desktop\flutter\face billing\face_billing\build\windows\x64\pdfium-download\CMakeFiles\22c921a78c99c73ce72aea4ae1424c11\pdfium-download-configure.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\Users\AK\Desktop\flutter git\face billing\face_billing\build\windows\x64\pdfium-download\CMakeFiles\84fa5ad8e7f641d7fb384caedcc43d6a\pdfium-download-build.rule">
+    <CustomBuild Include="C:\Users\AK\Desktop\flutter\face billing\face_billing\build\windows\x64\pdfium-download\CMakeFiles\22c921a78c99c73ce72aea4ae1424c11\pdfium-download-build.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\Users\AK\Desktop\flutter git\face billing\face_billing\build\windows\x64\pdfium-download\CMakeFiles\84fa5ad8e7f641d7fb384caedcc43d6a\pdfium-download-install.rule">
+    <CustomBuild Include="C:\Users\AK\Desktop\flutter\face billing\face_billing\build\windows\x64\pdfium-download\CMakeFiles\22c921a78c99c73ce72aea4ae1424c11\pdfium-download-install.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\Users\AK\Desktop\flutter git\face billing\face_billing\build\windows\x64\pdfium-download\CMakeFiles\84fa5ad8e7f641d7fb384caedcc43d6a\pdfium-download-test.rule">
+    <CustomBuild Include="C:\Users\AK\Desktop\flutter\face billing\face_billing\build\windows\x64\pdfium-download\CMakeFiles\22c921a78c99c73ce72aea4ae1424c11\pdfium-download-test.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\Users\AK\Desktop\flutter git\face billing\face_billing\build\windows\x64\pdfium-download\CMakeFiles\254811fcf16e3eb015a47ae1e7d926d2\pdfium-download-complete.rule">
+    <CustomBuild Include="C:\Users\AK\Desktop\flutter\face billing\face_billing\build\windows\x64\pdfium-download\CMakeFiles\8c4ee56a3fd66f951c6b9e3d08db5f17\pdfium-download-complete.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\Users\AK\Desktop\flutter git\face billing\face_billing\build\windows\x64\pdfium-download\CMakeFiles\1ddf60ebc463dbfd59fafbd000a62568\pdfium-download.rule">
+    <CustomBuild Include="C:\Users\AK\Desktop\flutter\face billing\face_billing\build\windows\x64\pdfium-download\CMakeFiles\5b35403423b510a2ecfa747f4600fd95\pdfium-download.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\Users\AK\Desktop\flutter git\face billing\face_billing\build\windows\x64\pdfium-download\CMakeLists.txt" />
+    <CustomBuild Include="C:\Users\AK\Desktop\flutter\face billing\face_billing\build\windows\x64\pdfium-download\CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="C:\Users\AK\Desktop\flutter git\face billing\face_billing\build\windows\x64\pdfium-download\CMakeFiles\pdfium-download" />
+    <None Include="C:\Users\AK\Desktop\flutter\face billing\face_billing\build\windows\x64\pdfium-download\CMakeFiles\pdfium-download" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="CMake Rules">
-      <UniqueIdentifier>{7864EE07-9BEA-3D14-AD28-756EC2FC68F1}</UniqueIdentifier>
+      <UniqueIdentifier>{9C52177D-32B0-3F3E-B6A0-7D9FBE27699A}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

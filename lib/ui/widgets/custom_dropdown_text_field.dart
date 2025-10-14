@@ -210,7 +210,7 @@ class _CustomDropdownFieldState<T> extends State<CustomDropdownField<T>> {
                     size: 20,
                   ),
                   onPressed: _openPopup,
-                ) : SizedBox(width: 37,)  
+                ) : SizedBox(width: 31,)  
             ],
           ),
         ),

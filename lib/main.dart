@@ -1,3 +1,4 @@
+import 'package:facebilling/core/app_globals.dart';
 import 'package:facebilling/core/preference_helper.dart';
 import 'package:facebilling/ui/screens/masters/home/home_page.dart';
 import 'package:flutter/material.dart';
@@ -16,13 +17,21 @@ class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) { 
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Inventory System',
-      theme: ThemeData(primarySwatch: Colors.blue),
-      home: const WebmailLoginScreen(),
-    );
+  navigatorKey: navigatorKey, // ✅ Add this line
+  debugShowCheckedModeBanner: false,
+  title: 'Face Billing App',
+  theme: ThemeData(
+    primarySwatch: Colors.blue,
+  ),
+  initialRoute: '/login',
+  routes: {
+    '/login': (context) => const WebmailLoginScreen(),
+    '/home': (context) => const HomePage(),
+  },
+);
+
   }
 }
 

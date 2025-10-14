@@ -1,6 +1,6 @@
-^C:\USERS\AK\DESKTOP\FLUTTER GIT\FACE BILLING\FACE_BILLING\BUILD\WINDOWS\X64\CMAKEFILES\6F106C006E3E6BA64A836EF06C223B8A\GENERATE.STAMP.RULE
+^C:\USERS\AK\DESKTOP\FLUTTER\FACE BILLING\FACE_BILLING\BUILD\WINDOWS\X64\CMAKEFILES\FB2B68837C55CDC194B36D20577ADA3C\GENERATE.STAMP.RULE
 setlocal
-"C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" "-SC:/Users/AK/Desktop/flutter git/face billing/face_billing/windows" "-BC:/Users/AK/Desktop/flutter git/face billing/face_billing/build/windows/x64" --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file "C:/Users/AK/Desktop/flutter git/face billing/face_billing/build/windows/x64/facebilling.sln"
+"C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" "-SC:/Users/AK/Desktop/flutter/face billing/face_billing/windows" "-BC:/Users/AK/Desktop/flutter/face billing/face_billing/build/windows/x64" --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file "C:/Users/AK/Desktop/flutter/face billing/face_billing/build/windows/x64/facebilling.sln"
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone

@@ -1,0 +1,1 @@
+ C:\\Users\\AK\\Desktop\\flutter\\face\ billing\\face_billing\\.dart_tool\\flutter_build\\a4bb3861f01d3d1ee78ab924b1c51c4d\\native_assets.yaml: 

@@ -18,7 +18,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{3F5A9268-0E7C-36A1-9624-AC96BA4EA9D0}</ProjectGuid>
+    <ProjectGuid>{C64CE0B0-E535-3600-924A-F6952AD8A983}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <WindowsTargetPlatformVersion>10.0.26100.0</WindowsTargetPlatformVersion>
     <Platform>x64</Platform>
@@ -50,19 +50,19 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\AK\Desktop\flutter git\face billing\face_billing\build\windows\x64\plugins\printing\Debug\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\AK\Desktop\flutter\face billing\face_billing\build\windows\x64\plugins\printing\Debug\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">printing_plugin.dir\Debug\</IntDir>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">printing_plugin</TargetName>
     <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.dll</TargetExt>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</LinkIncremental>
     <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateManifest>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">C:\Users\AK\Desktop\flutter git\face billing\face_billing\build\windows\x64\plugins\printing\Profile\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">C:\Users\AK\Desktop\flutter\face billing\face_billing\build\windows\x64\plugins\printing\Profile\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">printing_plugin.dir\Profile\</IntDir>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">printing_plugin</TargetName>
     <TargetExt Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">.dll</TargetExt>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">false</LinkIncremental>
     <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">true</GenerateManifest>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\AK\Desktop\flutter git\face billing\face_billing\build\windows\x64\plugins\printing\Release\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\AK\Desktop\flutter\face billing\face_billing\build\windows\x64\plugins\printing\Release\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">printing_plugin.dir\Release\</IntDir>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">printing_plugin</TargetName>
     <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.dll</TargetExt>
@@ -72,8 +72,8 @@
   <PropertyGroup />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\AK\Desktop\flutter git\face billing\face_billing\windows\flutter\ephemeral;C:\Users\AK\Desktop\flutter git\face billing\face_billing\windows\flutter\ephemeral\cpp_client_wrapper\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalOptions>%(AdditionalOptions) /external:I "C:/Users/AK/Desktop/flutter git/face billing/face_billing/build/windows/x64/pdfium-src/include" /external:I "C:/Users/AK/Desktop/flutter git/face billing/face_billing/build/windows/x64/pdfium-src/include/cpp"</AdditionalOptions>
+      <AdditionalIncludeDirectories>C:\Users\AK\Desktop\flutter\face billing\face_billing\windows\flutter\ephemeral;C:\Users\AK\Desktop\flutter\face billing\face_billing\windows\flutter\ephemeral\cpp_client_wrapper\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /external:I "C:/Users/AK/Desktop/flutter/face billing/face_billing/build/windows/x64/pdfium-src/include" /external:I "C:/Users/AK/Desktop/flutter/face billing/face_billing/build/windows/x64/pdfium-src/include/cpp"</AdditionalOptions>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -97,10 +97,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;_HAS_EXCEPTIONS=0;FLUTTER_PLUGIN_IMPL;UNICODE;_UNICODE;CMAKE_INTDIR=\"Debug\";printing_plugin_EXPORTS</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\AK\Desktop\flutter git\face billing\face_billing\windows\flutter\ephemeral;C:\Users\AK\Desktop\flutter git\face billing\face_billing\windows\flutter\ephemeral\cpp_client_wrapper\include;C:\Users\AK\Desktop\flutter git\face billing\face_billing\build\windows\x64\pdfium-src\include;C:\Users\AK\Desktop\flutter git\face billing\face_billing\build\windows\x64\pdfium-src\include\cpp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\AK\Desktop\flutter\face billing\face_billing\windows\flutter\ephemeral;C:\Users\AK\Desktop\flutter\face billing\face_billing\windows\flutter\ephemeral\cpp_client_wrapper\include;C:\Users\AK\Desktop\flutter\face billing\face_billing\build\windows\x64\pdfium-src\include;C:\Users\AK\Desktop\flutter\face billing\face_billing\build\windows\x64\pdfium-src\include\cpp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\AK\Desktop\flutter git\face billing\face_billing\windows\flutter\ephemeral;C:\Users\AK\Desktop\flutter git\face billing\face_billing\windows\flutter\ephemeral\cpp_client_wrapper\include;C:\Users\AK\Desktop\flutter git\face billing\face_billing\build\windows\x64\pdfium-src\include;C:\Users\AK\Desktop\flutter git\face billing\face_billing\build\windows\x64\pdfium-src\include\cpp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\AK\Desktop\flutter\face billing\face_billing\windows\flutter\ephemeral;C:\Users\AK\Desktop\flutter\face billing\face_billing\windows\flutter\ephemeral\cpp_client_wrapper\include;C:\Users\AK\Desktop\flutter\face billing\face_billing\build\windows\x64\pdfium-src\include;C:\Users\AK\Desktop\flutter\face billing\face_billing\build\windows\x64\pdfium-src\include\cpp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -108,13 +108,13 @@
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <Link>
-      <AdditionalDependencies>..\..\pdfium-src\lib\pdfium.dll.lib;..\..\flutter\Debug\flutter_wrapper_plugin.lib;C:\Users\AK\Desktop\flutter git\face billing\face_billing\windows\flutter\ephemeral\flutter_windows.dll.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>..\..\pdfium-src\lib\pdfium.dll.lib;..\..\flutter\Debug\flutter_wrapper_plugin.lib;C:\Users\AK\Desktop\flutter\face billing\face_billing\windows\flutter\ephemeral\flutter_windows.dll.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
-      <ImportLibrary>C:/Users/AK/Desktop/flutter git/face billing/face_billing/build/windows/x64/plugins/printing/Debug/printing_plugin.lib</ImportLibrary>
-      <ProgramDataBaseFile>C:/Users/AK/Desktop/flutter git/face billing/face_billing/build/windows/x64/plugins/printing/Debug/printing_plugin.pdb</ProgramDataBaseFile>
+      <ImportLibrary>C:/Users/AK/Desktop/flutter/face billing/face_billing/build/windows/x64/plugins/printing/Debug/printing_plugin.lib</ImportLibrary>
+      <ProgramDataBaseFile>C:/Users/AK/Desktop/flutter/face billing/face_billing/build/windows/x64/plugins/printing/Debug/printing_plugin.pdb</ProgramDataBaseFile>
       <SubSystem>Console</SubSystem>
     </Link>
     <ProjectReference>
@@ -123,8 +123,8 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\AK\Desktop\flutter git\face billing\face_billing\windows\flutter\ephemeral;C:\Users\AK\Desktop\flutter git\face billing\face_billing\windows\flutter\ephemeral\cpp_client_wrapper\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalOptions>%(AdditionalOptions) /external:I "C:/Users/AK/Desktop/flutter git/face billing/face_billing/build/windows/x64/pdfium-src/include" /external:I "C:/Users/AK/Desktop/flutter git/face billing/face_billing/build/windows/x64/pdfium-src/include/cpp"</AdditionalOptions>
+      <AdditionalIncludeDirectories>C:\Users\AK\Desktop\flutter\face billing\face_billing\windows\flutter\ephemeral;C:\Users\AK\Desktop\flutter\face billing\face_billing\windows\flutter\ephemeral\cpp_client_wrapper\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /external:I "C:/Users/AK/Desktop/flutter/face billing/face_billing/build/windows/x64/pdfium-src/include" /external:I "C:/Users/AK/Desktop/flutter/face billing/face_billing/build/windows/x64/pdfium-src/include/cpp"</AdditionalOptions>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <DisableSpecificWarnings>"4100"</DisableSpecificWarnings>
@@ -149,10 +149,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;_HAS_EXCEPTIONS=0;FLUTTER_PLUGIN_IMPL;UNICODE;_UNICODE;CMAKE_INTDIR=\"Profile\";printing_plugin_EXPORTS</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\AK\Desktop\flutter git\face billing\face_billing\windows\flutter\ephemeral;C:\Users\AK\Desktop\flutter git\face billing\face_billing\windows\flutter\ephemeral\cpp_client_wrapper\include;C:\Users\AK\Desktop\flutter git\face billing\face_billing\build\windows\x64\pdfium-src\include;C:\Users\AK\Desktop\flutter git\face billing\face_billing\build\windows\x64\pdfium-src\include\cpp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\AK\Desktop\flutter\face billing\face_billing\windows\flutter\ephemeral;C:\Users\AK\Desktop\flutter\face billing\face_billing\windows\flutter\ephemeral\cpp_client_wrapper\include;C:\Users\AK\Desktop\flutter\face billing\face_billing\build\windows\x64\pdfium-src\include;C:\Users\AK\Desktop\flutter\face billing\face_billing\build\windows\x64\pdfium-src\include\cpp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\AK\Desktop\flutter git\face billing\face_billing\windows\flutter\ephemeral;C:\Users\AK\Desktop\flutter git\face billing\face_billing\windows\flutter\ephemeral\cpp_client_wrapper\include;C:\Users\AK\Desktop\flutter git\face billing\face_billing\build\windows\x64\pdfium-src\include;C:\Users\AK\Desktop\flutter git\face billing\face_billing\build\windows\x64\pdfium-src\include\cpp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\AK\Desktop\flutter\face billing\face_billing\windows\flutter\ephemeral;C:\Users\AK\Desktop\flutter\face billing\face_billing\windows\flutter\ephemeral\cpp_client_wrapper\include;C:\Users\AK\Desktop\flutter\face billing\face_billing\build\windows\x64\pdfium-src\include;C:\Users\AK\Desktop\flutter\face billing\face_billing\build\windows\x64\pdfium-src\include\cpp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -160,13 +160,13 @@
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <Link>
-      <AdditionalDependencies>..\..\pdfium-src\lib\pdfium.dll.lib;..\..\flutter\Profile\flutter_wrapper_plugin.lib;C:\Users\AK\Desktop\flutter git\face billing\face_billing\windows\flutter\ephemeral\flutter_windows.dll.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>..\..\pdfium-src\lib\pdfium.dll.lib;..\..\flutter\Profile\flutter_wrapper_plugin.lib;C:\Users\AK\Desktop\flutter\face billing\face_billing\windows\flutter\ephemeral\flutter_windows.dll.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
-      <ImportLibrary>C:/Users/AK/Desktop/flutter git/face billing/face_billing/build/windows/x64/plugins/printing/Profile/printing_plugin.lib</ImportLibrary>
-      <ProgramDataBaseFile>C:/Users/AK/Desktop/flutter git/face billing/face_billing/build/windows/x64/plugins/printing/Profile/printing_plugin.pdb</ProgramDataBaseFile>
+      <ImportLibrary>C:/Users/AK/Desktop/flutter/face billing/face_billing/build/windows/x64/plugins/printing/Profile/printing_plugin.lib</ImportLibrary>
+      <ProgramDataBaseFile>C:/Users/AK/Desktop/flutter/face billing/face_billing/build/windows/x64/plugins/printing/Profile/printing_plugin.pdb</ProgramDataBaseFile>
       <SubSystem>Console</SubSystem>
     </Link>
     <ProjectReference>
@@ -175,8 +175,8 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\AK\Desktop\flutter git\face billing\face_billing\windows\flutter\ephemeral;C:\Users\AK\Desktop\flutter git\face billing\face_billing\windows\flutter\ephemeral\cpp_client_wrapper\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalOptions>%(AdditionalOptions) /external:I "C:/Users/AK/Desktop/flutter git/face billing/face_billing/build/windows/x64/pdfium-src/include" /external:I "C:/Users/AK/Desktop/flutter git/face billing/face_billing/build/windows/x64/pdfium-src/include/cpp"</AdditionalOptions>
+      <AdditionalIncludeDirectories>C:\Users\AK\Desktop\flutter\face billing\face_billing\windows\flutter\ephemeral;C:\Users\AK\Desktop\flutter\face billing\face_billing\windows\flutter\ephemeral\cpp_client_wrapper\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /external:I "C:/Users/AK/Desktop/flutter/face billing/face_billing/build/windows/x64/pdfium-src/include" /external:I "C:/Users/AK/Desktop/flutter/face billing/face_billing/build/windows/x64/pdfium-src/include/cpp"</AdditionalOptions>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <DisableSpecificWarnings>"4100"</DisableSpecificWarnings>
@@ -201,10 +201,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;_HAS_EXCEPTIONS=0;FLUTTER_PLUGIN_IMPL;UNICODE;_UNICODE;CMAKE_INTDIR=\"Release\";printing_plugin_EXPORTS</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\AK\Desktop\flutter git\face billing\face_billing\windows\flutter\ephemeral;C:\Users\AK\Desktop\flutter git\face billing\face_billing\windows\flutter\ephemeral\cpp_client_wrapper\include;C:\Users\AK\Desktop\flutter git\face billing\face_billing\build\windows\x64\pdfium-src\include;C:\Users\AK\Desktop\flutter git\face billing\face_billing\build\windows\x64\pdfium-src\include\cpp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\AK\Desktop\flutter\face billing\face_billing\windows\flutter\ephemeral;C:\Users\AK\Desktop\flutter\face billing\face_billing\windows\flutter\ephemeral\cpp_client_wrapper\include;C:\Users\AK\Desktop\flutter\face billing\face_billing\build\windows\x64\pdfium-src\include;C:\Users\AK\Desktop\flutter\face billing\face_billing\build\windows\x64\pdfium-src\include\cpp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\AK\Desktop\flutter git\face billing\face_billing\windows\flutter\ephemeral;C:\Users\AK\Desktop\flutter git\face billing\face_billing\windows\flutter\ephemeral\cpp_client_wrapper\include;C:\Users\AK\Desktop\flutter git\face billing\face_billing\build\windows\x64\pdfium-src\include;C:\Users\AK\Desktop\flutter git\face billing\face_billing\build\windows\x64\pdfium-src\include\cpp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\AK\Desktop\flutter\face billing\face_billing\windows\flutter\ephemeral;C:\Users\AK\Desktop\flutter\face billing\face_billing\windows\flutter\ephemeral\cpp_client_wrapper\include;C:\Users\AK\Desktop\flutter\face billing\face_billing\build\windows\x64\pdfium-src\include;C:\Users\AK\Desktop\flutter\face billing\face_billing\build\windows\x64\pdfium-src\include\cpp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -212,13 +212,13 @@
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <Link>
-      <AdditionalDependencies>..\..\pdfium-src\lib\pdfium.dll.lib;..\..\flutter\Release\flutter_wrapper_plugin.lib;C:\Users\AK\Desktop\flutter git\face billing\face_billing\windows\flutter\ephemeral\flutter_windows.dll.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>..\..\pdfium-src\lib\pdfium.dll.lib;..\..\flutter\Release\flutter_wrapper_plugin.lib;C:\Users\AK\Desktop\flutter\face billing\face_billing\windows\flutter\ephemeral\flutter_windows.dll.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
-      <ImportLibrary>C:/Users/AK/Desktop/flutter git/face billing/face_billing/build/windows/x64/plugins/printing/Release/printing_plugin.lib</ImportLibrary>
-      <ProgramDataBaseFile>C:/Users/AK/Desktop/flutter git/face billing/face_billing/build/windows/x64/plugins/printing/Release/printing_plugin.pdb</ProgramDataBaseFile>
+      <ImportLibrary>C:/Users/AK/Desktop/flutter/face billing/face_billing/build/windows/x64/plugins/printing/Release/printing_plugin.lib</ImportLibrary>
+      <ProgramDataBaseFile>C:/Users/AK/Desktop/flutter/face billing/face_billing/build/windows/x64/plugins/printing/Release/printing_plugin.pdb</ProgramDataBaseFile>
       <SubSystem>Console</SubSystem>
     </Link>
     <ProjectReference>
@@ -226,11 +226,11 @@
     </ProjectReference>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <CustomBuild Include="C:\Users\AK\Desktop\flutter git\face billing\face_billing\windows\flutter\ephemeral\.plugin_symlinks\printing\windows\CMakeLists.txt">
+    <CustomBuild Include="C:\Users\AK\Desktop\flutter\face billing\face_billing\windows\flutter\ephemeral\.plugin_symlinks\printing\windows\CMakeLists.txt">
       <UseUtf8Encoding>Always</UseUtf8Encoding>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule C:/Users/AK/Desktop/flutter git/face billing/face_billing/windows/flutter/ephemeral/.plugin_symlinks/printing/windows/CMakeLists.txt</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule C:/Users/AK/Desktop/flutter/face billing/face_billing/windows/flutter/ephemeral/.plugin_symlinks/printing/windows/CMakeLists.txt</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
-"C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" "-SC:/Users/AK/Desktop/flutter git/face billing/face_billing/windows" "-BC:/Users/AK/Desktop/flutter git/face billing/face_billing/build/windows/x64" --check-stamp-file "C:/Users/AK/Desktop/flutter git/face billing/face_billing/build/windows/x64/plugins/printing/CMakeFiles/generate.stamp"
+"C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" "-SC:/Users/AK/Desktop/flutter/face billing/face_billing/windows" "-BC:/Users/AK/Desktop/flutter/face billing/face_billing/build/windows/x64" --check-stamp-file "C:/Users/AK/Desktop/flutter/face billing/face_billing/build/windows/x64/plugins/printing/CMakeFiles/generate.stamp"
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -238,12 +238,12 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\CMakeParseArguments.cmake;C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\FindPackageMessage.cmake;C:\Users\AK\Desktop\flutter git\face billing\face_billing\build\windows\x64\pdfium-src\PDFiumConfig.cmake;C:\Users\AK\Desktop\flutter git\face billing\face_billing\windows\flutter\ephemeral\.plugin_symlinks\printing\windows\DownloadProject.CMakeLists.cmake.in;C:\Users\AK\Desktop\flutter git\face billing\face_billing\windows\flutter\ephemeral\.plugin_symlinks\printing\windows\DownloadProject.cmake;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\AK\Desktop\flutter git\face billing\face_billing\build\windows\x64\plugins\printing\CMakeFiles\generate.stamp</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\CMakeParseArguments.cmake;C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\FindPackageMessage.cmake;C:\Users\AK\Desktop\flutter\face billing\face_billing\build\windows\x64\pdfium-src\PDFiumConfig.cmake;C:\Users\AK\Desktop\flutter\face billing\face_billing\windows\flutter\ephemeral\.plugin_symlinks\printing\windows\DownloadProject.CMakeLists.cmake.in;C:\Users\AK\Desktop\flutter\face billing\face_billing\windows\flutter\ephemeral\.plugin_symlinks\printing\windows\DownloadProject.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\AK\Desktop\flutter\face billing\face_billing\build\windows\x64\plugins\printing\CMakeFiles\generate.stamp</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">Building Custom Rule C:/Users/AK/Desktop/flutter git/face billing/face_billing/windows/flutter/ephemeral/.plugin_symlinks/printing/windows/CMakeLists.txt</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">Building Custom Rule C:/Users/AK/Desktop/flutter/face billing/face_billing/windows/flutter/ephemeral/.plugin_symlinks/printing/windows/CMakeLists.txt</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">setlocal
-"C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" "-SC:/Users/AK/Desktop/flutter git/face billing/face_billing/windows" "-BC:/Users/AK/Desktop/flutter git/face billing/face_billing/build/windows/x64" --check-stamp-file "C:/Users/AK/Desktop/flutter git/face billing/face_billing/build/windows/x64/plugins/printing/CMakeFiles/generate.stamp"
+"C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" "-SC:/Users/AK/Desktop/flutter/face billing/face_billing/windows" "-BC:/Users/AK/Desktop/flutter/face billing/face_billing/build/windows/x64" --check-stamp-file "C:/Users/AK/Desktop/flutter/face billing/face_billing/build/windows/x64/plugins/printing/CMakeFiles/generate.stamp"
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -251,12 +251,12 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\CMakeParseArguments.cmake;C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\FindPackageMessage.cmake;C:\Users\AK\Desktop\flutter git\face billing\face_billing\build\windows\x64\pdfium-src\PDFiumConfig.cmake;C:\Users\AK\Desktop\flutter git\face billing\face_billing\windows\flutter\ephemeral\.plugin_symlinks\printing\windows\DownloadProject.CMakeLists.cmake.in;C:\Users\AK\Desktop\flutter git\face billing\face_billing\windows\flutter\ephemeral\.plugin_symlinks\printing\windows\DownloadProject.cmake;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">C:\Users\AK\Desktop\flutter git\face billing\face_billing\build\windows\x64\plugins\printing\CMakeFiles\generate.stamp</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\CMakeParseArguments.cmake;C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\FindPackageMessage.cmake;C:\Users\AK\Desktop\flutter\face billing\face_billing\build\windows\x64\pdfium-src\PDFiumConfig.cmake;C:\Users\AK\Desktop\flutter\face billing\face_billing\windows\flutter\ephemeral\.plugin_symlinks\printing\windows\DownloadProject.CMakeLists.cmake.in;C:\Users\AK\Desktop\flutter\face billing\face_billing\windows\flutter\ephemeral\.plugin_symlinks\printing\windows\DownloadProject.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">C:\Users\AK\Desktop\flutter\face billing\face_billing\build\windows\x64\plugins\printing\CMakeFiles\generate.stamp</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">false</LinkObjects>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule C:/Users/AK/Desktop/flutter git/face billing/face_billing/windows/flutter/ephemeral/.plugin_symlinks/printing/windows/CMakeLists.txt</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule C:/Users/AK/Desktop/flutter/face billing/face_billing/windows/flutter/ephemeral/.plugin_symlinks/printing/windows/CMakeLists.txt</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
-"C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" "-SC:/Users/AK/Desktop/flutter git/face billing/face_billing/windows" "-BC:/Users/AK/Desktop/flutter git/face billing/face_billing/build/windows/x64" --check-stamp-file "C:/Users/AK/Desktop/flutter git/face billing/face_billing/build/windows/x64/plugins/printing/CMakeFiles/generate.stamp"
+"C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" "-SC:/Users/AK/Desktop/flutter/face billing/face_billing/windows" "-BC:/Users/AK/Desktop/flutter/face billing/face_billing/build/windows/x64" --check-stamp-file "C:/Users/AK/Desktop/flutter/face billing/face_billing/build/windows/x64/plugins/printing/CMakeFiles/generate.stamp"
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -264,35 +264,35 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\CMakeParseArguments.cmake;C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\FindPackageMessage.cmake;C:\Users\AK\Desktop\flutter git\face billing\face_billing\build\windows\x64\pdfium-src\PDFiumConfig.cmake;C:\Users\AK\Desktop\flutter git\face billing\face_billing\windows\flutter\ephemeral\.plugin_symlinks\printing\windows\DownloadProject.CMakeLists.cmake.in;C:\Users\AK\Desktop\flutter git\face billing\face_billing\windows\flutter\ephemeral\.plugin_symlinks\printing\windows\DownloadProject.cmake;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\AK\Desktop\flutter git\face billing\face_billing\build\windows\x64\plugins\printing\CMakeFiles\generate.stamp</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\CMakeParseArguments.cmake;C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\FindPackageMessage.cmake;C:\Users\AK\Desktop\flutter\face billing\face_billing\build\windows\x64\pdfium-src\PDFiumConfig.cmake;C:\Users\AK\Desktop\flutter\face billing\face_billing\windows\flutter\ephemeral\.plugin_symlinks\printing\windows\DownloadProject.CMakeLists.cmake.in;C:\Users\AK\Desktop\flutter\face billing\face_billing\windows\flutter\ephemeral\.plugin_symlinks\printing\windows\DownloadProject.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\AK\Desktop\flutter\face billing\face_billing\build\windows\x64\plugins\printing\CMakeFiles\generate.stamp</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="C:\Users\AK\Desktop\flutter git\face billing\face_billing\windows\flutter\ephemeral\.plugin_symlinks\printing\windows\printing.cpp" />
-    <ClInclude Include="C:\Users\AK\Desktop\flutter git\face billing\face_billing\windows\flutter\ephemeral\.plugin_symlinks\printing\windows\printing.h" />
-    <ClCompile Include="C:\Users\AK\Desktop\flutter git\face billing\face_billing\windows\flutter\ephemeral\.plugin_symlinks\printing\windows\printing_plugin.cpp" />
-    <ClInclude Include="C:\Users\AK\Desktop\flutter git\face billing\face_billing\windows\flutter\ephemeral\.plugin_symlinks\printing\windows\include\printing\printing_plugin.h" />
-    <ClCompile Include="C:\Users\AK\Desktop\flutter git\face billing\face_billing\windows\flutter\ephemeral\.plugin_symlinks\printing\windows\print_job.cpp" />
-    <ClInclude Include="C:\Users\AK\Desktop\flutter git\face billing\face_billing\windows\flutter\ephemeral\.plugin_symlinks\printing\windows\print_job.h" />
+    <ClCompile Include="C:\Users\AK\Desktop\flutter\face billing\face_billing\windows\flutter\ephemeral\.plugin_symlinks\printing\windows\printing.cpp" />
+    <ClInclude Include="C:\Users\AK\Desktop\flutter\face billing\face_billing\windows\flutter\ephemeral\.plugin_symlinks\printing\windows\printing.h" />
+    <ClCompile Include="C:\Users\AK\Desktop\flutter\face billing\face_billing\windows\flutter\ephemeral\.plugin_symlinks\printing\windows\printing_plugin.cpp" />
+    <ClInclude Include="C:\Users\AK\Desktop\flutter\face billing\face_billing\windows\flutter\ephemeral\.plugin_symlinks\printing\windows\include\printing\printing_plugin.h" />
+    <ClCompile Include="C:\Users\AK\Desktop\flutter\face billing\face_billing\windows\flutter\ephemeral\.plugin_symlinks\printing\windows\print_job.cpp" />
+    <ClInclude Include="C:\Users\AK\Desktop\flutter\face billing\face_billing\windows\flutter\ephemeral\.plugin_symlinks\printing\windows\print_job.h" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <ProjectReference Include="C:\Users\AK\Desktop\flutter git\face billing\face_billing\build\windows\x64\ZERO_CHECK.vcxproj">
-      <Project>{0441ED9F-C27D-3612-9751-912C779BD7BA}</Project>
+    <ProjectReference Include="C:\Users\AK\Desktop\flutter\face billing\face_billing\build\windows\x64\ZERO_CHECK.vcxproj">
+      <Project>{4BC233DE-1A5B-37A8-93E5-A94D0BCFE70E}</Project>
       <Name>ZERO_CHECK</Name>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </ProjectReference>
-    <ProjectReference Include="C:\Users\AK\Desktop\flutter git\face billing\face_billing\build\windows\x64\flutter\flutter_assemble.vcxproj">
-      <Project>{0122151F-2290-32A7-9C49-42138FDA8D3A}</Project>
+    <ProjectReference Include="C:\Users\AK\Desktop\flutter\face billing\face_billing\build\windows\x64\flutter\flutter_assemble.vcxproj">
+      <Project>{AC344BD5-8D30-3181-B406-3F0110F5F012}</Project>
       <Name>flutter_assemble</Name>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </ProjectReference>
-    <ProjectReference Include="C:\Users\AK\Desktop\flutter git\face billing\face_billing\build\windows\x64\flutter\flutter_wrapper_plugin.vcxproj">
-      <Project>{7917F62D-783F-337F-B488-D8B554CE32EB}</Project>
+    <ProjectReference Include="C:\Users\AK\Desktop\flutter\face billing\face_billing\build\windows\x64\flutter\flutter_wrapper_plugin.vcxproj">
+      <Project>{FFFD04BF-96B0-32E6-9B8B-6ADFA61C8767}</Project>
       <Name>flutter_wrapper_plugin</Name>
     </ProjectReference>
   </ItemGroup>

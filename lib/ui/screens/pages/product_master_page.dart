@@ -114,7 +114,7 @@ class _ProductMasterPageState extends State<ProductMasterPage> {
               children: [
                 // Left side: Country list
                 Expanded(
-                  flex: 5,
+                  flex: 7,
                   child: Padding(
                     padding: const EdgeInsets.all(18.0),
                     child:  AddProductMasterPage(
@@ -128,7 +128,7 @@ class _ProductMasterPageState extends State<ProductMasterPage> {
                 const SizedBox(width: 20),
                 // Right side: Add/Edit form
                 Expanded(
-                  flex: 5,
+                  flex: 4,
                   child: Padding(
                     padding: const EdgeInsets.all(18.0),
                     child:  ProductListMasterMaster(

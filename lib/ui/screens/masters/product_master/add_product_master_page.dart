@@ -444,7 +444,7 @@ class _AddProductMasterPageState extends State<AddProductMasterPage> {
     super.dispose();
   }
 
-  Future<void> _submit() async {
+  Future<void> _submit(bool isclearValue) async {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() {
@@ -502,7 +502,7 @@ class _AddProductMasterPageState extends State<AddProductMasterPage> {
         print("🟢 Request JSON: ${request.toJson()}");
 
         final response = await _service.addProductService(request);
-        _handleResponse(response.isSuccess, response.error);
+        _handleResponse(response.isSuccess, response.error, isclearValue);
       } else {
         // EDIT mode
         final updated = AddProductMasterModel(
@@ -515,7 +515,7 @@ class _AddProductMasterPageState extends State<AddProductMasterPage> {
           widget.unitInfo!.itemCode!,
           updated,
         );
-        _handleResponse(response.isSuccess, response.error);
+        _handleResponse(response.isSuccess, response.error, isclearValue);
       }
     } catch (e) {
       setState(() {
@@ -525,46 +525,59 @@ class _AddProductMasterPageState extends State<AddProductMasterPage> {
     }
   }
 
-  void _handleResponse(bool isSuccess, String? error) {
+  void _handleResponse(bool isSuccess, String? error, bool isclearvalue) {
     setState(() => _loading = false);
 
     if (isSuccess) {
-      // ✅ Clear all text controllers
-      _itemIdController.clear();
-      _itemNameController.clear();
-      _subQtyController.clear();
-      _subQtyController.clear();
-      _subQtyController.clear();
-      _purchaseRateController.clear();
-      _purchaseRateWTaxController.clear();
-      _salesRateController.clear();
-      _mRPRateController.clear();
-      _itemDiscountValueController.clear();
-      _subQtyController.clear();
+      if (!isclearvalue) {
+        // ✅ Refresh UI
+        setState(() {});
 
-      // ✅ Reset dropdowns and switches
-      selectedPaymentType = null;
-      _itemGroup = null;
-      _unitCode = null;
-      _itemMake = null;
-      selectedExpiryType = null;
-      priceTakenFrom = null;
-      _nonScheduledItem = false;
-      _isNarocotic = false;
-      _expiryRequired = false;
-      _isBatchNumbeRequired = false;
-      _isDiscountReq = false;
+        // ✅ Show success snackbar
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Product saved successfully!"),
+            backgroundColor: Colors.green,
+          ),
+        );
+      } else {
+        // ✅ Clear all text controllers
+        _itemIdController.clear();
+        _itemNameController.clear();
+        _subQtyController.clear();
+        _subQtyController.clear();
+        _subQtyController.clear();
+        _purchaseRateController.clear();
+        _purchaseRateWTaxController.clear();
+        _salesRateController.clear();
+        _mRPRateController.clear();
+        _itemDiscountValueController.clear();
+        _subQtyController.clear();
 
-      // ✅ Refresh UI
-      setState(() {});
+        // ✅ Reset dropdowns and switches
+        selectedPaymentType = null;
+        _itemGroup = null;
+        _unitCode = null;
+        _itemMake = null;
+        selectedExpiryType = null;
+        priceTakenFrom = null;
+        _nonScheduledItem = false;
+        _isNarocotic = false;
+        _expiryRequired = false;
+        _isBatchNumbeRequired = false;
+        _isDiscountReq = false;
 
-      // ✅ Show success snackbar
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Product saved successfully!"),
-          backgroundColor: Colors.green,
-        ),
-      );
+        // ✅ Refresh UI
+        setState(() {});
+
+        // ✅ Show success snackbar
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Product saved successfully!"),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
     } else {
       // ❌ Show error message
       setState(() {
@@ -886,7 +899,9 @@ class _AddProductMasterPageState extends State<AddProductMasterPage> {
                         setState(() {
                           if (_activeStatus) {
                             _loadList();
-                          } else {}
+                          } else {
+                            // Print("sd");
+                          }
 
                           _itemNameController.text = typedValue;
                           _createdUserController.text = userId.value!;
@@ -1317,7 +1332,7 @@ class _AddProductMasterPageState extends State<AddProductMasterPage> {
                         ),
 
                   SizedBox(
-                    width: constraints.maxWidth / columns - 20,
+                    width: constraints.maxWidth / columns - 30,
                     child: CustomTextField(
                       title: "Minimum Stock Quantity",
                       hintText: "Enter Minimum Stock Quantity",
@@ -1703,23 +1718,47 @@ class _AddProductMasterPageState extends State<AddProductMasterPage> {
                   //   ),
                   // ),
                   const SizedBox(height: 16),
-                  if (_loading)
-                    const CircularProgressIndicator()
-                  else
-                    GradientButton(
-                        text: isEdit ? "Update Product" : "Add Product",
-                        onPressed: _submit),
-                  if (_message != null) ...[
-                    const SizedBox(height: 16),
-                    Text(
-                      _message!,
-                      style: TextStyle(
-                        color: _message!.contains("successfully")
-                            ? Colors.green
-                            : Colors.red,
-                      ),
-                    ),
-                  ]
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      if (_loading)
+                        const Padding(
+                          padding: EdgeInsets.all(16.0),
+                          child: CircularProgressIndicator(),
+                        )
+                      else
+                        Wrap(
+                          spacing: 12,
+                          runSpacing: 12,
+                          alignment: WrapAlignment.center,
+                          children: [
+                            GradientButton(
+                              text: isEdit ? "Update Product" : "Add Product",
+                              onPressed: () => _submit(true),
+                            ),
+                            GradientButton(
+                              text: isEdit
+                                  ? "Update Product (Keep Entry)"
+                                  : "Add Product (Keep Entry)",
+                              onPressed: () => _submit(false),
+                            ),
+                          ],
+                        ),
+                      if (_message != null) ...[
+                        const SizedBox(height: 16),
+                        Text(
+                          _message!,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: _message!.contains("successfully")
+                                ? Colors.green
+                                : Colors.red,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
                 ],
               );
             },

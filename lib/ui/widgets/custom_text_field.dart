@@ -80,7 +80,9 @@ class _CustomTextFieldState extends State<CustomTextField> {
               ),
             ),
           SizedBox(
-            height: 30,
+            height:_errorText!=null
+            ?30
+            :40,
             child: Row(
               children: [
                 Expanded(

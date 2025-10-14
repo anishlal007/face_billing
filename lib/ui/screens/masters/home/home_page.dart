@@ -1,6 +1,7 @@
 import 'package:facebilling/core/colors.dart';
 import 'package:facebilling/ui/screens/pages/location_master.dart';
 import 'package:facebilling/ui/screens/pages/country_master.dart';
+import 'package:facebilling/ui/screens/pages/number_initialize_master.dart';
 import 'package:facebilling/ui/screens/pages/purchase_master_page.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/menu_item.dart';
@@ -509,9 +510,7 @@ class _HomePageState extends State<HomePage> {
           MenuItemData(
             title: "Number Initialize",
             icon: Icons.account_balance,
-            page: const DemoPage(
-              title: "Number Initialize",
-            ),
+            page: const NumberInitializeMaster(),
           ),
           MenuItemData(
             title: "Area Master",

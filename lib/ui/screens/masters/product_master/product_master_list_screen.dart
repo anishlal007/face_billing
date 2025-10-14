@@ -1,3 +1,4 @@
+import 'package:facebilling/ui/widgets/EmptyListWidget.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../data/models/product/product_master_list_model.dart';
@@ -21,7 +22,7 @@ class ProductMasterListScreen extends StatefulWidget {
 
 class _ProductMasterListScreenState extends State<ProductMasterListScreen> {
   final ProductService _service = ProductService();
-  ProductMasterListModel? getSalesListModel;
+  ProductMasterListModel? getProductList;
   bool loading = true;
   String? error;
   bool showForm = false;
@@ -45,7 +46,7 @@ class _ProductMasterListScreenState extends State<ProductMasterListScreen> {
     final response = await _service.getSProductService();
     if (response.isSuccess) {
       setState(() {
-        getSalesListModel = response.data!;
+       getProductList = response.data!;
         loading = false;
         error = null;
       });
@@ -62,9 +63,17 @@ class _ProductMasterListScreenState extends State<ProductMasterListScreen> {
     if (loading) return const Center(child: CircularProgressIndicator());
     if (error != null) return Center(child: Text("Error: $error"));
 
-    final infos = getSalesListModel?.info ?? [];
+    final infos = getProductList?.info ?? [];
 
-    return ListView.builder(
+    return EmptyListWidget(
+      items: getProductList?.info,
+      loading: loading,
+      error: error,
+      emptyMessage: "No customers found!",
+      emptyImage: "assets/watermark.png", // optional
+      itemBuilder: (context, index) {
+        final info = getProductList!.info![index]!;
+        return ListView.builder(
       itemCount: infos.length,
       itemBuilder: (context, index) {
         final info = infos[index]!;
@@ -114,5 +123,8 @@ class _ProductMasterListScreenState extends State<ProductMasterListScreen> {
         );
       },
     );
+      },
+    );
+     
   }
 }

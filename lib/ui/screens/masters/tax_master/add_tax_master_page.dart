@@ -3,7 +3,6 @@ import 'package:facebilling/data/models/unit/unit_response.dart';
 import 'package:facebilling/data/services/unit_service.dart';
 import 'package:flutter/material.dart';
 
-
 import '../../../../core/const.dart';
 import '../../../../data/models/tax_master/tax_master_list_model.dart';
 import '../../../../data/models/unit/add_location_master_req.dart';
@@ -31,14 +30,14 @@ class AddTaxMasterPage extends StatefulWidget {
 class _AddTaxMasterPageState extends State<AddTaxMasterPage> {
   final _formKey = GlobalKey<FormState>();
   final TaxMasterService _service = TaxMasterService();
-bool _isEditMode = false; 
+  bool _isEditMode = false;
   bool _activeStatus = true;
   bool _loading = false;
   String? _message;
 
   late TextEditingController _unitIdController;
   late TextEditingController _unitNameController;
-   late TextEditingController _taxPercentageController;
+  late TextEditingController _taxPercentageController;
 
   final FocusNode _unitIdFocus = FocusNode();
   final FocusNode _unitNameFocus = FocusNode();
@@ -52,19 +51,19 @@ bool _isEditMode = false;
         TextEditingController(text: widget.unitInfo?.taxCode.toString() ?? "");
     _unitNameController =
         TextEditingController(text: widget.unitInfo?.taxName ?? "");
-    _taxPercentageController =
-        TextEditingController(text: widget.unitInfo?.taxPercentage.toString() ?? "");
+    _taxPercentageController = TextEditingController(
+        text: widget.unitInfo?.taxPercentage.toString() ?? "");
     // _createdUserController = TextEditingController(
     //     text: widget.countryInfo?.createdUserCode?.toString() ?? userId.value!);
     _activeStatus = (widget.unitInfo?.activeStatus ?? 1) == 1;
-       _isEditMode = widget.unitInfo != null;
+    _isEditMode = widget.unitInfo != null;
   }
 
   @override
   void dispose() {
     _unitIdController.dispose();
     _unitNameController.dispose();
-     _taxPercentageController.dispose();
+    _taxPercentageController.dispose();
     _unitIdFocus.dispose();
     _unitNameFocus.dispose();
     __taxPercentageFocus.dispose();
@@ -73,25 +72,26 @@ bool _isEditMode = false;
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
-
+    print(_unitNameController.text.trim());
     setState(() {
       _loading = true;
       _message = null;
     });
-final request = AddTaxModelReq(
-  taxType: 1,
-  taxPercentage:_taxPercentageController.text.trim() ,
-  taxId: _unitIdController.text.trim(),
-  taxName: _unitNameController.text.trim(),   // ❌ not in model
-  cratedUserCode: DateTime.now().toIso8601String(),    // ✅ but should be user ID, not DateTime
-  createdDate: DateTime.now().toIso8601String(),       // ✅ correct
-  updatedUserCode: userId.value!,                               // ✅ int
-  updatedDate: DateTime.now().toIso8601String(),       // ✅ correct
-  activeStatus: _activeStatus ? 1 : 0,                 // ✅ correct
-);
-print("request");
-print(request);
-      if (_isEditMode && widget.unitInfo != null) {
+    final request = AddTaxModelReq(
+      taxType: 1,
+      taxPercentage: _taxPercentageController.text.trim(),
+      taxId: _unitIdController.text.trim(),
+      taxName: _unitNameController.text.trim(), // ❌ not in model
+      cratedUserCode: DateTime.now()
+          .toIso8601String(), // ✅ but should be user ID, not DateTime
+      createdDate: DateTime.now().toIso8601String(), // ✅ correct
+      updatedUserCode: userId.value!, // ✅ int
+      updatedDate: DateTime.now().toIso8601String(), // ✅ correct
+      activeStatus: _activeStatus ? 1 : 0, // ✅ correct
+    );
+    print("request");
+    print(request);
+    if (_isEditMode && widget.unitInfo != null) {
       // EDIT mode
       final response = await _service.updateTaxMaster(
         widget.unitInfo!.taxId!,
@@ -106,15 +106,20 @@ print(request);
   }
 
   void _handleResponse(bool success, String? error) {
-   if(success){
-setState(() {
-   _unitNameController.clear();
-   _unitIdController.clear();
-   _taxPercentageController.clear();
-      _loading = false;
-      _message = success ? "Saved successfully!" : error;
-    });
-    if (success) widget.onSaved(true);
+    if (success) {
+      setState(() {
+        _unitNameController.clear();
+        _unitIdController.clear();
+        _taxPercentageController.clear();
+        _loading = false;
+        _message = success ? "Saved successfully!" : error;
+      });
+      if (success) widget.onSaved(true);
+    } else {
+      setState(() {
+        _loading = false;
+        _message = success ? "${error}" : error;
+      });
     }
   }
 
@@ -124,11 +129,12 @@ setState(() {
     if (widget.unitInfo != oldWidget.unitInfo) {
       _unitIdController.text = widget.unitInfo?.taxCode.toString() ?? "";
       _unitNameController.text = widget.unitInfo?.taxName ?? "";
-        _taxPercentageController.text = widget.unitInfo?.taxPercentage ?.toString() ?? "";
+      _taxPercentageController.text =
+          widget.unitInfo?.taxPercentage?.toString() ?? "";
       // _createdUserController.text =
       //     widget.countryInfo?.createdUserCode?.toString() ?? userId.value!;
       _activeStatus = (widget.unitInfo?.activeStatus ?? 1) == 1;
-            _isEditMode = widget.unitInfo != null;
+      _isEditMode = widget.unitInfo != null;
     }
   }
 
@@ -149,37 +155,34 @@ setState(() {
               fetchItems: (q) async {
                 final response = await _service.getTaxMasterSearch(q);
                 if (response.isSuccess) {
-                  return (response.data?.info ?? [])
-                      .whereType<Info>()
-                      .toList();
+                  return (response.data?.info ?? []).whereType<Info>().toList();
                 }
                 return [];
               },
               displayString: (unit) => unit.taxName ?? "",
               onSelected: (country) {
-                if(country != null){
+                if (country != null) {
                   setState(() {
-                  _unitIdController.text = country.taxCode.toString() ?? "";
-                  _unitNameController.text = country.taxName ?? "";
-                  _taxPercentageController.text = country.taxPercentage ?.toString() ?? "";
-                  _activeStatus = (country.activeStatus ?? 1) == 1;
-                   _isEditMode = true;
-                });
+                    _unitIdController.text = country.taxCode.toString() ?? "";
+                    _unitNameController.text = country.taxName ?? "";
+                    _taxPercentageController.text =
+                        country.taxPercentage?.toString() ?? "";
+                    _activeStatus = (country.activeStatus ?? 1) == 1;
+                    _isEditMode = true;
+                  });
 
-                // ✅ Switch form into "Update mode"
-                widget.onSaved(false);
+                  // ✅ Switch form into "Update mode"
+                  widget.onSaved(false);
                 }
-             
               },
-                 onSubmitted: (typedValue) {
+              onSubmitted: (typedValue) {
                 setState(() {
                   _unitIdController.clear();
                   _unitNameController.text = typedValue;
-                  _taxPercentageController.text = _taxPercentageController.text ;
-                  //_createdUserController.text = userId.value!;
+                  _taxPercentageController.text = _taxPercentageController.text;
                   _activeStatus = true;
-                  _isEditMode = false; // <-- back to Add mode
-                }); 
+                  _isEditMode = false;
+                });
                 widget.onSaved(false);
               },
             ),
@@ -199,7 +202,7 @@ setState(() {
                 });
               },
             ),
-        
+
             const SizedBox(height: 16),
             // CustomTextField(
             //   title: "TAX Name",
@@ -216,8 +219,8 @@ setState(() {
             //   },
             // ),
             // const SizedBox(height: 16),
-            
-                CustomTextField(
+
+            CustomTextField(
               title: "Tax Code",
               hintText: "Enter Tax Code",
               controller: _unitIdController,
@@ -231,9 +234,9 @@ setState(() {
                 FocusScope.of(context).requestFocus(_unitNameFocus);
               },
             ),
-            
+
             const SizedBox(height: 16),
-                CustomTextField(
+            CustomTextField(
               title: "Tax Percentage",
               hintText: "Enter TaxPercentage",
               controller: _taxPercentageController,
@@ -247,7 +250,7 @@ setState(() {
                 FocusScope.of(context).requestFocus(__taxPercentageFocus);
               },
             ),
-            
+
             // CustomTextField(
             //   title: "Create User",
             //   controller: _createdUserController,

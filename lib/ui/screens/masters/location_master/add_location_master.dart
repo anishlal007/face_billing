@@ -95,17 +95,26 @@ bool _isEditMode = false;
     }
   }
 
-  void _handleResponse(bool success, String? error) {
- if(success){
-setState(() {
-   _unitNameController.clear();
-   _unitIdController.clear();
-      _loading = false;
-      _message = success ? "Saved successfully!" : error;
-    });
-    if (success) widget.onSaved(true);
+ void _handleResponse(bool success, String? error) {
+  setState(() {
+    _loading = false; // ✅ Always stop loader first
+
+    if (success) {
+      // Clear form fields
+      _unitNameController.clear();
+      _unitIdController.clear();
+      _message = "Saved successfully!";
+
+      // Trigger callback
+      widget.onSaved(true);
+    } else {
+      // Show or log the error
+      _message = error ?? "Something went wrong!";
+      debugPrint("❌ API Error: $_message");
     }
-  }
+  });
+}
+
 
   @override
   void didUpdateWidget(covariant AddLocationMaster oldWidget) {
@@ -207,13 +216,13 @@ setState(() {
             // ),
             const SizedBox(height: 16),
             CustomTextField(
-              title: "Location Name",
-              hintText: "Enter Location Name",
-              controller: _unitNameController,
+              title: "Location Code",
+              hintText: "Enter Location Code",
+              controller: _unitIdController,
               prefixIcon: Icons.flag,
               isValidate: true,
               validator: (value) =>
-                  value == null || value.isEmpty ? "Enter Location name" : null,
+                  value == null || value.isEmpty ? "Enter Location Code" : null,
               focusNode: _unitNameFocus,
               textInputAction: TextInputAction.next,
               onEditingComplete: () {

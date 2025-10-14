@@ -5,8 +5,8 @@ cmake_minimum_required(VERSION ${CMAKE_VERSION}) # this file comes with cmake
 
 # Make file names absolute:
 #
-get_filename_component(filename "C:/Users/AK/Desktop/flutter git/face billing/face_billing/build/windows/x64/pdfium-download/pdfium-download-prefix/src/pdfium-win-x64.tgz" ABSOLUTE)
-get_filename_component(directory "C:/Users/AK/Desktop/flutter git/face billing/face_billing/build/windows/x64/pdfium-src" ABSOLUTE)
+get_filename_component(filename "C:/Users/AK/Desktop/flutter/face billing/face_billing/build/windows/x64/pdfium-download/pdfium-download-prefix/src/pdfium-win-x64.tgz" ABSOLUTE)
+get_filename_component(directory "C:/Users/AK/Desktop/flutter/face billing/face_billing/build/windows/x64/pdfium-src" ABSOLUTE)
 
 message(VERBOSE "extracting...
      src='${filename}'

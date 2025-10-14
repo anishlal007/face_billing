@@ -1,10 +1,11 @@
-import 'package:facebilling/core/colors.dart';
+
 import 'package:facebilling/core/const.dart';
 import 'package:facebilling/data/models/get_serial_no_model.dart' as serialno;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../core/colors.dart';
 import '../../../../data/models/get_all_master_list_model.dart' as master;
 //import '../../../../data/models/tax_master/tax_master_list_model.dart'  as tax;
 import '../../../../data/models/product/product_master_list_model.dart'
@@ -68,21 +69,37 @@ final FocusNode _keyboardFocusNode = FocusNode();
   int? selectedTaxType;
   int? selectedGstType;
   serialno.GetSerialNoModel?serialNo;
-  void _calculateTotalSalesRate() {
-    double total = 0.0;
-    for (var item in items) {
-    total += item.salesRate ?? 0;
-    }
-    setState(() {
-      _totalSalesRate = total;
-      print("_totalSalesRate");
-      print(_totalSalesRate);
-// Suppose GST = 18% and Sales Rate = 1000
-      _setGSTValues("18%", _totalSalesRate);
-      _calculateInvoiceFromTotalSalesRate(_totalSalesRate);
-    });
-  }
+//   void _calculateTotalSalesRate() {
+//     double total = 0.0;
+//     for (var item in items) {
+//     total += item.salesRate ?? 0;
+//     }
+//     setState(() {
+//       _totalSalesRate = total;
+//       print("_totalSalesRate");
+//       print(_totalSalesRate);
+// // Suppose GST = 18% and Sales Rate = 1000
+//       _setGSTValues("18%", _totalSalesRate);
+//       _calculateInvoiceFromTotalSalesRate(_totalSalesRate);
+//     });
+//   }
 
+void _calculateTotalSalesRate() {
+  double total = 0.0;
+  for (var item in items) {
+    // Ensure numeric
+    final rate = item.salesRate is num
+        ? item.salesRate!.toDouble()
+        : double.tryParse(item.salesRate.toString()) ?? 0.0;
+    total += rate;
+  }
+  setState(() {
+    _totalSalesRate = total;
+    print("_totalSalesRate: $_totalSalesRate");
+    _setGSTValues("18%", _totalSalesRate);
+    _calculateInvoiceFromTotalSalesRate(_totalSalesRate);
+  });
+}
   void _setGSTValues(String gstRate, double totalSalesRate) {
     final gstPercent = double.tryParse(gstRate.replaceAll('%', '')) ?? 0;
 
@@ -247,6 +264,7 @@ final FocusNode _keyboardFocusNode = FocusNode();
   @override
   void initState() {
     super.initState();
+
     Future.delayed(Duration(milliseconds: 300), () {
       FocusScope.of(context).requestFocus(_spurchaseNoFocus);
     });
@@ -330,6 +348,7 @@ final FocusNode _keyboardFocusNode = FocusNode();
     _qtyTotalFocus = FocusNode();
   }
 String? serialError;
+  
   Future<void> _loadList() async {
     setState(() {
       _getAllLoading = true;
@@ -355,6 +374,8 @@ print(error);
       if (productResponse.isSuccess) {
         productMasterListModel = productResponse.data!;
         items = productMasterListModel!.info!;
+        print("items.length");
+        print(items.length);
       } else {
          print("error 7");
         print(response.error);
@@ -479,7 +500,7 @@ print(serialError);
       // add other fields in your model as needed
     ),
   ];
- 
+   List<ItemRowControllers> controllers = [ItemRowControllers()];
   Future<void> _pickDate() async {
     DateTime? pickedDate = await showDatePicker(
       context: context,
@@ -495,7 +516,7 @@ print(serialError);
     }
   }
  
-  List<ItemRowControllers> controllers = [ItemRowControllers()];
+
   List<Items> itemsList = []; // Empty list
   // will fill from API
   void loadItemsFromApi() async {
@@ -1158,347 +1179,168 @@ Widget build(BuildContext context) {
                       height: 20,
                     ),
 
-                    SizedBox(
-                      width: double.infinity,
-                      child: DataTable(
-                         headingRowHeight: 30, // <-- Reduce header height
-    dataRowHeight: 40,  
-                        showCheckboxColumn: false,
-                        border: TableBorder.all(color: primary),
-                        columnSpacing: 30,
-                        headingRowColor: MaterialStateProperty.all(primary),
-                        columns: [
-                          const DataColumn(
-                              label: Text(
-                            "SL No",
-                            style: TextStyle(color: white),
-                          )),
-                          const DataColumn(
-                              label: Text(
-                            "Item Id",
-                            style: TextStyle(color: white),
-                          )),
-                          DataColumn(
-                            label: Row(
-                              children: [
-                                const Text("Item Name",
-                                    style: TextStyle(color: white)),
-                                const SizedBox(width: 4),
-                                IconButton(
-                                  icon: Icon(Icons.add_circle_outline_rounded,
-                                      color: white, size: 20),
-                                  onPressed: () {
-                                    _showAddProductPopup(context);
-                                    // _showAddEditBottomSheet(editingUnit);
-
-                                    //_showAddProductPopup(context);
-                                  },
-                                ), // NON-INTERACTIVE
-                              ],
-                            ),
-                          ),
-
-                          const DataColumn(
-                              label: Text(
-                            "Batch No",
-                            style: TextStyle(color: white),
-                          )),
-                          const DataColumn(
-                              label: Text(
-                            "Expiry",
-                            style: TextStyle(color: white),
-                          )),
-                          const DataColumn(
-                              label: Text(
-                            "UOM",
-                            style: TextStyle(color: white),
-                          )),
-                          const DataColumn(
-                              label: Text(
-                            "HSN Code",
-                            style: TextStyle(color: white),
-                          )),
-                          const DataColumn(
-                              label: Text(
-                            "Qty",
-                            style: TextStyle(color: white),
-                          )),
-                          const DataColumn(
-                              label: Text(
-                            "MRP/Rate",
-                            style: TextStyle(color: white),
-                          )),
-                          // DataColumn(label: Text("Net Rate")),
-                          // DataColumn(label: Text("Net Value")),
-                          const DataColumn(
-                              label: Text(
-                            "Purchase Rate",
-                            style: TextStyle(color: white),
-                          )),
-                          const DataColumn(
-                              label: Text(
-                            "Sales Rate",
-                            style: TextStyle(color: white),
-                          )),
-                          //DataColumn(label: Text("GST Value")),
-                          const DataColumn(
-                              label: Text(
-                            "Action",
-                            style: TextStyle(color: white),
-                          )),
-                        ],
-                        rows: List.generate(items.length, (index) {
-                          final item = items[index];
-                          print(controllers[index]);
-                          final controller = controllers[index];
-                          return DataRow(cells: [
-                            DataCell(Text(
-                              "${index + 1}",
-                              style: const TextStyle(
-                                  fontSize: 12.0, height: 1.0, color: black),
-                            )),
-
-                            // Item Code
-                            DataCell(TextFormField(
-                              controller: controller.itemCodeController,
-                              focusNode: controller.itemCodeFocus,
-                              keyboardType: TextInputType.number,
-                              style: const TextStyle(
-                                  fontSize: 12.0, height: 1.0, color: black),
-                              decoration: const InputDecoration(
-                                  border: InputBorder.none),
-                              onChanged: (val) => item.itemID = val,
-                              textInputAction: TextInputAction.next,
-                              onEditingComplete: () => FocusScope.of(context)
-                                  .requestFocus(controller.itemNameFocus),
-                            )),
-                            DataCell(
-                              TextFormField(
-                                style: const TextStyle(
-                                    fontSize: 12.0, height: 1.0, color: black),
-                                focusNode: controller.itemNameFocus,
-                                controller: controller.itemNameController,
-                                decoration: const InputDecoration(
-                                  hintText: "Item Name",
-                                  border: InputBorder.none,
-                                ),
-                                textInputAction: TextInputAction
-                                    .next, // ✅ show "Next" on keyboard
-                                onEditingComplete: () => FocusScope.of(context)
-                                    .requestFocus(controller
-                                        .batchNoFocus), // ✅ jump to batch
-                                onChanged: (val) async {
-                                  if (val.isNotEmpty) {
-                                    final response = await _productService
-                                        .getProductServiceSearch(val);
-                                    if (response.isSuccess) {
-                                      setState(() {
-                                        _searchResults =
-                                            response.data?.info ?? [];
-                                        _showSubTable =
-                                            _searchResults.isNotEmpty;
-                                        _activeRowIndex =
-                                            index; // track which row user is editing
-                                      });
-                                    }
-                                  } else {
-                                    setState(() {
-                                      _searchResults.clear();
-                                      _activeRowIndex = null;
-                                    });
-                                  }
-                                },
-                              ),
-                            ),
-                            // DataCell(TextFormField(
-                            //  // onTap: () => _showItemSelection(context),
-                            //   initialValue: item.itemName?.toString() ?? '',
-                            //   keyboardType: TextInputType.number,
-                            //   onChanged: (val) => item.itemCode = int.tryParse(val),
-                            // )),
-
-                            // Batch No
-                            DataCell(TextFormField(
-                              style: const TextStyle(
-                                  fontSize: 12.0, height: 1.0, color: black),
-                              controller: controller.batchNoController,
-                              focusNode: controller.batchNoFocus,
-                              decoration: const InputDecoration(
-                                  border: InputBorder.none),
-                              onChanged: (val) =>
-                                  item.batchNoRequired = int.tryParse(val) ?? 0,
-                              textInputAction: TextInputAction.next,
-                              onEditingComplete: () => FocusScope.of(context)
-                                  .requestFocus(controller.expiryFocus),
-                            )),
-
-                            // Expiry
-                            DataCell(TextFormField(
-                              style: const TextStyle(
-                                  fontSize: 12.0, height: 1.0, color: black),
-                              controller: controller.expiryController,
-                              focusNode: controller.expiryFocus,
-                              decoration: const InputDecoration(
-                                  border: InputBorder.none),
-                              onChanged: (val) => item.expiryDateFormat = val,
-                              textInputAction: TextInputAction.next,
-                              onEditingComplete: () => FocusScope.of(context)
-                                  .requestFocus(controller.hsnFocus),
-                            )),
-
-                            // HSN Code
-                            DataCell(TextFormField(
-                              style: const TextStyle(
-                                  fontSize: 12.0, height: 1.0, color: black),
-                              controller: controller.hsnController,
-                              focusNode: controller.hsnFocus,
-                              decoration: const InputDecoration(
-                                  border: InputBorder.none),
-                              onChanged: (val) => item.hSNCode = val,
-                              textInputAction: TextInputAction.next,
-                              onEditingComplete: () => FocusScope.of(context)
-                                  .requestFocus(controller.qtyFocus),
-                            )),
-
-                            // Qty
-                            DataCell(TextFormField(
-                              style: const TextStyle(
-                                  fontSize: 12.0, height: 1.0, color: black),
-                              controller: controller.qtyController,
-                              focusNode: controller.qtyFocus,
-                              keyboardType: TextInputType.number,
-                              decoration: const InputDecoration(
-                                  border: InputBorder.none),
-                              onChanged: (val) =>
-                                  item.maximumStockQty = int.tryParse(val) ?? 0,
-                              textInputAction: TextInputAction.next,
-                              onEditingComplete: () => FocusScope.of(context)
-                                  .requestFocus(controller.mrpFocus),
-                            )),
-
-                            // MRP/Rate
-                            DataCell(TextFormField(
-                              style: const TextStyle(
-                                  fontSize: 12.0, height: 1.0, color: black),
-                              controller: controller.mrpController,
-                              focusNode: controller.mrpFocus,
-                              keyboardType: TextInputType.number,
-                              decoration: const InputDecoration(
-                                  border: InputBorder.none),
-                              onChanged: (val) =>
-                                  item.mRPRate = int.tryParse(val) ?? 0,
-                              textInputAction: TextInputAction.next,
-                              onEditingComplete: () => FocusScope.of(context)
-                                  .requestFocus(controller.salesRateFocus),
-                            )),
-
-                            // Sales Rate
-                            DataCell(TextFormField(
-                              style: const TextStyle(
-                                  fontSize: 12.0, height: 1.0, color: black),
-                              controller: controller.salesRateController,
-                              focusNode: controller.salesRateFocus,
-                              keyboardType: TextInputType.number,
-                              decoration: const InputDecoration(
-                                  border: InputBorder.none),
-                              onChanged: (val) {
-                                item.salesRate = int.tryParse(val) ?? 0;
-                                _calculateTotalSalesRate();
-                              },
-                              textInputAction: TextInputAction.next,
-                              onEditingComplete: () => FocusScope.of(context)
-                                  .requestFocus(controller.gstFocus),
-                            )),
-
-                            // GST %
-                            DataCell(TextFormField(
-                              style: const TextStyle(
-                                  fontSize: 12.0, height: 1.0, color: black),
-                              controller: controller.gstController,
-                              focusNode: controller.gstFocus,
-                              keyboardType: TextInputType.number,
-                              decoration: const InputDecoration(
-                                  border: InputBorder.none),
-                              onChanged: (val) =>
-                                  item.gstPercentage = int.tryParse(val) ?? 0,
-                              textInputAction: TextInputAction.done,
-                              onEditingComplete: () => FocusScope.of(context)
-                                  .requestFocus(controller.salesRateFocus),
-                            )),
-                            // GST Value
-                            DataCell(TextFormField(
-                              style: const TextStyle(
-                                  fontSize: 12.0, height: 1.0, color: black),
-                              focusNode: controller.salesRateFocus,
-                              controller: controller.salesRateController,
-                              decoration: const InputDecoration(
-                                hintText: "",
-                                border: InputBorder.none,
-                              ),
-                              keyboardType: TextInputType.number,
-                              onChanged: (val) =>
-                                  item.gstPercentage = int.tryParse(val) ?? 0,
-
-                              // 🔹 Jump to next row's itemCode when Enter pressed
-                              onEditingComplete: () {
-                                final currentIndex =
-                                    index; // ✅ use index from List.generate
-                                if (currentIndex < controllers.length - 1) {
-                                  // go to next row's itemCode
-                                  FocusScope.of(context).requestFocus(
-                                    controllers[currentIndex + 1].itemCodeFocus,
-                                  );
-                                } else {
-                                  // last row → just unfocus
-                                  FocusScope.of(context).unfocus();
-                                }
-                              },
-                            )),
-
-                            // Delete
-                            DataCell(
-                              controller.itemNameController.text.isNotEmpty
-                                  ? Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        // ✅ Edit icon
-                                        IconButton(
-                                          icon: const Icon(Icons.edit,
-                                              color: primary),
-                                          onPressed: () {
-                                            _showEditPopup(context, index);
-                                            // 👉 Your edit logic here
-                                            print("Edit row $index");
-                                          },
-                                        ),
-
-                                        // ✅ Delete icon
-                                        IconButton(
-                                          icon: const Icon(Icons.delete,
-                                              color: red),
-                                          onPressed: () {
-                                            setState(() {
-                                              if (items.length > 1) {
-                                                // ✅ Delete row at the same index for both lists
-                                                items.removeAt(index);
-                                                controllers.removeAt(index);
-                                              } else {
-                                                // ✅ If it's the last row, just reset it instead of deleting
-                                                items[0] = product.Info();
-                                                controllers[0] =
-                                                    ItemRowControllers();
-                                              }
-                                            });
-                                          },
-                                        ),
-                                      ],
-                                    )
-                                  : const SizedBox.shrink(), // nothing if empty
-                            ),
-                          ]);
-                        }),
-                      ),
+                     SizedBox(
+          width: double.infinity,
+          child: DataTable(
+            headingRowHeight: 30,
+            dataRowHeight: 40,
+            showCheckboxColumn: false,
+            border: TableBorder.all(color:primary),
+            columnSpacing: 20,
+            headingRowColor: MaterialStateProperty.all(primary),
+            columns: [
+              const DataColumn(label: Text("SL No", style: TextStyle(color: white))),
+              const DataColumn(label: Text("Item Id", style: TextStyle(color: white))),
+              DataColumn(
+                label: Row(
+                  children: [
+                    const Text("Item Name", style: TextStyle(color: white)),
+                    const SizedBox(width: 4),
+                    IconButton(
+                      icon: const Icon(Icons.add_circle_outline_rounded, color: white, size: 20),
+                      onPressed: () {},
                     ),
+                  ],
+                ),
+              ),
+              const DataColumn(label: Text("Batch No", style: TextStyle(color: white))),
+              const DataColumn(label: Text("Expiry", style: TextStyle(color: white))),
+              const DataColumn(label: Text("UOM", style: TextStyle(color: white))),
+              const DataColumn(label: Text("HSN Code", style: TextStyle(color: white))),
+              const DataColumn(label: Text("Qty", style: TextStyle(color: white))),
+              const DataColumn(label: Text("MRP/Rate", style: TextStyle(color: white))),
+              const DataColumn(label: Text("Sales Rate", style: TextStyle(color: white))),
+              const DataColumn(label: Text("GST %", style: TextStyle(color: white))),
+              const DataColumn(label: Text("Action", style: TextStyle(color: white))),
+            ],
+            rows: List.generate(items.length, (index) {
+              if (index >= controllers.length) {
+                controllers.add(ItemRowControllers());
+              }
+              final controller = controllers[index];
+              final item = items[index];
+
+              return DataRow(cells: [
+                DataCell(Text("${index + 1}")),
+                DataCell(TextFormField(
+                  controller: controller.itemCodeController,
+                  focusNode: controller.itemCodeFocus,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(border: InputBorder.none),
+                  onChanged: (val) => item.itemCode = val,
+                )),
+                DataCell(
+                  TextFormField(
+                    controller: controller.itemNameController,
+                    focusNode: controller.itemNameFocus,
+                    decoration: const InputDecoration(hintText: "Item Name", border: InputBorder.none),
+                    onChanged: (val) async {
+                      if (val.isNotEmpty) {
+                        final response = await _productService.getProductServiceSearch(val);
+                        if (response.isSuccess && response.data!.info!.isNotEmpty) {
+                          setState(() {
+                            _searchResults = response.data!.info!;
+                            _showSubTable = true;
+                            _activeRowIndex = index;
+                          });
+                        }
+                      } else {
+                        setState(() {
+                          _searchResults.clear();
+                          _showSubTable = false;
+                          _activeRowIndex = null;
+                        });
+                      }
+                    },
+                  ),
+                ),
+                DataCell(TextFormField(
+                  controller: controller.batchNoController,
+                  decoration: const InputDecoration(border: InputBorder.none),
+                  onChanged: (val) => item.batchNoRequired = int.tryParse(val) ?? 0,
+                )),
+                DataCell(TextFormField(
+                  controller: controller.expiryController,
+                  decoration: const InputDecoration(border: InputBorder.none),
+                  onChanged: (val) => item.expiryDateFormat = val,
+                )),
+                DataCell(Text(item.itemBoxNo ?? "")),
+                DataCell(TextFormField(
+                  controller: controller.hsnController,
+                  decoration: const InputDecoration(border: InputBorder.none),
+                  onChanged: (val) => item.hSNCode = val,
+                )),
+                DataCell(TextFormField(
+                  controller: controller.qtyController,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(border: InputBorder.none),
+                  onChanged: (val) => item.maximumStockQty = int.tryParse(val) ?? 0,
+                )),
+                DataCell(TextFormField(
+                  controller: controller.mrpController,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(border: InputBorder.none),
+                  onChanged: (val) => item.mRPRate = double.tryParse(val) ?? 0,
+                )),
+                DataCell(TextFormField(
+                  controller: controller.salesRateController,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(border: InputBorder.none),
+                  onChanged: (val) => item.salesRate = double.tryParse(val) ?? 0,
+                )),
+                DataCell(TextFormField(
+                  controller: controller.gstController,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(border: InputBorder.none),
+                  onChanged: (val) => item.gstPercentage = int.tryParse(val) ?? 0,
+                )),
+               DataCell(
+  controller.itemNameController.text.isNotEmpty
+      ? Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Edit icon
+            IconButton(
+              icon: const Icon(Icons.edit, color: primary),
+              onPressed: () {
+                _showEditPopup(context, index);
+              },
+            ),
+            // Delete icon
+            IconButton(
+              icon: const Icon(Icons.delete, color: red),
+              onPressed: () {
+                setState(() {
+                  items.removeAt(index);
+                  controllers.removeAt(index);
+
+                  // Always keep at least 1 blank row
+                  if (items.isEmpty) {
+                    items.add(product.Info(
+                      itemCode: null,
+                      itemName: '',
+                      batchNoRequired: 0,
+                      expiryDateFormat: '',
+                      hSNCode: '',
+                      maximumStockQty: 0,
+                      mRPRate: 0,
+                      salesRate: 0,
+                      gstPercentage: 0,
+                    ));
+                    controllers.add(ItemRowControllers());
+                  }
+                });
+              },
+            ),
+          ],
+        )
+      : const SizedBox
+          .shrink(), // Nothing is shown if itemNameController is empty
+),
+              ]);
+            }),
+          ),
+        ),
 
                     const SizedBox(
                       height: 0,

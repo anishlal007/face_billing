@@ -44,6 +44,7 @@ dependencies:
   excel: ^4.0.2         # to read .xlsx
   csv: ^6.0.0 
   shared_preferences: ^2.5.3
+  lottie: ^3.2.0
 
 dev_dependencies:
   flutter_test:
@@ -73,6 +74,8 @@ flutter:
     - assets/profile.jpg
     - assets/eye_background.png
     - assets/watermark.png
+    - assets/No_internet.json
+    - assets/error.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

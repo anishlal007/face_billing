@@ -1,13 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <CustomBuild Include="C:\Users\AK\Desktop\flutter git\face billing\face_billing\build\windows\x64\pdfium-download\CMakeFiles\1ddf60ebc463dbfd59fafbd000a62568\generate.stamp.rule">
+    <CustomBuild Include="C:\Users\AK\Desktop\flutter\face billing\face_billing\build\windows\x64\pdfium-download\CMakeFiles\5b35403423b510a2ecfa747f4600fd95\generate.stamp.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="CMake Rules">
-      <UniqueIdentifier>{7864EE07-9BEA-3D14-AD28-756EC2FC68F1}</UniqueIdentifier>
+      <UniqueIdentifier>{9C52177D-32B0-3F3E-B6A0-7D9FBE27699A}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

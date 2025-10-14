@@ -1,48 +1,48 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="C:\Users\AK\Desktop\flutter git\face billing\face_billing\windows\flutter\ephemeral\.plugin_symlinks\file_selector_windows\windows\file_selector_windows.cpp">
+    <ClCompile Include="C:\Users\AK\Desktop\flutter\face billing\face_billing\windows\flutter\ephemeral\.plugin_symlinks\file_selector_windows\windows\file_selector_windows.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\AK\Desktop\flutter git\face billing\face_billing\windows\flutter\ephemeral\.plugin_symlinks\file_selector_windows\windows\file_dialog_controller.cpp">
+    <ClCompile Include="C:\Users\AK\Desktop\flutter\face billing\face_billing\windows\flutter\ephemeral\.plugin_symlinks\file_selector_windows\windows\file_dialog_controller.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\AK\Desktop\flutter git\face billing\face_billing\windows\flutter\ephemeral\.plugin_symlinks\file_selector_windows\windows\file_selector_plugin.cpp">
+    <ClCompile Include="C:\Users\AK\Desktop\flutter\face billing\face_billing\windows\flutter\ephemeral\.plugin_symlinks\file_selector_windows\windows\file_selector_plugin.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\AK\Desktop\flutter git\face billing\face_billing\windows\flutter\ephemeral\.plugin_symlinks\file_selector_windows\windows\messages.g.cpp">
+    <ClCompile Include="C:\Users\AK\Desktop\flutter\face billing\face_billing\windows\flutter\ephemeral\.plugin_symlinks\file_selector_windows\windows\messages.g.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\AK\Desktop\flutter git\face billing\face_billing\windows\flutter\ephemeral\.plugin_symlinks\file_selector_windows\windows\string_utils.cpp">
+    <ClCompile Include="C:\Users\AK\Desktop\flutter\face billing\face_billing\windows\flutter\ephemeral\.plugin_symlinks\file_selector_windows\windows\string_utils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="C:\Users\AK\Desktop\flutter git\face billing\face_billing\windows\flutter\ephemeral\.plugin_symlinks\file_selector_windows\windows\include\file_selector_windows\file_selector_windows.h">
+    <ClInclude Include="C:\Users\AK\Desktop\flutter\face billing\face_billing\windows\flutter\ephemeral\.plugin_symlinks\file_selector_windows\windows\include\file_selector_windows\file_selector_windows.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\AK\Desktop\flutter git\face billing\face_billing\windows\flutter\ephemeral\.plugin_symlinks\file_selector_windows\windows\file_dialog_controller.h">
+    <ClInclude Include="C:\Users\AK\Desktop\flutter\face billing\face_billing\windows\flutter\ephemeral\.plugin_symlinks\file_selector_windows\windows\file_dialog_controller.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\AK\Desktop\flutter git\face billing\face_billing\windows\flutter\ephemeral\.plugin_symlinks\file_selector_windows\windows\file_selector_plugin.h">
+    <ClInclude Include="C:\Users\AK\Desktop\flutter\face billing\face_billing\windows\flutter\ephemeral\.plugin_symlinks\file_selector_windows\windows\file_selector_plugin.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\AK\Desktop\flutter git\face billing\face_billing\windows\flutter\ephemeral\.plugin_symlinks\file_selector_windows\windows\messages.g.h">
+    <ClInclude Include="C:\Users\AK\Desktop\flutter\face billing\face_billing\windows\flutter\ephemeral\.plugin_symlinks\file_selector_windows\windows\messages.g.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\AK\Desktop\flutter git\face billing\face_billing\windows\flutter\ephemeral\.plugin_symlinks\file_selector_windows\windows\string_utils.h">
+    <ClInclude Include="C:\Users\AK\Desktop\flutter\face billing\face_billing\windows\flutter\ephemeral\.plugin_symlinks\file_selector_windows\windows\string_utils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="C:\Users\AK\Desktop\flutter git\face billing\face_billing\windows\flutter\ephemeral\.plugin_symlinks\file_selector_windows\windows\CMakeLists.txt" />
+    <CustomBuild Include="C:\Users\AK\Desktop\flutter\face billing\face_billing\windows\flutter\ephemeral\.plugin_symlinks\file_selector_windows\windows\CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Header Files">
-      <UniqueIdentifier>{3F6EB6E3-A46E-3138-82A8-E26A45659EC5}</UniqueIdentifier>
+      <UniqueIdentifier>{2ABC5A2A-646E-3633-8C90-13C678A3DEA2}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files">
-      <UniqueIdentifier>{7276ED18-8FA5-372E-A9D7-A5DA303FF3FB}</UniqueIdentifier>
+      <UniqueIdentifier>{5899792A-F365-3B0E-9222-D73AA7197EB8}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
