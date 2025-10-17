@@ -43,16 +43,55 @@ print("Sending JSON: ${jsonEncode(request.toJson())}");
     }
   }
 
-  Future<ApiResponse<SupplierMasterListModel>> getSupplierMasterSearch(String q) async {
+  // Future<ApiResponse<SupplierMasterListModel>> getSupplierMasterSearch(String q) async {
+  //   try {
+  //     final response = await _dio.get("supplier/search?q=$q");
+
+  //     final responseData = response.data;
+
+  //     final countryResponse = SupplierMasterListModel.fromJson(responseData);
+
+  //     return ApiResponse(data: countryResponse);
+  //   } catch (e) {
+  //     return ApiResponse(error: e.toString());
+  //   }
+  // }
+
+  
+
+  Future<ApiResponse<SupplierMasterListModel>> getSupplierMasterSearch(
+      String q) async {
     try {
       final response = await _dio.get("supplier/search?q=$q");
 
+      // ✅ Print the raw response
+      print("===== Raw API Response =====");
+      print(response.data);
+
+      // Make sure response data is not null
       final responseData = response.data;
+      if (responseData == null) {
+        print("Response data is null!");
+        return ApiResponse(error: "Response data is null");
+      }
 
-      final countryResponse = SupplierMasterListModel.fromJson(responseData);
+      // ✅ Print responseData type
+      print("Response type: ${responseData.runtimeType}");
 
-      return ApiResponse(data: countryResponse);
+      // Parse to your model
+      final productResponse = SupplierMasterListModel.fromJson(responseData);
+
+      // ✅ Print parsed info list
+      print("Parsed Info list length: ${productResponse.info?.length}");
+      if (productResponse.info != null) {
+        for (var item in productResponse.info!) {
+          print("Item: ${item.supName}, Code: ${item.supCode}");
+        }
+      }
+
+      return ApiResponse(data: productResponse);
     } catch (e) {
+      print("Error in getProductServiceSearch: $e");
       return ApiResponse(error: e.toString());
     }
   }

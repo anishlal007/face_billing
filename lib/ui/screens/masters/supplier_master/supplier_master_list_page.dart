@@ -7,7 +7,7 @@ import '../../../widgets/list_card_widget.dart';
 
 class SupplierMasterListPage extends StatefulWidget {
   final bool refreshList;
-  final Function(Info) onEdit;
+  final Function(SupplierInfo) onEdit;
   const SupplierMasterListPage({
     super.key,
     required this.refreshList,

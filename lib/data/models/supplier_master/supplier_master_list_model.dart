@@ -1,7 +1,7 @@
 class SupplierMasterListModel {
   bool? status;
   String? message;
-  List<Info>? info;
+  List<SupplierInfo>? info;
 
   SupplierMasterListModel({this.status, this.message, this.info});
 
@@ -9,9 +9,9 @@ class SupplierMasterListModel {
     status = json['status'];
     message = json['message'];
     if (json['info'] != null) {
-      info = <Info>[];
+      info = <SupplierInfo>[];
       json['info'].forEach((v) {
-        info!.add(new Info.fromJson(v));
+        info!.add(new SupplierInfo.fromJson(v));
       });
     }
   }
@@ -27,7 +27,7 @@ class SupplierMasterListModel {
   }
 }
 
-class Info {
+class SupplierInfo {
   dynamic supCode;
   String? supId;
   String? supName;
@@ -56,7 +56,7 @@ class Info {
   dynamic updatedUserCode;
   dynamic supActiveStatus;
 
-  Info(
+  SupplierInfo(
       {this.supCode,
       this.supId,
       this.supName,
@@ -85,7 +85,7 @@ class Info {
       this.updatedUserCode,
       this.supActiveStatus});
 
-  Info.fromJson(Map<String, dynamic> json) {
+  SupplierInfo.fromJson(Map<String, dynamic> json) {
     supCode = json['SupCode'];
     supId = json['SupId'];
     supName = json['SupName'];

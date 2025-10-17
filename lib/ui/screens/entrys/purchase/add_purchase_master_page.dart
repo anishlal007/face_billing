@@ -1,6 +1,9 @@
-
 import 'package:facebilling/core/const.dart';
 import 'package:facebilling/data/models/get_serial_no_model.dart' as serialno;
+import 'package:facebilling/data/services/supplier_master_service.dart';
+import 'package:facebilling/ui/screens/masters/supplier_group_master/add_supplier_group_master_page.dart';
+import 'package:facebilling/ui/screens/masters/supplier_master/Add_supplier_master_page.dart';
+import 'package:facebilling/ui/widgets/AutoSearchDropdown.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -12,6 +15,7 @@ import '../../../../data/models/product/product_master_list_model.dart'
     as product;
 import '../../../../data/models/purchase_model/add_purchase_master_model.dart';
 import '../../../../data/models/purchase_model/purchase_list_model.dart';
+import '../../../../data/models/supplier_master/supplier_master_list_model.dart';
 import '../../../../data/services/get_all_master_service.dart';
 import '../../../../data/services/get_serial_no_services.dart';
 import '../../../../data/services/product_service.dart';
@@ -46,12 +50,14 @@ class AddPurchaseMasterPage extends StatefulWidget {
 
 class _AddPurchaseMasterPageState extends State<AddPurchaseMasterPage> {
   final _formKey = GlobalKey<FormState>();
-final FocusNode _keyboardFocusNode = FocusNode();
+  final FocusNode _keyboardFocusNode = FocusNode();
+
   ///services
   final PurchaseMasterService _service = PurchaseMasterService();
   final GetAllMasterService _getAllMasterService = GetAllMasterService();
   final ProductService _productService = ProductService();
-    final GetSerialNoServices _getSerialservice = GetSerialNoServices();
+  final GetSerialNoServices _getSerialservice = GetSerialNoServices();
+  final SupplierMasterService _supplier = SupplierMasterService();
   product.Info? editingUnit;
   bool refreshList = false;
   bool _activeStatus = true;
@@ -63,12 +69,12 @@ final FocusNode _keyboardFocusNode = FocusNode();
   final FocusNode _subTableFocus = FocusNode(); // focus for keyboard
   ///sales rate calculation
   double _totalSalesRate = 0.0;
-  int? selectedPaymentType=1;
-  int? selectedEntryType=1;
+  int? selectedPaymentType = 1;
+  int? selectedEntryType = 1;
   int? selectedEntryMode = 1;
   int? selectedTaxType;
   int? selectedGstType;
-  serialno.GetSerialNoModel?serialNo;
+  serialno.GetSerialNoModel? serialNo;
 //   void _calculateTotalSalesRate() {
 //     double total = 0.0;
 //     for (var item in items) {
@@ -84,22 +90,23 @@ final FocusNode _keyboardFocusNode = FocusNode();
 //     });
 //   }
 
-void _calculateTotalSalesRate() {
-  double total = 0.0;
-  for (var item in items) {
-    // Ensure numeric
-    final rate = item.salesRate is num
-        ? item.salesRate!.toDouble()
-        : double.tryParse(item.salesRate.toString()) ?? 0.0;
-    total += rate;
+  void _calculateTotalSalesRate() {
+    double total = 0.0;
+    for (var item in items) {
+      // Ensure numeric
+      final rate = item.salesRate is num
+          ? item.salesRate!.toDouble()
+          : double.tryParse(item.salesRate.toString()) ?? 0.0;
+      total += rate;
+    }
+    setState(() {
+      _totalSalesRate = total;
+      print("_totalSalesRate: $_totalSalesRate");
+      _setGSTValues("18%", _totalSalesRate);
+      _calculateInvoiceFromTotalSalesRate(_totalSalesRate);
+    });
   }
-  setState(() {
-    _totalSalesRate = total;
-    print("_totalSalesRate: $_totalSalesRate");
-    _setGSTValues("18%", _totalSalesRate);
-    _calculateInvoiceFromTotalSalesRate(_totalSalesRate);
-  });
-}
+
   void _setGSTValues(String gstRate, double totalSalesRate) {
     final gstPercent = double.tryParse(gstRate.replaceAll('%', '')) ?? 0;
 
@@ -177,6 +184,7 @@ void _calculateTotalSalesRate() {
   late TextEditingController _invoiceDateController;
   late TextEditingController _gstTypeController;
   late TextEditingController _invoiceAmtController;
+  late TextEditingController _supStateController;
   late TextEditingController _purchaseNoController;
   late TextEditingController _purchaseDateController;
   late TextEditingController _paymentModeController;
@@ -269,8 +277,8 @@ void _calculateTotalSalesRate() {
       FocusScope.of(context).requestFocus(_spurchaseNoFocus);
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
-    _keyboardFocusNode.requestFocus();
-  });
+      _keyboardFocusNode.requestFocus();
+    });
     _loadList();
     //_itemIdController = TextEditingController(text: widget.unitInfo?.purchaseAccCode.toString() ?? "");
 
@@ -278,21 +286,24 @@ void _calculateTotalSalesRate() {
         TextEditingController(text: widget.unitInfo?.supName ?? "");
     _supplierInvoicNoController =
         TextEditingController(text: widget.unitInfo?.invoiceNo ?? "");
-  _invoiceDateController = TextEditingController(
-  text: widget.unitInfo?.invoiceDate != null
-      ? DateFormat('dd-MM-yyyy').format(DateTime.parse(widget.unitInfo!.invoiceDate!))
-      : DateFormat('dd-MM-yyyy').format(DateTime.now()),
-);
+    _invoiceDateController = TextEditingController(
+      text: widget.unitInfo?.invoiceDate != null
+          ? DateFormat('dd-MM-yyyy')
+              .format(DateTime.parse(widget.unitInfo!.invoiceDate!))
+          : DateFormat('dd-MM-yyyy').format(DateTime.now()),
+    );
     _gstTypeController =
         TextEditingController(text: widget.unitInfo?.taxType.toString() ?? "");
     _invoiceAmtController = TextEditingController(
         text: widget.unitInfo?.iGSTAmount?.toString() ?? "");
     _purchaseNoController =
         TextEditingController(text: widget.unitInfo?.purchaseNo ?? "");
+    _supStateController = TextEditingController(text: "");
     _purchaseDateController = TextEditingController(
       text: widget.unitInfo?.purchaseDate?.isNotEmpty == true
           ? widget.unitInfo!.purchaseDate
-          :DateFormat('dd-MM-yyyy').format(DateTime.now()), // YYYY-MM-DD format
+          : DateFormat('dd-MM-yyyy')
+              .format(DateTime.now()), // YYYY-MM-DD format
     );
     _paymentModeController = TextEditingController(
         text: widget.unitInfo?.paymentType.toString() ?? "");
@@ -347,14 +358,15 @@ void _calculateTotalSalesRate() {
     _totalGstAmtFocus = FocusNode();
     _qtyTotalFocus = FocusNode();
   }
-String? serialError;
-  
+
+  String? serialError;
+
   Future<void> _loadList() async {
     setState(() {
       _getAllLoading = true;
       error = null;
       print("error 5");
-print(error);
+      print(error);
     });
 
     try {
@@ -366,7 +378,6 @@ print(error);
         print("error 6");
         print(response.error);
         throw Exception(response.error);
-        
       }
 
       // 🔹 Load product list
@@ -377,7 +388,7 @@ print(error);
         print("items.length");
         print(items.length);
       } else {
-         print("error 7");
+        print("error 7");
         print(response.error);
         throw Exception(productResponse.error);
       }
@@ -388,7 +399,7 @@ print(error);
       setState(() {
         error = e.toString();
         print("error 4");
-print(error);
+        print(error);
       });
     } finally {
       setState(() {
@@ -397,33 +408,33 @@ print(error);
     }
   }
 
-Future<void> _loadSerialNo() async {
-  try {
-    final serialNoResponse = await _getSerialservice.getSerialNo();
-    if (serialNoResponse.isSuccess) {
+  Future<void> _loadSerialNo() async {
+    try {
+      final serialNoResponse = await _getSerialservice.getSerialNo();
+      if (serialNoResponse.isSuccess) {
+        setState(() {
+          serialNo = serialNoResponse.data!;
+          _purchaseNoController.text = serialNo?.info?.purchaseNextId ?? "";
+          serialError = null;
+          print("error 1");
+          print(serialError); // ✅ clear if success
+        });
+      } else {
+        setState(() {
+          serialError = serialNoResponse.error ?? "Serial number not found.";
+          print("error 2");
+          print(serialError);
+        });
+      }
+    } catch (e) {
       setState(() {
-        serialNo = serialNoResponse.data!;
-        _purchaseNoController.text = serialNo?.info?.purchaseNextId ?? "";
-        serialError = null; 
-        print("error 1");
-print(serialError);// ✅ clear if success
-      });
-    } else {
-      setState(() {
-        serialError = serialNoResponse.error ?? "Serial number not found.";
-        print("error 2");
-print(serialError);
+        serialError = e.toString();
+        print("error 3");
+        print(serialError);
       });
     }
-  } catch (e) {
-    setState(() {
-      serialError = e.toString();
-      print("error 3");
-print(serialError);
-    });
   }
-}
- 
+
   void _onSaved(bool success) {
     if (success) {
       setState(() {
@@ -442,6 +453,7 @@ print(serialError);
     _gstTypeController.dispose();
     _invoiceAmtController.dispose();
     _purchaseNoController.dispose();
+    _supStateController.dispose();
     _purchaseDateController.dispose();
     _paymentModeController.dispose();
     _basedOnController.dispose();
@@ -493,29 +505,29 @@ print(serialError);
       // netValue: 0,           // Net Value
       salesRate: 0, // Sale Rate
       gstPercentage: 0, // GST %
-     // finYearCode : "2025-26",
+      // finYearCode : "2025-26",
       // gstPercentage: 0,           // GST Value
       // supName: '',           // Supplier Name
       //purchaseAccCode: null, // Purchase Account Code
       // add other fields in your model as needed
     ),
   ];
-   List<ItemRowControllers> controllers = [ItemRowControllers()];
+  List<ItemRowControllers> controllers = [ItemRowControllers()];
   Future<void> _pickDate() async {
     DateTime? pickedDate = await showDatePicker(
       context: context,
       initialDate: DateTime.now(), // default date
       firstDate: DateTime(2000), // earliest date allowed
-      lastDate: DateTime(2100),  // latest date allowed
+      lastDate: DateTime(2100), // latest date allowed
     );
 
     if (pickedDate != null) {
       setState(() {
-        _invoiceDateController.text = DateFormat('dd-MM-yyyy').format(pickedDate);
+        _invoiceDateController.text =
+            DateFormat('dd-MM-yyyy').format(pickedDate);
       });
     }
   }
- 
 
   List<Items> itemsList = []; // Empty list
   // will fill from API
@@ -546,37 +558,37 @@ print(serialError);
       _loading = true;
       _message = null;
     });
-final filledItems = itemsList.map((item) {
-  // finYearCode
-  if (item.finYearCode == null || item.finYearCode!.isEmpty) {
-    item.finYearCode = _finYearCodeController.text.trim().isNotEmpty
-        ? _finYearCodeController.text.trim()
-        : "2025-26";
-  }
+    final filledItems = itemsList.map((item) {
+      // finYearCode
+      if (item.finYearCode == null || item.finYearCode!.isEmpty) {
+        item.finYearCode = _finYearCodeController.text.trim().isNotEmpty
+            ? _finYearCodeController.text.trim()
+            : "2025-26";
+      }
 
-  // ExpiryDate
-  if (item.expiryDate == null || item.expiryDate!.isEmpty) {
-    // Set default or nullable value
-    item.expiryDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
-  } else {
-    try {
-      // Ensure valid date format
-      final parsedDate = DateTime.parse(item.expiryDate!);
-      item.expiryDate = DateFormat('yyyy-MM-dd').format(parsedDate);
-    } catch (e) {
-      // fallback if parsing fails
-      item.expiryDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
-    }
-  }
+      // ExpiryDate
+      if (item.expiryDate == null || item.expiryDate!.isEmpty) {
+        // Set default or nullable value
+        item.expiryDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
+      } else {
+        try {
+          // Ensure valid date format
+          final parsedDate = DateTime.parse(item.expiryDate!);
+          item.expiryDate = DateFormat('yyyy-MM-dd').format(parsedDate);
+        } catch (e) {
+          // fallback if parsing fails
+          item.expiryDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
+        }
+      }
 
-  return item;
-}).toList();
+      return item;
+    }).toList();
 
-final purchaseDate = _purchaseDateController.text.trim();
-final invoiceDate = _invoiceDateController.text.trim();
+    final purchaseDate = _purchaseDateController.text.trim();
+    final invoiceDate = _invoiceDateController.text.trim();
 
-final formattedPurchaseDate = DateFormat('dd-MM-yyyy').parse(purchaseDate);
-final formattedInvoiceDate = DateFormat('dd-MM-yyyy').parse(invoiceDate);
+    final formattedPurchaseDate = DateFormat('dd-MM-yyyy').parse(purchaseDate);
+    final formattedInvoiceDate = DateFormat('dd-MM-yyyy').parse(invoiceDate);
 
     if (widget.unitInfo == null) {
       // ADD mode
@@ -587,12 +599,13 @@ final formattedInvoiceDate = DateFormat('dd-MM-yyyy').parse(invoiceDate);
       // int? activeStatus;
       final request = AddPurchaseMasterModel(
 // Basic info
-        
+
         invoiceNo: _supplierInvoicNoController.text.trim(),
-   purchaseDate: DateFormat('yyyy-MM-dd').format(formattedPurchaseDate),
-  invoiceDate: DateFormat('yyyy-MM-dd').format(formattedInvoiceDate),
+        purchaseDate: DateFormat('yyyy-MM-dd').format(formattedPurchaseDate),
+        invoiceDate: DateFormat('yyyy-MM-dd').format(formattedInvoiceDate),
         purchaseOrderNo: _purchaseNoController.text.trim(),
-        purchaseOrderDate:  DateFormat('yyyy-MM-dd').format(formattedPurchaseDate),
+        purchaseOrderDate:
+            DateFormat('yyyy-MM-dd').format(formattedPurchaseDate),
         supName: _supplierNameController.text.trim(),
         supCode: int.tryParse(_supplierNameController.text) ?? 0,
 
@@ -600,8 +613,8 @@ final formattedInvoiceDate = DateFormat('dd-MM-yyyy').parse(invoiceDate);
         paymentType: selectedPaymentType, // from dropdown (0,1,2)
         purchaseEntryType: selectedEntryType, // from dropdown (0,1,2)
         purchaseEntryMode: selectedEntryMode, // from dropdown (1,2)
-        taxType: selectedTaxType??0, // from dropdown (0,1)
-        supGstType: selectedGstType??0, // from dropdown (0,1,2)
+        taxType: selectedTaxType ?? 0, // from dropdown (0,1)
+        supGstType: selectedGstType ?? 0, // from dropdown (0,1,2)
 
         // Amounts
         purchaseTaxableAmount: int.tryParse(_gstValueController.text) ?? 0,
@@ -621,78 +634,79 @@ final formattedInvoiceDate = DateFormat('dd-MM-yyyy').parse(invoiceDate);
         purchaseDiscountValue: int.tryParse(_discountController.text) ?? 0,
         cashDiscountPercentage: int.tryParse(_discountController.text) ?? 0,
         cashDiscountValue: int.tryParse(_cashDiscountValueController.text) ?? 0,
-        frieghtChargesAddWithoutTotal:0,
+        frieghtChargesAddWithoutTotal: 0,
         // Other details
         paidAmount: int.tryParse(_paidAmountController.text) ?? 0,
         supDueDays: int.tryParse(_supDueDaysController.text) ?? 0,
         createUserCode: int.tryParse(userId.value!),
-        createDateTime: DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now()),
+        createDateTime:
+            DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now()),
         computerName: "computerName",
         vehicleNo: "00",
         finYearCode: _finYearCodeController.text.trim().isNotEmpty
-    ? _finYearCodeController.text.trim()
-    : "2025-26", 
+            ? _finYearCodeController.text.trim()
+            : "2025-26",
         coCode: 0,
         purchaseNotes: "",
         purchaseAccCode: 0,
-       
 
         // Items list
-      // Ensure all items have a valid finYearCode
+        // Ensure all items have a valid finYearCode
 
- items: filledItems,// List<Items> you've populated earlier
+        items: filledItems, // List<Items> you've populated earlier
       );
 
 // Print the full request as JSON
       print("AddPurchaseMasterModel request:");
       print(request.toJson());
       final response = await _service.addPurchaseMaster(request);
-      
+
       _handleResponse(response.isSuccess, response.error);
-        if (response.isSuccess) {
-    // Clear all text fields
-    _supplierInvoicNoController.clear();
-    _purchaseNoController.clear();
-    _purchaseDateController.clear();
-    _invoiceDateController.clear();
-    _supplierNameController.clear();
-    _gstValueController.clear();
-    _netAmountController.clear();
-    _subTotalValueController.clear();
-    _sgstAmtController.clear();
-    _cgstAmtController.clear();
-    _igstAmtController.clear();
-    _roundOffController.clear();
-    _frightChargesController.clear();
-    _discountController.clear();
-    _cashDiscountValueController.clear();
-    _paidAmountController.clear();
-    _supDueDaysController.clear();
-    _vehicleNoController.clear();
-    _finYearCodeController.clear();
-items.clear();
-_isBottomBarExpanded=false;
-    // Clear items list
-    setState(() {
-      itemsList.clear();
-    });
+      if (response.isSuccess) {
+        // Clear all text fields
+        _supplierInvoicNoController.clear();
+        _purchaseNoController.clear();
+        _supStateController.clear();
+        _purchaseDateController.clear();
+        _invoiceDateController.clear();
+        _supplierNameController.clear();
+        _gstValueController.clear();
+        _netAmountController.clear();
+        _subTotalValueController.clear();
+        _sgstAmtController.clear();
+        _cgstAmtController.clear();
+        _igstAmtController.clear();
+        _roundOffController.clear();
+        _frightChargesController.clear();
+        _discountController.clear();
+        _cashDiscountValueController.clear();
+        _paidAmountController.clear();
+        _supDueDaysController.clear();
+        _vehicleNoController.clear();
+        _finYearCodeController.clear();
+        items.clear();
+        _isBottomBarExpanded = false;
+        // Clear items list
+        setState(() {
+          itemsList.clear();
+        });
 
-    // Optionally, reset dropdowns
-    selectedPaymentType = 0;
-    selectedEntryType = 0;
-    selectedEntryMode = 1;
-    selectedTaxType = 0;
-    selectedGstType = 0;
-  }
+        // Optionally, reset dropdowns
+        selectedPaymentType = 0;
+        selectedEntryType = 0;
+        selectedEntryMode = 1;
+        selectedTaxType = 0;
+        selectedGstType = 0;
+      }
 
-  setState(() {
-    _loading = false;
-  });
+      setState(() {
+        _loading = false;
+      });
     } else {
       // EDIT mode
       final updated = AddPurchaseMasterModel(
-         purchaseDate: DateFormat('yyyy-MM-dd').format(formattedPurchaseDate),
-  invoiceDate: DateFormat('yyyy-MM-dd').format(formattedInvoiceDate),
+        purchaseDate: DateFormat('yyyy-MM-dd').format(formattedPurchaseDate),
+        invoiceDate: DateFormat('yyyy-MM-dd').format(formattedInvoiceDate),
         // Basic info
         // purchaseDate: _purchaseDateController.text.trim(),
         // invoiceNo: _invoiceNoController.text.trim(),
@@ -732,19 +746,20 @@ _isBottomBarExpanded=false;
         paidAmount: int.tryParse(_paidAmountController.text) ?? 0,
         supDueDays: int.tryParse(_supDueDaysController.text) ?? 0,
         createUserCode: int.tryParse(userId.value!),
-      createDateTime: DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now()),
+        createDateTime:
+            DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now()),
         computerName: "computerName",
         vehicleNo: _vehicleNoController.text.trim(),
         finYearCode: _finYearCodeController.text.trim().isNotEmpty
-    ? _finYearCodeController.text.trim()
-    : "2025-26", // example default
+            ? _finYearCodeController.text.trim()
+            : "2025-26", // example default
         coCode: 0,
         purchaseNotes: "",
         purchaseAccCode: 0,
 
         // Items list
-        
-     items: filledItems, // List<Items> you've populated earlier
+
+        items: filledItems, // List<Items> you've populated earlier
       );
       print("updated");
       print(updated);
@@ -756,51 +771,53 @@ _isBottomBarExpanded=false;
     }
   }
 
-void _handleResponse(bool success, String? error) {
-  setState(() {
-    _loading = false;
-    _message = success ? "Saved successfully!" : error;
-  });
+  void _handleResponse(bool success, String? error) {
+    setState(() {
+      _loading = false;
+      _message = success ? "Saved successfully!" : error;
+    });
 
-  if (success) {
-    // Clear all text fields
-    _supplierInvoicNoController.clear();
-    _purchaseNoController.clear();
-    _purchaseDateController.clear();
-    _invoiceDateController.clear();
-    _supplierNameController.clear();
-    _gstValueController.clear();
-    _netAmountController.clear();
-    _subTotalValueController.clear();
-    _sgstAmtController.clear();
-    _cgstAmtController.clear();
-    _igstAmtController.clear();
-    _roundOffController.clear();
-    _frightChargesController.clear();
-    _discountController.clear();
-    _cashDiscountValueController.clear();
-    _paidAmountController.clear();
-    _supDueDaysController.clear();
-    _vehicleNoController.clear();
-    _finYearCodeController.clear();
+    if (success) {
+      // Clear all text fields
+      _supplierInvoicNoController.clear();
+      _purchaseNoController.clear();
+      _supStateController.clear();
+      _purchaseDateController.clear();
+      _invoiceDateController.clear();
+      _supplierNameController.clear();
+      _gstValueController.clear();
+      _netAmountController.clear();
+      _subTotalValueController.clear();
+      _sgstAmtController.clear();
+      _cgstAmtController.clear();
+      _igstAmtController.clear();
+      _roundOffController.clear();
+      _frightChargesController.clear();
+      _discountController.clear();
+      _cashDiscountValueController.clear();
+      _paidAmountController.clear();
+      _supDueDaysController.clear();
+      _vehicleNoController.clear();
+      _finYearCodeController.clear();
 
-    // Clear items list
-    itemsList.clear();
-    _isBottomBarExpanded = false;
+      // Clear items list
+      itemsList.clear();
+      _isBottomBarExpanded = false;
 
-    // Reset dropdowns
-    selectedPaymentType = 0;
-    selectedEntryType = 0;
-    selectedEntryMode = 1;
-    selectedTaxType = 0;
-    selectedGstType = 0;
+      // Reset dropdowns
+      selectedPaymentType = 0;
+      selectedEntryType = 0;
+      selectedEntryMode = 1;
+      selectedTaxType = 0;
+      selectedGstType = 0;
 
-    setState(() {}); // Update the UI
+      setState(() {}); // Update the UI
 
-    // Notify parent widget if needed
-    widget.onSaved(true);
+      // Notify parent widget if needed
+      widget.onSaved(true);
+    }
   }
-}
+
   @override
   void didUpdateWidget(covariant AddPurchaseMasterPage oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -819,262 +836,303 @@ void _handleResponse(bool success, String? error) {
     FocusScope.of(context).requestFocus(next);
   }
 
-void _showAddProductPopup(BuildContext context) {
-  showDialog(
-    context: context,
-    barrierDismissible: false, // Prevent accidental closing
-    builder: (BuildContext context) {
-      final screenSize = MediaQuery.of(context).size;
-      final dialogWidth = screenSize.width * 0.7;
-      final dialogHeight = screenSize.height * 0.9;
+  void _showAddProductPopup(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false, // Prevent accidental closing
+      builder: (BuildContext context) {
+        final screenSize = MediaQuery.of(context).size;
+        final dialogWidth = screenSize.width * 0.7;
+        final dialogHeight = screenSize.height * 0.9;
 
-      return Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        insetPadding: EdgeInsets.symmetric(
-          horizontal: screenSize.width * 0.15,
-          vertical: screenSize.height * 0.2,
-        ),
-        child: ConstrainedBox(
-          constraints: BoxConstraints(
-            maxWidth: dialogWidth,
-            maxHeight: dialogHeight,
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
           ),
-          child: Scaffold(
-            backgroundColor:  white,
-            appBar: AppBar(
-              title: const Text("Add Product"),
-              backgroundColor: const Color(0xFF0B2046),
-              foregroundColor:  white,
-              centerTitle: true,
-              automaticallyImplyLeading: false,
-              actions: [
-                IconButton(
-                  icon: const Icon(Icons.close, color:  white),
-                  onPressed: () => Navigator.pop(context),
-                ),
-              ],
+          insetPadding: EdgeInsets.symmetric(
+            horizontal: screenSize.width * 0.15,
+            vertical: screenSize.height * 0.2,
+          ),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: dialogWidth,
+              maxHeight: dialogHeight,
             ),
-            body: AddProductMasterPage(
-              onSaved: (bool success) {
-                if (success) {
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("Product added successfully")),
-                  );
-                  setState(() {
-                    // 🔹 Optionally reload your table data
-                    // _fetchProducts();
-                  });
-                }
-              },
+            child: Scaffold(
+              backgroundColor: white,
+              appBar: AppBar(
+                title: const Text("Add Product"),
+                backgroundColor: const Color(0xFF0B2046),
+                foregroundColor: white,
+                centerTitle: true,
+                automaticallyImplyLeading: false,
+                actions: [
+                  IconButton(
+                    icon: const Icon(Icons.close, color: white),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ],
+              ),
+              body: AddProductMasterPage(
+                onSaved: (bool success) {
+                  if (success) {
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                          content: Text("Product added successfully")),
+                    );
+                    setState(() {
+                      // 🔹 Optionally reload your table data
+                      // _fetchProducts();
+                    });
+                  }
+                },
+              ),
             ),
           ),
-        ),
-      );
-    },
-  );
-}
+        );
+      },
+    );
+  }
 
   @override
-Widget build(BuildContext context) {
-  if (_getAllLoading) return const Center(child: CircularProgressIndicator());
-  if (error != null) return Center(child: Text("Error: $error"));
+  Widget build(BuildContext context) {
+    if (_getAllLoading) return const Center(child: CircularProgressIndicator());
+    if (error != null) return Center(child: Text("Error: $error"));
 
-  final isEdit = widget.unitInfo != null;
+    final isEdit = widget.unitInfo != null;
 
-  return RawKeyboardListener(
-    focusNode: _keyboardFocusNode,
-    autofocus: true,
-    onKey: (RawKeyEvent event) {
-      if (event is RawKeyDownEvent) {
-        final isShiftPressed = event.isShiftPressed;
-        final keyLabel = event.logicalKey.keyLabel.toLowerCase();
+    return RawKeyboardListener(
+      focusNode: _keyboardFocusNode,
+      autofocus: true,
+      onKey: (RawKeyEvent event) {
+        if (event is RawKeyDownEvent) {
+          final isShiftPressed = event.isShiftPressed;
+          final keyLabel = event.logicalKey.keyLabel.toLowerCase();
 
-        if (isShiftPressed && keyLabel == 'm') {
-          setState(() {
-            selectedEntryMode = (selectedEntryMode == 1) ? 2 : 1;
-          });
+          if (isShiftPressed && keyLabel == 'm') {
+            setState(() {
+              selectedEntryMode = (selectedEntryMode == 1) ? 2 : 1;
+            });
 
-          debugPrint("🟢 Entry Mode changed to: $selectedEntryMode");
+            debugPrint("🟢 Entry Mode changed to: $selectedEntryMode");
 
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text("Entry Mode switched to: $selectedEntryMode"),
-              duration: const Duration(seconds: 1),
-            ),
-          );
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text("Entry Mode switched to: $selectedEntryMode"),
+                duration: const Duration(seconds: 1),
+              ),
+            );
+          }
         }
-      }
-    },
+      },
 
-    // ✅ your existing UI starts here
-    child: Scaffold(
-        backgroundColor: selectedEntryMode == 1 ? white : lightblue,
-        body: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Form(
-              key: _formKey,
-              child: LayoutBuilder(builder: (context, constraints) {
-                int columns = 1; // default mobile
-                if (constraints.maxWidth > 1200) {
-                  columns = 4;
-                } else if (constraints.maxWidth > 800) {
-                  columns = 3;
-                }
-                return Wrap(
-                  spacing: 16,
-                  runSpacing: 16,
-                  children: [
+      // ✅ your existing UI starts here
+      child: Scaffold(
+          backgroundColor: selectedEntryMode == 1 ? white : lightblue,
+          body: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Form(
+                key: _formKey,
+                child: LayoutBuilder(builder: (context, constraints) {
+                  int columns = 1; // default mobile
+                  if (constraints.maxWidth > 1200) {
+                    columns = 4;
+                  } else if (constraints.maxWidth > 800) {
+                    columns = 3;
+                  }
+                  return Wrap(
+                    spacing: 16,
+                    runSpacing: 16,
+                    children: [
                       SizedBox(
-                      width: constraints.maxWidth / columns - 20,
-                      child: SearchableDropdown<master.Suppliers>(
-                        hintText: "Supplier Name",
-                        items: getAllMasterListModel!.info!.suppliers!,
-                        itemLabel: (supplier) => supplier.supName ?? "",
-                        onChanged: (supplier) {
-                          if (supplier != null) {
-                            _supplierNameController.text =
-                                supplier.supCode.toString();
-                            print("Selected Code: ${supplier.supCode}");
-                            print("Selected Name: ${supplier.supName}");
-                            print("Selected GSt type: ${supplier.supGSTType}");
-                            
-                             // TaxType: 0=Exclusive, 1=Inclusive
-                            if(supplier.taxIsIncluded==1){
-                              selectedTaxType=1;
-                              selectedGstType=1;
- taxTypeController.text="Inclusive";
-                            }else{
-                              selectedTaxType=0;
-                               selectedGstType=0;
- taxTypeController.text='Exclusive';
+                        width: constraints.maxWidth / columns - 20,
+                        // 1. Ensure the generic type is your Product model (e.g., ProductMasterInfo)
+                        child: AutoSuggestion<SupplierInfo>(
+                          controller: _supplierNameController,
+                          labelText: 'Supplier Name',
+                          hintText: 'Search by Supplier Name',
+
+                          suggestionsCallback: (pattern) async {
+                            final apiResponse = await _supplier
+                                .getSupplierMasterSearch(pattern);
+
+                            if (apiResponse.error != null) {
+                              return [];
                             }
-                            //_gstTypeController
-                           if(supplier.supGSTType==1){
-                            _gstTypeController.text="";
-                           }else{
-                            _gstTypeController.text="";
-                           }
-                           
-                          }
-                        },
-                      ),
-                    ),
-                   
-                    SizedBox(
-                      width: constraints.maxWidth / columns - 20,
-                      child: CustomTextField(
-                        title: "Purches No",
-                        hintText: "Purches No",
-                        controller: _purchaseNoController,
-                        // prefixIcon: Icons.person,
-                        isEdit: true,
-                        focusNode: _spurchaseNoFocus,
-                        textInputAction: TextInputAction.done,
-                        onEditingComplete: () => _fieldFocusChange(
-                            context, _supNameFocus, _invoiceDateFocus),
-                      ),
-                    ),
-                    SizedBox(
-                      width: constraints.maxWidth / columns - 20,
-                      child: CustomTextField(
-                        title: "Supplier Invoice No",
-                        hintText: "Invoice No",
-                        controller: _supplierInvoicNoController,
-                        // prefixIcon: Icons.person,
-                        isEdit: false,
-                        focusNode: _supNameFocus,
-                        textInputAction: TextInputAction.done,
-                        onEditingComplete: () => _fieldFocusChange(
-                            context, _supNameFocus, _invoiceDateFocus),
-                      ),
-                    ),
-                   
-                    SizedBox(
-                      width: constraints.maxWidth / columns - 20,
-                      child: CustomDropdownField<int>(
-                        title: "Payment Type",
-                        hintText: "Select Payment Type",
-                        items: const [
-                          DropdownMenuItem(value: 0, child: Text("Credit")),
-                          DropdownMenuItem(value: 1, child: Text("Cash")),
-                          DropdownMenuItem(value: 2, child: Text("Cheque")),
-                        ],
-                        initialValue: selectedPaymentType,
-                        onChanged: (val) {
-                          setState(() => selectedPaymentType = val);
-                          print("Selected PaymentType: $val");
-                        },
-                      ),
-                    ),
 
-                    // PurchaseEntryType : 0=Opening,1=Entry,2=Order
-                    
-                    SizedBox(
-                      width: constraints.maxWidth / columns - 20,
-                      child: CustomDropdownField<int>(
-                        
-                        title: "Purchase Entry Type",
-                        hintText: "Select Entry Type",
-                        items: const [
-                          DropdownMenuItem(value: 0, child: Text("Opening")),
-                          DropdownMenuItem(value: 1, child: Text("Entry")),
-                          DropdownMenuItem(value: 2, child: Text("Order")),
-                        ],
-                        initialValue: selectedEntryType,
-                        onChanged: (val) {
-                          setState(() => selectedEntryType = val);
-                          print("Selected EntryType: $val");
-                        },
-                      ),
-                    ),
+                            return apiResponse.data?.info ?? [];
+                          },
 
-                    // PurchaseEntryMode: 1=Mode1,2=Mode2
-                    // SizedBox(
-                    //   width: constraints.maxWidth / columns - 20,
-                    //   child: CustomDropdownField<int>(
-                    //     title: "Purchase Entry Mode",
-                    //     hintText: "Select Mode",
-                    //     items: const [
-                    //       DropdownMenuItem(value: 1, child: Text("Mode1")),
-                    //       DropdownMenuItem(value: 2, child: Text("Mode2")),
-                    //     ],
-                    //     initialValue: selectedEntryMode,
-                    //     onChanged: (val) {
-                    //       setState(() => selectedEntryMode = val);
-                    //       print("Selected EntryMode: $val");
-                    //     },
-                    //   ),
-                    // ),
+                          // 🎯 FIX: Use Product-specific fields
+                          itemBuilder: (context, suggestion) {
+                            // Assuming suggestion is now ProductMasterInfo
+                            return ListTile(
+                              title: Text(
+                                  suggestion.supName ?? ""), // Use item name
+                              subtitle: Text(
+                                  'mobile: ${suggestion.supMobileNo ?? ""}'), // Use item code
+                            );
+                          },
 
-                    // TaxType: 0=Exclusive, 1=Inclusive
-                    SizedBox(
-                      width: constraints.maxWidth / columns - 20,
-                      child: CustomTextField(
-                        title: "Tax Type",
-                        controller: taxTypeController,
-                        // prefixIcon: Icons.person,
-                        isEdit: true,
-                        focusNode: _invoiceDateFocus,
-                        textInputAction: TextInputAction.done,
-                        onEditingComplete: () => _fieldFocusChange(
-                            context, _invoiceDateFocus, _gstTypeFocus),
+                          onSuggestionSelected: (supplier) {
+                            // Assuming you have a ProductMasterInfo variable like _selectedProduct
+                            // setState(() => _selectedProduct = product);
+                            print('Selected Product: ${supplier.supCode}');
+                            // You should update your product-related state here, not a customer state
+                          },
+
+                          // 🎯 FIX: Use Product-specific text extractor
+                          getDisplayString: (product) => product.supName ?? "",
+                          addPage: AddSupplierMasterPage(
+                            onSaved: (success) async {
+                              if (success) {
+                                Navigator.pop(context, true);
+                                await _loadList();
+                              }
+                            },
+                          ),
+                          addTooltip: "Add Item Make",
+                        ),
                       ),
-                    ),
-                  
-                
-                    SizedBox(
-                      width: constraints.maxWidth / columns - 20,
-                      child: GestureDetector(
-                        onTap: (){
-                          _pickDate();
-                        },
+                      // SizedBox(
+                      //   width: constraints.maxWidth / columns - 20,
+                      //   child: SearchableDropdown<master.Suppliers>(
+                      //     hintText: "Supplier Name",
+                      //     items: getAllMasterListModel!.info!.suppliers!,
+                      //     itemLabel: (supplier) => supplier.supName ?? "",
+                      //     onChanged: (supplier) {
+                      //       if (supplier != null) {
+                      //         _supplierNameController.text =
+                      //             supplier.supCode.toString();
+                      //         print("Selected Code: ${supplier.supCode}");
+                      //         print("Selected Name: ${supplier.supName}");
+                      //         print(
+                      //             "Selected GSt type: ${supplier.supGSTType}");
+
+                      //         // TaxType: 0=Exclusive, 1=Inclusive
+                      //         if (supplier.taxIsIncluded == 1) {
+                      //           selectedTaxType = 1;
+                      //           selectedGstType = 1;
+                      //           taxTypeController.text = "Inclusive";
+                      //         } else {
+                      //           selectedTaxType = 0;
+                      //           selectedGstType = 0;
+                      //           taxTypeController.text = 'Exclusive';
+                      //         }
+                      //         //_gstTypeController
+                      //         if (supplier.supGSTType == 1) {
+                      //           _gstTypeController.text = "";
+                      //         } else {
+                      //           _gstTypeController.text = "";
+                      //         }
+                      //       }
+                      //     },
+                      //     addPage: AddSupplierMasterPage(
+                      //       onSaved: (success) async {
+                      //         if (success) {
+                      //           Navigator.pop(context, true);
+                      //           await _loadList();
+                      //         }
+                      //       },
+                      //     ),
+                      //     addTooltip: "Add Item Make",
+                      //   ),
+                      // ),
+                      SizedBox(
+                        width: constraints.maxWidth / columns - 20,
                         child: CustomTextField(
-                          title: "Invoice Date",
-                          controller: _invoiceDateController,
+                          title: "Supplier State",
+                          hintText: "Supplier State",
+                          controller: _supStateController,
+                          // prefixIcon: Icons.person,
+                          isEdit: true,
+                          focusNode: _spurchaseNoFocus,
+                          textInputAction: TextInputAction.done,
+                          onEditingComplete: () => _fieldFocusChange(
+                              context, _supNameFocus, _invoiceDateFocus),
+                        ),
+                      ),
+                      SizedBox(
+                        width: constraints.maxWidth / columns - 20,
+                        child: CustomTextField(
+                          title: "Purches No",
+                          hintText: "Purches No",
+                          controller: _purchaseNoController,
+                          // prefixIcon: Icons.person,
+                          isEdit: true,
+                          focusNode: _spurchaseNoFocus,
+                          textInputAction: TextInputAction.done,
+                          onEditingComplete: () => _fieldFocusChange(
+                              context, _supNameFocus, _invoiceDateFocus),
+                        ),
+                      ),
+                      SizedBox(
+                        width: constraints.maxWidth / columns - 20,
+                        child: CustomTextField(
+                          title: "Supplier Invoice No",
+                          hintText: "Invoice No",
+                          controller: _supplierInvoicNoController,
+                          // prefixIcon: Icons.person,
+                          isEdit: false,
+                          focusNode: _supNameFocus,
+                          textInputAction: TextInputAction.done,
+                          onEditingComplete: () => _fieldFocusChange(
+                              context, _supNameFocus, _invoiceDateFocus),
+                        ),
+                      ),
+                      SizedBox(
+                        width: constraints.maxWidth / columns - 20,
+                        child: CustomTextField(
+                          title: " Supplier GST Type",
+                          hintText: "Supplier GST Type",
+                          controller: _gstTypeController,
+                          // prefixIcon: Icons.person,
+                          isEdit: true,
+                          focusNode: _gstTypeFocus,
+                          textInputAction: TextInputAction.done,
+                          onEditingComplete: () => _fieldFocusChange(
+                              context, _gstTypeFocus, _invoiceAmtFocus),
+                        ),
+                      ),
+                      SizedBox(
+                        width: constraints.maxWidth / columns - 20,
+                        child: CustomTextField(
+                          title: "Purchase Date",
+                          controller: _purchaseDateController,
+                          // prefixIcon: Icons.person,
+                          isEdit: true,
+                          focusNode: _purchaseDateFocus,
+                          textInputAction: TextInputAction.done,
+                          onEditingComplete: () => _fieldFocusChange(
+                              context, _purchaseDateFocus, _basedOnFocus),
+                        ),
+                      ),
+                      SizedBox(
+                        width: constraints.maxWidth / columns - 20,
+                        child: GestureDetector(
+                          onTap: () {
+                            _pickDate();
+                          },
+                          child: CustomTextField(
+                            title: "Invoice Date",
+                            controller: _invoiceDateController,
+                            // prefixIcon: Icons.person,
+                            isEdit: true,
+                            focusNode: _invoiceDateFocus,
+                            textInputAction: TextInputAction.done,
+                            onEditingComplete: () => _fieldFocusChange(
+                                context, _invoiceDateFocus, _gstTypeFocus),
+                          ),
+                        ),
+                      ),
+
+                      SizedBox(
+                        width: constraints.maxWidth / columns - 20,
+                        child: CustomTextField(
+                          title: "Tax Type",
+                          controller: taxTypeController,
                           // prefixIcon: Icons.person,
                           isEdit: true,
                           focusNode: _invoiceDateFocus,
@@ -1083,829 +1141,1000 @@ Widget build(BuildContext context) {
                               context, _invoiceDateFocus, _gstTypeFocus),
                         ),
                       ),
-                    ),
-                    const Divider(),
-
-                    // SupGstType: 0=No Gst, 1=SGST,2=IGST
-
-                    SizedBox(
-                      width: constraints.maxWidth / columns - 20,
-                      child: CustomTextField(
-                        title: " Supplier GST Type",
-                        hintText: "Supplier GST Type",
-                        controller: _gstTypeController,
-                        // prefixIcon: Icons.person,
-                        isEdit: true,
-                        focusNode: _gstTypeFocus,
-                        textInputAction: TextInputAction.done,
-                        onEditingComplete: () => _fieldFocusChange(
-                            context, _gstTypeFocus, _invoiceAmtFocus),
+                      SizedBox(
+                        width: constraints.maxWidth / columns - 20,
+                        child: CustomDropdownField<int>(
+                          title: "Payment Type",
+                          hintText: "Select Payment Type",
+                          items: const [
+                            DropdownMenuItem(value: 0, child: Text("Credit")),
+                            DropdownMenuItem(value: 1, child: Text("Cash")),
+                            DropdownMenuItem(value: 2, child: Text("Cheque")),
+                          ],
+                          initialValue: selectedPaymentType,
+                          onChanged: (val) {
+                            setState(() => selectedPaymentType = val);
+                            print("Selected PaymentType: $val");
+                          },
+                        ),
                       ),
-                    ),
-                  
-                    SizedBox(
-                      width: constraints.maxWidth / columns - 20,
-                      child: CustomTextField(
-                        title: "Invoice Amount",
-                        hintText: "Invoice Amount",
-                        controller: _invoiceAmtController,
-                        // prefixIcon: Icons.person,
-                        isEdit: false,
-                        focusNode: _invoiceAmtFocus,
-                        textInputAction: TextInputAction.done,
-                        onEditingComplete: () => _fieldFocusChange(
-                            context, _gstTypeFocus, _purchaseNoFocus),
+
+                      // PurchaseEntryType : 0=Opening,1=Entry,2=Order
+
+                      SizedBox(
+                        width: constraints.maxWidth / columns - 20,
+                        child: CustomTextField(
+                          title: "Invoice Amount",
+                          hintText: "Invoice Amount",
+                          controller: _invoiceAmtController,
+                          // prefixIcon: Icons.person,
+                          isEdit: false,
+                          focusNode: _invoiceAmtFocus,
+                          textInputAction: TextInputAction.done,
+                          onEditingComplete: () => _fieldFocusChange(
+                              context, _gstTypeFocus, _purchaseNoFocus),
+                        ),
                       ),
-                    ),
-                    SizedBox(
-                      width: constraints.maxWidth / columns - 20,
-                      child: CustomTextField(
-                        title: "Purchase No",
-                        hintText: "Purchase No",
-                        controller: _purchaseNoController,
-                        // prefixIcon: Icons.person,
-                        isEdit: true,
-                        focusNode: _purchaseNoFocus,
-                        textInputAction: TextInputAction.done,
-                        onEditingComplete: () => _fieldFocusChange(
-                            context, _purchaseNoFocus, _purchaseDateFocus),
+                      SizedBox(
+                        width: constraints.maxWidth / columns - 20,
+                        child: CustomDropdownField<int>(
+                          title: "Purchase Entry Type",
+                          hintText: "Select Entry Type",
+                          items: const [
+                            DropdownMenuItem(value: 0, child: Text("Opening")),
+                            DropdownMenuItem(value: 1, child: Text("Entry")),
+                            DropdownMenuItem(value: 2, child: Text("Order")),
+                          ],
+                          initialValue: selectedEntryType,
+                          onChanged: (val) {
+                            setState(() => selectedEntryType = val);
+                            print("Selected EntryType: $val");
+                          },
+                        ),
                       ),
-                    ),
-                    SizedBox(
-                      width: constraints.maxWidth / columns - 20,
-                      child: CustomTextField(
-                        title: "Purchase Date",
-                        controller: _purchaseDateController,
-                        // prefixIcon: Icons.person,
-                        isEdit: true,
-                        focusNode: _purchaseDateFocus,
-                        textInputAction: TextInputAction.done,
-                        onEditingComplete: () => _fieldFocusChange(
-                            context, _purchaseDateFocus, _basedOnFocus),
+
+                      // PurchaseEntryMode: 1=Mode1,2=Mode2
+                      // SizedBox(
+                      //   width: constraints.maxWidth / columns - 20,
+                      //   child: CustomDropdownField<int>(
+                      //     title: "Purchase Entry Mode",
+                      //     hintText: "Select Mode",
+                      //     items: const [
+                      //       DropdownMenuItem(value: 1, child: Text("Mode1")),
+                      //       DropdownMenuItem(value: 2, child: Text("Mode2")),
+                      //     ],
+                      //     initialValue: selectedEntryMode,
+                      //     onChanged: (val) {
+                      //       setState(() => selectedEntryMode = val);
+                      //       print("Selected EntryMode: $val");
+                      //     },
+                      //   ),
+                      // ),
+
+                      // TaxType: 0=Exclusive, 1=Inclusive
+
+                      const Divider(),
+
+                      // SupGstType: 0=No Gst, 1=SGST,2=IGST
+
+                      // SizedBox(
+                      //   width: constraints.maxWidth / columns - 20,
+                      //   child: CustomTextField(
+                      //     title: "Based On",
+                      //     hintText: "Based On",
+                      //     controller: _basedOnController,
+                      //     // prefixIcon: Icons.person,
+                      //     isEdit: false,
+                      //     focusNode: _basedOnFocus,
+                      //     textInputAction: TextInputAction.done,
+                      //     onEditingComplete: () => _fieldFocusChange(
+                      //         context, _purchaseDateFocus, _accountNameFocus),
+                      //   ),
+                      // ),
+                      // SizedBox(
+                      //   width: constraints.maxWidth / columns - 20,
+                      //   child: CustomTextField(
+                      //     title: "Amount Name",
+                      //     hintText: "Amount Name",
+                      //     controller: _accountNameController,
+                      //     // prefixIcon: Icons.person,
+                      //     isEdit: false,
+                      //     focusNode: _accountNameFocus,
+                      //     textInputAction: TextInputAction.done,
+                      //     onEditingComplete: _submit,
+                      //   ),
+                      // ),
+
+                      // const SizedBox(height: 26),
+
+                      const SizedBox(
+                        height: 10,
                       ),
-                    ),
 
-                    // SizedBox(
-                    //   width: constraints.maxWidth / columns - 20,
-                    //   child: CustomTextField(
-                    //     title: "Based On",
-                    //     hintText: "Based On",
-                    //     controller: _basedOnController,
-                    //     // prefixIcon: Icons.person,
-                    //     isEdit: false,
-                    //     focusNode: _basedOnFocus,
-                    //     textInputAction: TextInputAction.done,
-                    //     onEditingComplete: () => _fieldFocusChange(
-                    //         context, _purchaseDateFocus, _accountNameFocus),
-                    //   ),
-                    // ),
-                    // SizedBox(
-                    //   width: constraints.maxWidth / columns - 20,
-                    //   child: CustomTextField(
-                    //     title: "Amount Name",
-                    //     hintText: "Amount Name",
-                    //     controller: _accountNameController,
-                    //     // prefixIcon: Icons.person,
-                    //     isEdit: false,
-                    //     focusNode: _accountNameFocus,
-                    //     textInputAction: TextInputAction.done,
-                    //     onEditingComplete: _submit,
-                    //   ),
-                    // ),
+                      SizedBox(
+                        width: double.infinity,
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: DataTable(
+                            headingRowHeight: 30,
+                            dataRowMinHeight: 40,
+                            dataRowMaxHeight:
+                                40, // ✅ same value prevents constraint issues
+                            showCheckboxColumn: false,
+                            border: TableBorder.all(color: primary),
+                            columnSpacing: 20,
+                            headingRowColor: MaterialStateProperty.all(primary),
+                            columns: [
+                              const DataColumn(
+                                  label: Text("SL No",
+                                      style: TextStyle(color: white))),
+                              const DataColumn(
+                                  label: Text("Item Id",
+                                      style: TextStyle(color: white))),
+                              DataColumn(
+                                label: Row(
+                                  children: [
+                                    const Text("Item Name",
+                                        style: TextStyle(color: white)),
+                                    const SizedBox(width: 4),
+                                    IconButton(
+                                      icon: const Icon(
+                                          Icons.add_circle_outline_rounded,
+                                          color: white,
+                                          size: 20),
+                                      onPressed: () {},
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const DataColumn(
+                                  label: Text("HSN Code",
+                                      style: TextStyle(color: white))),
+                              const DataColumn(
+                                  label: Text("Batch No",
+                                      style: TextStyle(color: white))),
+                              const DataColumn(
+                                  label: Text("Expiry",
+                                      style: TextStyle(color: white))),
+                              const DataColumn(
+                                  label: Text("UOM",
+                                      style: TextStyle(color: white))),
 
-                    // const SizedBox(height: 26),
+                              const DataColumn(
+                                  label: Text("Qty",
+                                      style: TextStyle(color: white))),
+                              const DataColumn(
+                                  label: Text("Purchase Rate",
+                                      style: TextStyle(color: white))),
+                              const DataColumn(
+                                  label: Text("MRP/Rate",
+                                      style: TextStyle(color: white))),
+                              const DataColumn(
+                                  label: Text("Sales Rate",
+                                      style: TextStyle(color: white))),
+                              const DataColumn(
+                                  label: Text("GST %",
+                                      style: TextStyle(color: white))),
+                              const DataColumn(
+                                  label: Text("Discount %",
+                                      style: TextStyle(color: white))),
+                              const DataColumn(
+                                  label: Text("Taxable Value",
+                                      style: TextStyle(color: white))),
+                              const DataColumn(
+                                  label: Text("Net Rate %",
+                                      style: TextStyle(
+                                          color: white))), //sales rate
+                              const DataColumn(
+                                  label: Text("Net Value",
+                                      style: TextStyle(
+                                          color: white))), // qty x sales Rate
+                              const DataColumn(
+                                  label: Text("Action",
+                                      style: TextStyle(color: white))),
+                            ],
+                            rows: List.generate(items.length, (index) {
+                              if (index >= controllers.length) {
+                                controllers.add(ItemRowControllers());
+                              }
+                              final controller = controllers[index];
+                              final item = items[index];
 
-                    const SizedBox(
-                      height: 20,
-                    ),
+                              return DataRow(cells: [
+                                DataCell(Text("${index + 1}")),
+                                DataCell(TextFormField(
+                                  style: TextStyle(fontSize: 12),
+                                  controller: controller.itemCodeController,
+                                  focusNode: controller.itemCodeFocus,
+                                  keyboardType: TextInputType.number,
+                                  decoration: const InputDecoration(
+                                      border: InputBorder.none),
+                                  onChanged: (val) => item.itemCode = val,
+                                )),
+                                DataCell(
+                                  TextFormField(
+                                    style: TextStyle(fontSize: 12),
+                                    controller: controller.itemNameController,
+                                    focusNode: controller.itemNameFocus,
+                                    decoration: const InputDecoration(
+                                        hintText: "Item Name",
+                                        border: InputBorder.none),
+                                    onChanged: (val) async {
+                                      if (val.isNotEmpty) {
+                                        final response = await _productService
+                                            .getProductServiceSearch(val);
+                                        if (response.isSuccess &&
+                                            response.data!.info!.isNotEmpty) {
+                                          setState(() {
+                                            _searchResults =
+                                                response.data!.info!;
+                                            _showSubTable = true;
+                                            _activeRowIndex = index;
+                                          });
+                                        }
+                                      } else {
+                                        setState(() {
+                                          _searchResults.clear();
+                                          _showSubTable = false;
+                                          _activeRowIndex = null;
+                                        });
+                                      }
+                                    },
+                                  ),
+                                ),
+                                DataCell(TextFormField(
+                                  style: TextStyle(fontSize: 12),
+                                  controller: controller.hsnController,
+                                  decoration: const InputDecoration(
+                                      border: InputBorder.none),
+                                  onChanged: (val) => item.hSNCode = val,
+                                )),
 
-                     SizedBox(
-          width: double.infinity,
-          child: DataTable(
-            headingRowHeight: 30,
-            dataRowHeight: 40,
-            showCheckboxColumn: false,
-            border: TableBorder.all(color:primary),
-            columnSpacing: 20,
-            headingRowColor: MaterialStateProperty.all(primary),
-            columns: [
-              const DataColumn(label: Text("SL No", style: TextStyle(color: white))),
-              const DataColumn(label: Text("Item Id", style: TextStyle(color: white))),
-              DataColumn(
-                label: Row(
-                  children: [
-                    const Text("Item Name", style: TextStyle(color: white)),
-                    const SizedBox(width: 4),
-                    IconButton(
-                      icon: const Icon(Icons.add_circle_outline_rounded, color: white, size: 20),
-                      onPressed: () {},
+                                DataCell(TextFormField(
+                                  style: TextStyle(fontSize: 12),
+                                  controller: controller.batchNoController,
+                                  decoration: const InputDecoration(
+                                      border: InputBorder.none),
+                                  onChanged: (val) => item.batchNoRequired =
+                                      int.tryParse(val) ?? 0,
+                                )),
+                                DataCell(TextFormField(
+                                  style: TextStyle(fontSize: 12),
+                                  controller: controller.expiryController,
+                                  decoration: const InputDecoration(
+                                      border: InputBorder.none),
+                                  onChanged: (val) =>
+                                      item.expiryDateFormat = val,
+                                )),
+                                DataCell(Text(item.itemBoxNo ?? "")),
+                                DataCell(TextFormField(
+                                  style: TextStyle(fontSize: 12),
+                                  controller: controller.qtyController,
+                                  keyboardType: TextInputType.number,
+                                  decoration: const InputDecoration(
+                                      border: InputBorder.none),
+                                  onChanged: (val) => item.maximumStockQty =
+                                      int.tryParse(val) ?? 0,
+                                )),
+
+                                DataCell(TextFormField(
+                                  style: TextStyle(fontSize: 12),
+                                  controller: controller.purchaseRate,
+                                  keyboardType: TextInputType.number,
+                                  decoration: const InputDecoration(
+                                      border: InputBorder.none),
+                                  onChanged: (val) =>
+                                      item.mRPRate = double.tryParse(val) ?? 0,
+                                )),
+
+                                DataCell(TextFormField(
+                                  style: TextStyle(fontSize: 12),
+                                  controller: controller.mrpController,
+                                  keyboardType: TextInputType.number,
+                                  decoration: const InputDecoration(
+                                      border: InputBorder.none),
+                                  onChanged: (val) =>
+                                      item.mRPRate = double.tryParse(val) ?? 0,
+                                )),
+
+                                DataCell(TextFormField(
+                                  style: TextStyle(fontSize: 12),
+                                  controller: controller.salesRateController,
+                                  keyboardType: TextInputType.number,
+                                  decoration: const InputDecoration(
+                                      border: InputBorder.none),
+                                  onChanged: (val) => item.salesRate =
+                                      double.tryParse(val) ?? 0,
+                                )),
+
+                                DataCell(TextFormField(
+                                  style: TextStyle(fontSize: 12),
+                                  controller: controller.gstController,
+                                  keyboardType: TextInputType.number,
+                                  decoration: const InputDecoration(
+                                      border: InputBorder.none),
+                                  onChanged: (val) => item.gstPercentage =
+                                      int.tryParse(val) ?? 0,
+                                )),
+
+                                DataCell(TextFormField(
+                                  style: TextStyle(fontSize: 12),
+                                  controller:
+                                      controller.discountPercentageController,
+                                  keyboardType: TextInputType.number,
+                                  decoration: const InputDecoration(
+                                      border: InputBorder.none),
+                                  onChanged: (val) =>
+                                      item.itemDiscountPercentage =
+                                          int.tryParse(val) ?? 0,
+                                )),
+                                // DataCell(Text(item.itemBoxNo ?? "")),
+
+                                DataCell(TextFormField(
+                                  style: TextStyle(fontSize: 12),
+                                  controller: controller.taxableValueController,
+                                  keyboardType: TextInputType.number,
+                                  decoration: const InputDecoration(
+                                      border: InputBorder.none),
+                                  onChanged: (val) =>
+                                      item.itemDiscountPercentage =
+                                          int.tryParse("10") ?? 0,
+                                )),
+                                // DataCell(Text(item.itemBoxNo ?? "")),
+
+                                DataCell(TextFormField(
+                                  style: TextStyle(fontSize: 12),
+                                  controller: controller.netRateController,
+                                  keyboardType: TextInputType.number,
+                                  decoration: const InputDecoration(
+                                      border: InputBorder.none),
+                                  onChanged: (val) => item
+                                          .itemDiscountPercentage =
+                                      int.tryParse(item.salesRate.toString()) ??
+                                          0,
+                                )),
+                                DataCell(TextFormField(
+                                  style: TextStyle(fontSize: 12),
+                                  controller: controller.netValueController,
+                                  keyboardType: TextInputType.number,
+                                  decoration: const InputDecoration(
+                                      border: InputBorder.none),
+                                  onChanged: (val) => item
+                                          .itemDiscountPercentage =
+                                      int.tryParse(item.salesRate.toString()) ??
+                                          0,
+                                )),
+                                // DataCell(Text(item.itemBoxNo ?? "")),
+
+                                DataCell(
+                                  controller.itemNameController.text.isNotEmpty
+                                      ? Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            // Edit icon
+                                            IconButton(
+                                              icon: const Icon(Icons.edit,
+                                                  color: primary),
+                                              onPressed: () {
+                                                _showEditPopup(context, index);
+                                              },
+                                            ),
+                                            // Delete icon
+                                            IconButton(
+                                              icon: const Icon(Icons.delete,
+                                                  color: red),
+                                              onPressed: () {
+                                                setState(() {
+                                                  items.removeAt(index);
+                                                  controllers.removeAt(index);
+
+                                                  // Always keep at least 1 blank row
+                                                  if (items.isEmpty) {
+                                                    items.add(product.Info(
+                                                      itemCode: null,
+                                                      itemName: '',
+                                                      batchNoRequired: 0,
+                                                      expiryDateFormat: '',
+                                                      hSNCode: '',
+                                                      maximumStockQty: 0,
+                                                      mRPRate: 0,
+                                                      salesRate: 0,
+                                                      gstPercentage: 0,
+                                                    ));
+                                                    controllers.add(
+                                                        ItemRowControllers());
+                                                  }
+                                                });
+                                              },
+                                            ),
+                                          ],
+                                        )
+                                      : const SizedBox
+                                          .shrink(), // Nothing is shown if itemNameController is empty
+                                ),
+                              ]);
+                            }),
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(
+                        height: 0,
+                      ),
+                      if (!_showSubTable)
+                        SizedBox(
+                          height: 200,
+                        ),
+                      if (_showSubTable)
+                        SizedBox(
+                          height: 800,
+                          child: SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: SingleChildScrollView(
+                              scrollDirection: Axis.vertical,
+                              child: _searchResults.isNotEmpty
+                                  ? DataTable(
+                                      headingRowHeight:
+                                          30, // <-- Reduce header height
+                                      dataRowHeight: 40,
+                                      showCheckboxColumn: false,
+                                      border: TableBorder.all(color: lightgray),
+                                      headingRowColor:
+                                          MaterialStateProperty.all(primary),
+                                      columns: const [
+                                        DataColumn(
+                                            label: Text(
+                                          "SL No",
+                                          style: TextStyle(color: white),
+                                        )),
+                                        DataColumn(
+                                            label: Text(
+                                          "Item Id",
+                                          style: TextStyle(color: white),
+                                        )),
+                                        DataColumn(
+                                            label: Text(
+                                          "Item Name",
+                                          style: TextStyle(color: white),
+                                        )),
+                                        DataColumn(
+                                            label: Text(
+                                          "Batch No",
+                                          style: TextStyle(color: white),
+                                        )),
+                                        DataColumn(
+                                            label: Text(
+                                          "Expiry",
+                                          style: TextStyle(color: white),
+                                        )),
+                                        DataColumn(
+                                            label: Text(
+                                          "VOM",
+                                          style: TextStyle(color: white),
+                                        )),
+                                        DataColumn(
+                                            label: Text(
+                                          "HSN Code",
+                                          style: TextStyle(color: white),
+                                        )),
+                                        DataColumn(
+                                            label: Text(
+                                          "FreeQty",
+                                          style: TextStyle(color: white),
+                                        )),
+                                        DataColumn(
+                                            label: Text(
+                                          "MRP/Rate",
+                                          style: TextStyle(color: white),
+                                        )),
+                                        // DataColumn(label: Text("Net Rate")),
+                                        // DataColumn(label: Text("Net Value")),
+                                        DataColumn(
+                                            label: Text(
+                                          "Purchase Rate",
+                                          style: TextStyle(color: white),
+                                        )),
+                                        DataColumn(
+                                            label: Text(
+                                          "Sales Rate",
+                                          style: TextStyle(color: white),
+                                        )),
+                                      ],
+                                      rows: _searchResults
+                                          .asMap()
+                                          .entries
+                                          .map((entry) {
+                                        final index = entry
+                                            .key; // <-- gives you the index
+                                        final p = entry
+                                            .value; // <-- this is your Info object
+
+                                        return DataRow(
+                                          onSelectChanged: (_) {
+                                            setState(() {
+                                              if (_activeRowIndex != null) {
+                                                // final p = _searchResults[_activeRowIndex!];
+                                                final item =
+                                                    items[_activeRowIndex!];
+                                                final controller = controllers[
+                                                    _activeRowIndex!];
+                                                item.itemID = p.itemID;
+                                                item.itemName =
+                                                    p.itemName ?? '';
+                                                item.batchNoRequired =
+                                                    p.batchNoRequired ?? 0;
+                                                item.expiryDateFormat =
+                                                    p.expiryDateFormat ?? '';
+
+                                                item.hSNCode = p.hSNCode ?? '';
+                                                item.maximumStockQty =
+                                                    p.maximumStockQty ?? 0;
+                                                item.mRPRate = p.mRPRate ?? 0;
+                                                item.salesRate =
+                                                    p.salesRate ?? 0;
+                                                item.gstPercentage =
+                                                    p.gstPercentage ?? 0;
+
+                                                // Update controllers
+                                                controller.itemCodeController
+                                                        .text =
+                                                    item.itemID?.toString() ??
+                                                        '';
+                                                controller.itemNameController
+                                                    .text = item.itemName ?? '';
+                                                controller.batchNoController
+                                                        .text =
+                                                    item.batchNoRequired
+                                                        .toString();
+                                                controller
+                                                        .expiryController.text =
+                                                    item.expiryDateFormat ?? '';
+                                                controller.hsnController.text =
+                                                    item.hSNCode ?? '';
+                                                controller.qtyController.text =
+                                                    item.maximumStockQty
+                                                        .toString();
+                                                controller.mrpController.text =
+                                                    item.mRPRate.toString();
+                                                controller.salesRateController
+                                                        .text =
+                                                    item.salesRate.toString();
+                                                controller.gstController.text =
+                                                    item.gstPercentage
+                                                        .toString();
+                                                controller.gstValueController
+                                                        .text =
+                                                    item.gstPercentage
+                                                        .toString();
+                                                _calculateTotalSalesRate();
+                                                // Convert Info to Items
+                                                final newItem = Items(
+                                                  itemCode: p.itemCode,
+                                                  itemID: p.itemID ?? '',
+                                                  itemName: p.itemName ?? '',
+                                                  itemGroupCode:
+                                                      p.itemGroupCode ?? 0,
+                                                  itemMakeCode:
+                                                      p.itemMakeCode ?? 0,
+                                                  itemGenericCode:
+                                                      p.itemGenericCode ?? 0,
+                                                  barCodeId: '',
+                                                  batchNo: p.batchNoRequired
+                                                          ?.toString() ??
+                                                      '',
+                                                  mFGDate: "2025-10-01",
+                                                  expiryDate: "2025-10-07",
+                                                  //  mFGDate: '2025-10-01',
+                                                  //   expiryDate:
+                                                  //       p.expiryDateFormat ?? '',
+                                                  hsnCode: int.tryParse(
+                                                          p.hSNCode ?? '0') ??
+                                                      0,
+                                                  gstPercentage:
+                                                      p.gstPercentage ?? 0,
+
+                                                  itemQuantity:
+                                                      p.maximumStockQty ?? 0,
+                                                  freeQuantity: 0,
+                                                  itemUnitCode:
+                                                      p.itemUnitCode ?? 0,
+                                                  subQuantity: 0,
+                                                  subQtyUnitCode: 0,
+                                                  subQtyPurchaseRate: 0,
+                                                  itemPurchaseRate:
+                                                      p.purchaseRate ?? 0,
+                                                  purchaseRateBeforeTax: 0.0,
+                                                  itemDiscountPercentage: 0,
+                                                  itemDiscountValue: 0,
+                                                  itemGstValue: 0,
+                                                  itemValue: 0,
+                                                  actualPurchaseRate: 0.0,
+                                                  itemSaleRate:
+                                                      p.salesRate ?? 0,
+                                                  itemMRPRate: p.mRPRate ?? 0,
+                                                  itemSGSTPercentage: 0,
+                                                  itemCGSTPercentage: 0,
+                                                  itemIGSTPercentage: 0,
+                                                  itemSGSTAmount: 0,
+                                                  itemCGSTAmount: 0,
+                                                  itemIGSTAmount: 0,
+                                                  purchaseEntryMode: 0,
+                                                  purchaseEntryType: 0,
+                                                  createdUserCode:
+                                                      p.createdUserCode ?? 0,
+                                                  createdDate:
+                                                      "2025-09-24 00:23:30",
+                                                  // createdDate: p.createdDate ??
+                                                  //     DateTime.now()
+                                                  //         .toIso8601String(),
+                                                  updatedUserCode: int.tryParse(
+                                                      userId.value ?? '0'),
+                                                  updatedDate: DateFormat(
+                                                          'yyyy-MM-dd')
+                                                      .format(DateTime.now()),
+                                                  coCode: 0,
+                                                  computerName: 'computername',
+                                                  finYearCode: '',
+                                                  stockRequiredEffect: 0,
+                                                  frieghtChargesAddWithoutTotal:
+                                                      0,
+                                                );
+
+                                                // Add to itemsList
+                                                itemsList.add(newItem);
+                                                if (_activeRowIndex ==
+                                                    items.length - 1) {
+                                                  items.add(product.Info());
+                                                  controllers.add(
+                                                      ItemRowControllers());
+                                                }
+
+                                                // Hide sub-table & clear selection
+                                                _showSubTable = false;
+                                                _searchResults.clear();
+                                                _activeRowIndex = null;
+                                                // Print current count
+                                                print(
+                                                    "Current itemsList count: ${itemsList.length}");
+                                              }
+                                            });
+                                          },
+                                          cells: [
+                                            DataCell(Text(
+                                              "${index + 1}",
+                                              style: const TextStyle(
+                                                  fontSize: 12.0,
+                                                  height: 1.0,
+                                                  color: black),
+                                            )),
+                                            DataCell(Text(
+                                              p.itemID?.toString() ?? "",
+                                              style: const TextStyle(
+                                                  fontSize: 12.0,
+                                                  height: 1.0,
+                                                  color: black),
+                                            )),
+                                            DataCell(Text(
+                                              p.itemName ?? "",
+                                              style: const TextStyle(
+                                                  fontSize: 12.0,
+                                                  height: 1.0,
+                                                  color: black),
+                                            )),
+                                            DataCell(Text(
+                                              p.batchNoRequired.toString(),
+                                              style: const TextStyle(
+                                                  fontSize: 12.0,
+                                                  height: 1.0,
+                                                  color: black),
+                                            )),
+                                            DataCell(Text(
+                                              p.expiryDateFormat ?? "",
+                                              style: const TextStyle(
+                                                  fontSize: 12.0,
+                                                  height: 1.0,
+                                                  color: black),
+                                            )),
+                                            DataCell(Text(
+                                              p.hSNCode.toString(),
+                                              style: const TextStyle(
+                                                  fontSize: 12.0,
+                                                  height: 1.0,
+                                                  color: black),
+                                            )),
+                                            DataCell(Text(
+                                              p.maximumStockQty.toString(),
+                                              style: const TextStyle(
+                                                  fontSize: 12.0,
+                                                  height: 1.0,
+                                                  color: black),
+                                            )),
+                                            DataCell(Text(
+                                              p.maximumStockQty.toString(),
+                                              style: const TextStyle(
+                                                  fontSize: 12.0,
+                                                  height: 1.0,
+                                                  color: black),
+                                            )),
+                                            DataCell(Text(
+                                              p.mRPRate.toString(),
+                                              style: const TextStyle(
+                                                  fontSize: 12.0,
+                                                  height: 1.0,
+                                                  color: black),
+                                            )),
+                                            DataCell(Text(
+                                              p.purchaseRate.toString(),
+                                              style: const TextStyle(
+                                                  fontSize: 12.0,
+                                                  height: 1.0,
+                                                  color: black),
+                                            )),
+                                            DataCell(Text(
+                                              p.salesRate.toString(),
+                                              style: const TextStyle(
+                                                  fontSize: 12.0,
+                                                  height: 1.0,
+                                                  color: black),
+                                            )),
+                                          ],
+                                        );
+                                      }).toList(),
+                                    )
+                                  : Container(
+                                      padding: const EdgeInsets.all(12),
+                                      alignment: Alignment.center,
+                                      child: const Text(
+                                        "No item found",
+                                        style: TextStyle(
+                                          color: red,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                    ),
+                            ),
+                          ),
+                        )
+                    ],
+                  );
+                }),
+              ),
+            ),
+          ),
+          bottomNavigationBar: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 400),
+                curve: Curves.easeInOut,
+                height: _isBottomBarExpanded ? 350 : 60, // adjust max height
+                width: MediaQuery.of(context).size.width,
+                decoration: BoxDecoration(
+                  color: lightgray,
+                  border: const Border(
+                    top: BorderSide(color: gray, width: 1), // ✅ only top border
+                  ),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Color.fromARGB(50, 0, 0, 0),
+                      blurRadius: 4,
+                      offset: Offset(0, -2), // ✅ shadow above (negative y)
                     ),
                   ],
                 ),
-              ),
-              const DataColumn(label: Text("Batch No", style: TextStyle(color: white))),
-              const DataColumn(label: Text("Expiry", style: TextStyle(color: white))),
-              const DataColumn(label: Text("UOM", style: TextStyle(color: white))),
-              const DataColumn(label: Text("HSN Code", style: TextStyle(color: white))),
-              const DataColumn(label: Text("Qty", style: TextStyle(color: white))),
-              const DataColumn(label: Text("MRP/Rate", style: TextStyle(color: white))),
-              const DataColumn(label: Text("Sales Rate", style: TextStyle(color: white))),
-              const DataColumn(label: Text("GST %", style: TextStyle(color: white))),
-              const DataColumn(label: Text("Action", style: TextStyle(color: white))),
-            ],
-            rows: List.generate(items.length, (index) {
-              if (index >= controllers.length) {
-                controllers.add(ItemRowControllers());
-              }
-              final controller = controllers[index];
-              final item = items[index];
 
-              return DataRow(cells: [
-                DataCell(Text("${index + 1}")),
-                DataCell(TextFormField(
-                  controller: controller.itemCodeController,
-                  focusNode: controller.itemCodeFocus,
-                  keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(border: InputBorder.none),
-                  onChanged: (val) => item.itemCode = val,
-                )),
-                DataCell(
-                  TextFormField(
-                    controller: controller.itemNameController,
-                    focusNode: controller.itemNameFocus,
-                    decoration: const InputDecoration(hintText: "Item Name", border: InputBorder.none),
-                    onChanged: (val) async {
-                      if (val.isNotEmpty) {
-                        final response = await _productService.getProductServiceSearch(val);
-                        if (response.isSuccess && response.data!.info!.isNotEmpty) {
-                          setState(() {
-                            _searchResults = response.data!.info!;
-                            _showSubTable = true;
-                            _activeRowIndex = index;
-                          });
-                        }
-                      } else {
-                        setState(() {
-                          _searchResults.clear();
-                          _showSubTable = false;
-                          _activeRowIndex = null;
-                        });
-                      }
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const SizedBox(height: 16),
+                      if (_isBottomBarExpanded) ...[
+                        // 👉 Content when expanded
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            GstDataTableWidget(totalAmount: _totalSalesRate),
+                            const SizedBox(width: 16),
+
+                            // First column
+                            Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                LabeledTextField(
+                                  focusNode: _sgstpreFocus,
+                                  label: "SGST %",
+                                  controller: _sgstpreController,
+                                ),
+                                LabeledTextField(
+                                  focusNode: _cgstpreFocus,
+                                  label: "CGST %",
+                                  controller: _cgstpreController,
+                                  readOnly: true,
+                                ),
+                                LabeledTextField(
+                                  focusNode: _igstpreFocus,
+                                  label: "IGST %",
+                                  controller: _igstpreController,
+                                  readOnly: true,
+                                ),
+                              ],
+                            ),
+
+                            const SizedBox(width: 16),
+
+                            // Second column
+                            Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                LabeledTextField(
+                                  focusNode: _sgstAmtFocus,
+                                  label: "SGST Amount",
+                                  controller: _sgstAmtController,
+                                  readOnly: true,
+                                ),
+                                LabeledTextField(
+                                  focusNode: _cgstAmtFocus,
+                                  label: "CGST Amount",
+                                  controller: _cgstAmtController,
+                                  readOnly: true,
+                                ),
+                                LabeledTextField(
+                                  focusNode: _igstAmtFocus,
+                                  label: "IGST Amount",
+                                  controller: _igstAmtController,
+                                  readOnly: true,
+                                ),
+                                LabeledTextField(
+                                  focusNode: _totalGstAmtFocus,
+                                  label: "Total GST Amount",
+                                  controller: _totalGstAmtController,
+                                  readOnly: true,
+                                ),
+                              ],
+                            ),
+
+                            const SizedBox(width: 16),
+
+                            // Third column
+                            Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                LabeledTextField(
+                                  focusNode: _subTotalFocus,
+                                  label: "Sub Total Value",
+                                  controller: _subTotalValueController,
+                                  readOnly: true,
+                                ),
+                                LabeledTextField(
+                                  focusNode: _gstValueFocus,
+                                  label: "GST Value",
+                                  controller: _gstValueController,
+                                  readOnly: true,
+                                ),
+                                LabeledTextField(
+                                  focusNode: _discountFocus,
+                                  label: "Discount",
+                                  controller: _discountController,
+                                  readOnly: true,
+                                ),
+                                LabeledTextField(
+                                  focusNode: _roundOFfFocus,
+                                  label: "Round Off",
+                                  controller: _roundOffController,
+                                  readOnly: true,
+                                ),
+                                LabeledTextField(
+                                  focusNode: _frightFocus,
+                                  label: "Freight Charges",
+                                  controller: _frightChargesController,
+                                  readOnly: true,
+                                ),
+                                LabeledTextField(
+                                  focusNode: _roundOFfFocus,
+                                  label: "Net Amount",
+                                  controller: _netAmountController,
+                                  readOnly: true,
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 16),
+
+                        // Save / Edit / Delete buttons
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: green,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              onPressed: _submit,
+                              child: const Text("Save",
+                                  style: TextStyle(color: white)),
+                            ),
+                            const SizedBox(width: 20),
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: primary,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              onPressed: _submit,
+                              child: const Text("Edit",
+                                  style: TextStyle(color: white)),
+                            ),
+                            const SizedBox(width: 20),
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: red,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              onPressed: () {
+                                // Delete logic
+                              },
+                              child: const Text("Delete",
+                                  style: TextStyle(color: white)),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                      ],
+                    ],
+                  ),
+                ),
+              ),
+
+              // Toggle Button
+              Positioned(
+                right: 50,
+                top: -30,
+                child: Container(
+                  padding: const EdgeInsets.all(3),
+                  decoration: const BoxDecoration(
+                    color: lightgray,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Color.fromARGB(50, 0, 0, 0),
+                        blurRadius: 2,
+                        offset: Offset(1, 1),
+                      ),
+                    ],
+                  ),
+                  child: IconButton(
+                    icon: Icon(
+                      _isBottomBarExpanded
+                          ? Icons.arrow_drop_down
+                          : Icons.arrow_drop_up,
+                      color: primary,
+                      size: 30,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _isBottomBarExpanded = !_isBottomBarExpanded;
+                      });
                     },
                   ),
                 ),
-                DataCell(TextFormField(
-                  controller: controller.batchNoController,
-                  decoration: const InputDecoration(border: InputBorder.none),
-                  onChanged: (val) => item.batchNoRequired = int.tryParse(val) ?? 0,
-                )),
-                DataCell(TextFormField(
-                  controller: controller.expiryController,
-                  decoration: const InputDecoration(border: InputBorder.none),
-                  onChanged: (val) => item.expiryDateFormat = val,
-                )),
-                DataCell(Text(item.itemBoxNo ?? "")),
-                DataCell(TextFormField(
-                  controller: controller.hsnController,
-                  decoration: const InputDecoration(border: InputBorder.none),
-                  onChanged: (val) => item.hSNCode = val,
-                )),
-                DataCell(TextFormField(
-                  controller: controller.qtyController,
-                  keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(border: InputBorder.none),
-                  onChanged: (val) => item.maximumStockQty = int.tryParse(val) ?? 0,
-                )),
-                DataCell(TextFormField(
-                  controller: controller.mrpController,
-                  keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(border: InputBorder.none),
-                  onChanged: (val) => item.mRPRate = double.tryParse(val) ?? 0,
-                )),
-                DataCell(TextFormField(
-                  controller: controller.salesRateController,
-                  keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(border: InputBorder.none),
-                  onChanged: (val) => item.salesRate = double.tryParse(val) ?? 0,
-                )),
-                DataCell(TextFormField(
-                  controller: controller.gstController,
-                  keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(border: InputBorder.none),
-                  onChanged: (val) => item.gstPercentage = int.tryParse(val) ?? 0,
-                )),
-               DataCell(
-  controller.itemNameController.text.isNotEmpty
-      ? Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Edit icon
-            IconButton(
-              icon: const Icon(Icons.edit, color: primary),
-              onPressed: () {
-                _showEditPopup(context, index);
-              },
-            ),
-            // Delete icon
-            IconButton(
-              icon: const Icon(Icons.delete, color: red),
-              onPressed: () {
-                setState(() {
-                  items.removeAt(index);
-                  controllers.removeAt(index);
-
-                  // Always keep at least 1 blank row
-                  if (items.isEmpty) {
-                    items.add(product.Info(
-                      itemCode: null,
-                      itemName: '',
-                      batchNoRequired: 0,
-                      expiryDateFormat: '',
-                      hSNCode: '',
-                      maximumStockQty: 0,
-                      mRPRate: 0,
-                      salesRate: 0,
-                      gstPercentage: 0,
-                    ));
-                    controllers.add(ItemRowControllers());
-                  }
-                });
-              },
-            ),
-          ],
-        )
-      : const SizedBox
-          .shrink(), // Nothing is shown if itemNameController is empty
-),
-              ]);
-            }),
-          ),
-        ),
-
-                    const SizedBox(
-                      height: 0,
-                    ),
-                    if (!_showSubTable)
-                      SizedBox(
-                        height: 200,
-                      ),
-                    if (_showSubTable)
-                      SizedBox(
-                        height: 800,
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: SingleChildScrollView(
-                            scrollDirection: Axis.vertical,
-                            child: _searchResults.isNotEmpty
-                                ? DataTable(
-                                     headingRowHeight: 30, // <-- Reduce header height
-    dataRowHeight: 40, 
-                                    showCheckboxColumn: false,
-                                    border: TableBorder.all(color: lightgray),
-                                    headingRowColor:
-                                        MaterialStateProperty.all(primary),
-                                    columns: const [
-                                      DataColumn(
-                                          label: Text(
-                                        "SL No",
-                                        style: TextStyle(color: white),
-                                      )),
-                                      DataColumn(
-                                          label: Text(
-                                        "Item Id",
-                                        style: TextStyle(color: white),
-                                      )),
-                                      DataColumn(
-                                          label: Text(
-                                        "Item Name",
-                                        style: TextStyle(color: white),
-                                      )),
-                                      DataColumn(
-                                          label: Text(
-                                        "Batch No",
-                                        style: TextStyle(color: white),
-                                      )),
-                                      DataColumn(
-                                          label: Text(
-                                        "Expiry",
-                                        style: TextStyle(color: white),
-                                      )),
-                                      DataColumn(
-                                          label: Text(
-                                        "VOM",
-                                        style: TextStyle(color: white),
-                                      )),
-                                      DataColumn(
-                                          label: Text(
-                                        "HSN Code",
-                                        style: TextStyle(color: white),
-                                      )),
-                                      DataColumn(
-                                          label: Text(
-                                        "FreeQty",
-                                        style: TextStyle(color: white),
-                                      )),
-                                      DataColumn(
-                                          label: Text(
-                                        "MRP/Rate",
-                                        style: TextStyle(color: white),
-                                      )),
-                                      // DataColumn(label: Text("Net Rate")),
-                                      // DataColumn(label: Text("Net Value")),
-                                      DataColumn(
-                                          label: Text(
-                                        "Purchase Rate",
-                                        style: TextStyle(color: white),
-                                      )),
-                                      DataColumn(
-                                          label: Text(
-                                        "Sales Rate",
-                                        style: TextStyle(color: white),
-                                      )),
-                                    ],
-                                    rows: _searchResults
-                                        .asMap()
-                                        .entries
-                                        .map((entry) {
-                                      final index =
-                                          entry.key; // <-- gives you the index
-                                      final p = entry
-                                          .value; // <-- this is your Info object
-
-                                      return DataRow(
-                                        onSelectChanged: (_) {
-                                          setState(() {
-                                            if (_activeRowIndex != null) {
-                                              // final p = _searchResults[_activeRowIndex!];
-                                              final item =
-                                                  items[_activeRowIndex!];
-                                              final controller =
-                                                  controllers[_activeRowIndex!];
-                                              item.itemID = p.itemID;
-                                              item.itemName = p.itemName ?? '';
-                                              item.batchNoRequired =
-                                                  p.batchNoRequired ?? 0;
-                                              item.expiryDateFormat =
-                                                  p.expiryDateFormat ?? '';
-
-                                              item.hSNCode = p.hSNCode ?? '';
-                                              item.maximumStockQty =
-                                                  p.maximumStockQty ?? 0;
-                                              item.mRPRate = p.mRPRate ?? 0;
-                                              item.salesRate = p.salesRate ?? 0;
-                                              item.gstPercentage =
-                                                  p.gstPercentage ?? 0;
-
-                                              // Update controllers
-                                              controller
-                                                      .itemCodeController.text =
-                                                  item.itemID?.toString() ?? '';
-                                              controller.itemNameController
-                                                  .text = item.itemName ?? '';
-                                              controller
-                                                      .batchNoController.text =
-                                                  item.batchNoRequired
-                                                      .toString();
-                                              controller.expiryController.text =
-                                                  item.expiryDateFormat ?? '';
-                                              controller.hsnController.text =
-                                                  item.hSNCode ?? '';
-                                              controller.qtyController.text =
-                                                  item.maximumStockQty
-                                                      .toString();
-                                              controller.mrpController.text =
-                                                  item.mRPRate.toString();
-                                              controller.salesRateController
-                                                      .text =
-                                                  item.salesRate.toString();
-                                              controller.gstController.text =
-                                                  item.gstPercentage.toString();
-                                              controller
-                                                      .gstValueController.text =
-                                                  item.gstPercentage.toString();
-                                              _calculateTotalSalesRate();
-                                              // Convert Info to Items
-                                              final newItem = Items(
-                                                
-                                                itemCode: p.itemCode,
-                                                itemID: p.itemID ?? '',
-                                                itemName: p.itemName ?? '',
-                                                itemGroupCode:
-                                                    p.itemGroupCode ?? 0,
-                                                itemMakeCode:
-                                                    p.itemMakeCode ?? 0,
-                                                itemGenericCode:
-                                                    p.itemGenericCode ?? 0,
-                                                barCodeId: '',
-                                                batchNo: p.batchNoRequired
-                                                        ?.toString() ??
-                                                    '',
-                                                      mFGDate: "2025-10-01",
-  expiryDate: "2025-10-07",
-                                              //  mFGDate: '2025-10-01',
-                                              //   expiryDate:
-                                              //       p.expiryDateFormat ?? '',
-                                                hsnCode: int.tryParse(
-                                                        p.hSNCode ?? '0') ??
-                                                    0,
-                                                gstPercentage:
-                                                    p.gstPercentage ?? 0,
-                                                    
-                                                itemQuantity:
-                                                    p.maximumStockQty ?? 0,
-                                                freeQuantity: 0,
-                                                itemUnitCode:
-                                                    p.itemUnitCode ?? 0,
-                                                subQuantity: 0,
-                                                subQtyUnitCode: 0,
-                                                subQtyPurchaseRate: 0,
-                                                itemPurchaseRate:
-                                                    p.purchaseRate ?? 0,
-                                                purchaseRateBeforeTax: 0.0,
-                                                itemDiscountPercentage: 0,
-                                                itemDiscountValue: 0,
-                                                itemGstValue: 0,
-                                                itemValue: 0,
-                                                actualPurchaseRate: 0.0,
-                                                itemSaleRate: p.salesRate ?? 0,
-                                                itemMRPRate: p.mRPRate ?? 0,
-                                                itemSGSTPercentage: 0,
-                                                itemCGSTPercentage: 0,
-                                                itemIGSTPercentage: 0,
-                                                itemSGSTAmount: 0,
-                                                itemCGSTAmount: 0,
-                                                itemIGSTAmount: 0,
-                                                purchaseEntryMode: 0,
-                                                purchaseEntryType: 0,
-                                                createdUserCode:
-                                                    p.createdUserCode ?? 0,
-                                                    createdDate: "2025-09-24 00:23:30",
-                                                // createdDate: p.createdDate ??
-                                                //     DateTime.now()
-                                                //         .toIso8601String(),
-                                               updatedUserCode: int.tryParse(userId.value ?? '0'),
- updatedDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
-                                                coCode: 0,
-                                                computerName: 'computername',
-                                                finYearCode: '',
-                                                stockRequiredEffect: 0,
-                                                 frieghtChargesAddWithoutTotal: 0,
-                                              );
-
-                                              // Add to itemsList
-                                              itemsList.add(newItem);
-                                              if (_activeRowIndex ==
-                                                  items.length - 1) {
-                                                items.add(product.Info());
-                                                controllers
-                                                    .add(ItemRowControllers());
-                                              }
-
-                                              // Hide sub-table & clear selection
-                                              _showSubTable = false;
-                                              _searchResults.clear();
-                                              _activeRowIndex = null;
-                                              // Print current count
-                                              print(
-                                                  "Current itemsList count: ${itemsList.length}");
-                                            }
-                                          });
-                                        },
-                                        cells: [
-                                          DataCell(Text(
-                                            "${index + 1}",
-                                            style: const TextStyle(
-                                                fontSize: 12.0,
-                                                height: 1.0,
-                                                color: black),
-                                          )),
-                                          DataCell(Text(
-                                            p.itemID?.toString() ?? "",
-                                            style: const TextStyle(
-                                                fontSize: 12.0,
-                                                height: 1.0,
-                                                color: black),
-                                          )),
-                                          DataCell(Text(
-                                            p.itemName ?? "",
-                                            style: const TextStyle(
-                                                fontSize: 12.0,
-                                                height: 1.0,
-                                                color: black),
-                                          )),
-                                          DataCell(Text(
-                                            p.batchNoRequired.toString(),
-                                            style: const TextStyle(
-                                                fontSize: 12.0,
-                                                height: 1.0,
-                                                color: black),
-                                          )),
-                                          DataCell(Text(
-                                            p.expiryDateFormat ?? "",
-                                            style: const TextStyle(
-                                                fontSize: 12.0,
-                                                height: 1.0,
-                                                color: black),
-                                          )),
-                                          DataCell(Text(
-                                            p.hSNCode.toString(),
-                                            style: const TextStyle(
-                                                fontSize: 12.0,
-                                                height: 1.0,
-                                                color: black),
-                                          )),
-                                          DataCell(Text(
-                                            p.maximumStockQty.toString(),
-                                            style: const TextStyle(
-                                                fontSize: 12.0,
-                                                height: 1.0,
-                                                color: black),
-                                          )),
-                                          DataCell(Text(
-                                            p.maximumStockQty.toString(),
-                                            style: const TextStyle(
-                                                fontSize: 12.0,
-                                                height: 1.0,
-                                                color: black),
-                                          )),
-                                          DataCell(Text(
-                                            p.mRPRate.toString(),
-                                            style: const TextStyle(
-                                                fontSize: 12.0,
-                                                height: 1.0,
-                                                color: black),
-                                          )),
-                                          DataCell(Text(
-                                            p.purchaseRate.toString(),
-                                            style: const TextStyle(
-                                                fontSize: 12.0,
-                                                height: 1.0,
-                                                color: black),
-                                          )),
-                                          DataCell(Text(
-                                            p.salesRate.toString(),
-                                            style: const TextStyle(
-                                                fontSize: 12.0,
-                                                height: 1.0,
-                                                color: black),
-                                          )),
-                                        ],
-                                      );
-                                    }).toList(),
-                                  )
-                                : Container(
-                                    padding: const EdgeInsets.all(12),
-                                    alignment: Alignment.center,
-                                    child: const Text(
-                                      "No item found",
-                                      style: TextStyle(
-                                        color: red,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                  ),
-                          ),
-                        ),
-                      )
-                  ],
-                );
-              }),
-            ),
-          ),
-        ),
-        bottomNavigationBar: Stack(
-          clipBehavior: Clip.none,
-          children: [
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 400),
-              curve: Curves.easeInOut,
-              height: _isBottomBarExpanded ? 350 : 60, // adjust max height
-              width: MediaQuery.of(context).size.width,
-              decoration: BoxDecoration(
-                color: lightgray,
-                border: const Border(
-                  top: BorderSide(color: gray, width: 1), // ✅ only top border
-                ),
-                boxShadow: const [
-                  BoxShadow(
-                    color: Color.fromARGB(50, 0, 0, 0),
-                    blurRadius: 4,
-                    offset: Offset(0, -2), // ✅ shadow above (negative y)
-                  ),
-                ],
               ),
+            ],
+          )),
+    );
+  }
 
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const SizedBox(height: 16),
-                    if (_isBottomBarExpanded) ...[
-                      // 👉 Content when expanded
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          GstDataTableWidget(totalAmount: _totalSalesRate),
-                          const SizedBox(width: 16),
-
-                          // First column
-                          Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              LabeledTextField(
-                                focusNode: _sgstpreFocus,
-                                label: "SGST %",
-                                controller: _sgstpreController,
-                              ),
-                              LabeledTextField(
-                                focusNode: _cgstpreFocus,
-                                label: "CGST %",
-                                controller: _cgstpreController,
-                                readOnly: true,
-                              ),
-                              LabeledTextField(
-                                focusNode: _igstpreFocus,
-                                label: "IGST %",
-                                controller: _igstpreController,
-                                readOnly: true,
-                              ),
-                            ],
-                          ),
-
-                          const SizedBox(width: 16),
-
-                          // Second column
-                          Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              LabeledTextField(
-                                focusNode: _sgstAmtFocus,
-                                label: "SGST Amount",
-                                controller: _sgstAmtController,
-                                readOnly: true,
-                              ),
-                              LabeledTextField(
-                                focusNode: _cgstAmtFocus,
-                                label: "CGST Amount",
-                                controller: _cgstAmtController,
-                                readOnly: true,
-                              ),
-                              LabeledTextField(
-                                focusNode: _igstAmtFocus,
-                                label: "IGST Amount",
-                                controller: _igstAmtController,
-                                readOnly: true,
-                              ),
-                              LabeledTextField(
-                                focusNode: _totalGstAmtFocus,
-                                label: "Total GST Amount",
-                                controller: _totalGstAmtController,
-                                readOnly: true,
-                              ),
-                            ],
-                          ),
-
-                          const SizedBox(width: 16),
-
-                          // Third column
-                          Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              LabeledTextField(
-                                focusNode: _subTotalFocus,
-                                label: "Sub Total Value",
-                                controller: _subTotalValueController,
-                                readOnly: true,
-                              ),
-                              LabeledTextField(
-                                focusNode: _gstValueFocus,
-                                label: "GST Value",
-                                controller: _gstValueController,
-                                readOnly: true,
-                              ),
-                              LabeledTextField(
-                                focusNode: _discountFocus,
-                                label: "Discount",
-                                controller: _discountController,
-                                readOnly: true,
-                              ),
-                              LabeledTextField(
-                                focusNode: _roundOFfFocus,
-                                label: "Round Off",
-                                controller: _roundOffController,
-                                readOnly: true,
-                              ),
-                              LabeledTextField(
-                                focusNode: _frightFocus,
-                                label: "Freight Charges",
-                                controller: _frightChargesController,
-                                readOnly: true,
-                              ),
-                              LabeledTextField(
-                                focusNode: _roundOFfFocus,
-                                label: "Net Amount",
-                                controller: _netAmountController,
-                                readOnly: true,
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-
-                      const SizedBox(height: 16),
-
-                      // Save / Edit / Delete buttons
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: green,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
-                            onPressed: _submit,
-                            child: const Text("Save",
-                                style: TextStyle(color: white)),
-                          ),
-                          const SizedBox(width: 20),
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: primary,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
-                            onPressed: _submit,
-                            child: const Text("Edit",
-                                style: TextStyle(color: white)),
-                          ),
-                          const SizedBox(width: 20),
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: red,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
-                            onPressed: () {
-                              // Delete logic
-                            },
-                            child: const Text("Delete",
-                                style: TextStyle(color: white)),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                    ],
-                  ],
-                ),
-              ),
-            ),
-
-            // Toggle Button
-            Positioned(
-              right: 50,
-              top: -30,
-              child: Container(
-                padding: const EdgeInsets.all(3),
-                decoration: const BoxDecoration(
-                  color: lightgray,
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Color.fromARGB(50, 0, 0, 0),
-                      blurRadius: 2,
-                      offset: Offset(1, 1),
-                    ),
-                  ],
-                ),
-                child: IconButton(
-                  icon: Icon(
-                    _isBottomBarExpanded
-                        ? Icons.arrow_drop_down
-                        : Icons.arrow_drop_up,
-                    color: primary,
-                    size: 30,
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      _isBottomBarExpanded = !_isBottomBarExpanded;
-                    });
-                  },
-                ),
-              ),
-            ),
-          ],
-        )),
-  );
-}
-void _showEditPopup(BuildContext context, int index) {
+  void _showEditPopup(BuildContext context, int index) {
     final controller = controllers[index]; // get row’s controllers
 
     showDialog(

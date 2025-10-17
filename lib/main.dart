@@ -1,25 +1,23 @@
+import 'dart:ui_web';
+
 import 'package:facebilling/core/app_globals.dart';
 import 'package:facebilling/core/const.dart';
 import 'package:facebilling/core/preference_helper.dart';
 import 'package:facebilling/data/models/login_model.dart';
 import 'package:facebilling/ui/screens/masters/home/home_page.dart';
 import 'package:flutter/material.dart';
-
+import 'package:flutter_web_plugins/url_strategy.dart';
 import 'ui/screens/pages/login_page.dart';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_web_plugins/url_strategy.dart';
+import 'package:facebilling/core/app_globals.dart';
+import 'package:facebilling/core/preference_helper.dart';
+import 'package:facebilling/core/route_manager.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  // Initialize the saved token before launching the app
-  String? token = await SharedPreferenceHelper.getToken();
-  User? user = await SharedPreferenceHelper.getUser();
-  // Ensure token is not null (set empty string if null)
-  globalToken.value = token ?? "";
-  if (user != null) {
-    userId.value = user.userCode;
-  }
-
-  print("🔑 Loaded token: ${globalToken.value}");
+  setUrlStrategy(const HashUrlStrategy()); // ✅ Keeps /#/home for web
 
   runApp(const MyApp());
 }
@@ -36,28 +34,16 @@ class MyApp extends StatelessWidget {
       navigatorObservers: [routeObserver],
       navigatorKey: navigatorKey,
       debugShowCheckedModeBanner: false,
-      title: 'Billing Application',
+      title: 'Face Billing Application',
+      onGenerateRoute: RouteManager.generateRoute,
+      initialRoute: '/', // Root always goes to StartScreen
       routes: {
-        '/login': (context) => const WebmailLoginScreen(),
-        '/home': (context) => const HomePage(),
+        '/': (context) => const StartScreen(),
       },
-      home: const StartScreen(), // ✅ Root that decides which screen to show
     );
   }
 }
 
-class StartScreen extends StatelessWidget {
-  const StartScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    // ✅ Safe check: handle both null & empty token
-    final token = globalToken.value;
-    final isLoggedIn = token != null && token.isNotEmpty;
-
-    return isLoggedIn ? const HomePage() : const WebmailLoginScreen();
-  }
-}
 
 
 // import 'package:facebilling/core/preference_helper.dart';

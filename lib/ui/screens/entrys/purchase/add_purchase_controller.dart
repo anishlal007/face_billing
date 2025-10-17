@@ -8,6 +8,7 @@ class ItemRowControllers {
   final TextEditingController expiryController;
   final TextEditingController hsnController;
   final TextEditingController qtyController;
+  final TextEditingController purchaseRate;
   final TextEditingController mrpController;
   final TextEditingController salesRateController;
   final TextEditingController gstController;
@@ -42,6 +43,7 @@ class ItemRowControllers {
     String? qty,
     String? mrp,
     String? salesRate,
+    String? purchaseRate,
     String? gst,
     String? discountPercentage,
     String? discountValue,
@@ -57,6 +59,7 @@ class ItemRowControllers {
         expiryController = TextEditingController(text: expiry),
         hsnController = TextEditingController(text: hsn),
         qtyController = TextEditingController(text: qty),
+        purchaseRate = TextEditingController(text: purchaseRate),
         mrpController = TextEditingController(text: mrp),
         salesRateController = TextEditingController(text: salesRate),
         gstController = TextEditingController(text: gst),
@@ -86,6 +89,7 @@ class ItemRowControllers {
     expiryController.dispose();
     hsnController.dispose();
     qtyController.dispose();
+    purchaseRate.dispose();
     mrpController.dispose();
     salesRateController.dispose();
     gstController.dispose();

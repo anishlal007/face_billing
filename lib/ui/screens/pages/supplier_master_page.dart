@@ -20,7 +20,7 @@ class SupplierMasterPage extends StatefulWidget {
 }
 
 class _SupplierMasterPageState extends State<SupplierMasterPage> {
-   Info? editingUnit;
+   SupplierInfo? editingUnit;
   bool refreshList = false;
 
   void _onSaved(bool success) {
@@ -32,7 +32,7 @@ class _SupplierMasterPageState extends State<SupplierMasterPage> {
     }
   }
 
-  void _showAddEditBottomSheet(Info? unit) {
+  void _showAddEditBottomSheet(SupplierInfo? unit) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true, // ensures full-screen height
@@ -72,7 +72,7 @@ class _SupplierMasterPageState extends State<SupplierMasterPage> {
                 refreshList: refreshList,
                 onEdit: (country) {
                   _showAddEditBottomSheet(
-                      country as Info?); // ✅ open bottom sheet for edit
+                      country as SupplierInfo?); // ✅ open bottom sheet for edit
                 },
               ),
             )

@@ -23,12 +23,11 @@ class _WebmailLoginScreenState extends State<WebmailLoginScreen> {
       backgroundColor: white,
       body: Container(
         decoration: BoxDecoration(
-        image: const DecorationImage(
-        image: AssetImage('assets/eye_background.png'),  
-        fit: BoxFit.cover, 
-      ),
-       
-      ),
+          image: const DecorationImage(
+            image: AssetImage('assets/eye_background.png'),
+            fit: BoxFit.cover,
+          ),
+        ),
         child: Center(
           child: LayoutBuilder(
             builder: (context, constraints) {
@@ -53,10 +52,10 @@ class _WebmailLoginScreenState extends State<WebmailLoginScreen> {
       // The main card container for the web version
       constraints: const BoxConstraints(maxWidth: 800, maxHeight: 500),
       decoration: BoxDecoration(
-      //   image: const DecorationImage(
-      //   image: AssetImage('assets/eye_background.png'),  
-      //   fit: BoxFit.cover, 
-      // ),
+        //   image: const DecorationImage(
+        //   image: AssetImage('assets/eye_background.png'),
+        //   fit: BoxFit.cover,
+        // ),
         color: white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: const [
@@ -157,11 +156,7 @@ class _WebmailLoginFormState extends State<_WebmailLoginForm> {
       print(globalToken.value);
 
       // ✅ Navigate to HomePage and remove all previous routes
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (context) => const HomePage()),
-        (route) => false,
-      );
+      Navigator.of(context).pushNamed('/home');
     } else {
       // ❌ Show error message
       ScaffoldMessenger.of(context).showSnackBar(
@@ -311,4 +306,3 @@ class _TermsAndPolicyLinks extends StatelessWidget {
     );
   }
 }
-

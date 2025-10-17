@@ -1,3 +1,4 @@
+import 'package:facebilling/ui/screens/masters/supplier_group_master/add_supplier_group_master_page.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../core/const.dart';
@@ -16,7 +17,7 @@ import '../../../widgets/gradient_button.dart';
 import '../../../widgets/search_dropdown_field.dart';
 
 class AddSupplierMasterPage extends StatefulWidget {
-  final Info? unitInfo;
+  final SupplierInfo? unitInfo;
   final Function(bool success) onSaved;
   const AddSupplierMasterPage({
     super.key,
@@ -33,7 +34,7 @@ class _AddSupplierMasterPageState extends State<AddSupplierMasterPage> {
   final SupplierMasterService _service = SupplierMasterService();
   final GetAllMasterService _getAllMasterService = GetAllMasterService();
   int? _areaCode, _cityCode, _stateCode, _countryCode, _subGrpCode;
-  bool _activeStatus = true,_isTaxInclusive=false;
+  bool _activeStatus = true, _isTaxInclusive = false;
   bool _loading = false;
   String? _message;
   bool _getAllLoading = true;
@@ -56,13 +57,11 @@ class _AddSupplierMasterPageState extends State<AddSupplierMasterPage> {
   late TextEditingController _suppLicenseNoController;
   late TextEditingController _createdUserController;
 
-
-
   // 🔹 FocusNodes
   final FocusNode _suppIdFocus = FocusNode();
   final FocusNode _suppNameFocus = FocusNode();
   final FocusNode _createUserFocus = FocusNode();
-    final FocusNode _suppAddress1Focus = FocusNode();
+  final FocusNode _suppAddress1Focus = FocusNode();
   final FocusNode _supppinCodeFocus = FocusNode();
   final FocusNode _suppMobileFocus = FocusNode();
   final FocusNode _suppMailIdFocus = FocusNode();
@@ -97,8 +96,8 @@ class _AddSupplierMasterPageState extends State<AddSupplierMasterPage> {
   final FocusNode _unitNameFocus = FocusNode();
   final FocusNode _countryNameFocus = FocusNode();
   // final FocusNode _createdUserFocus = FocusNode();
-Country? country;
- bool loading = true;
+  Country? country;
+  bool loading = true;
   String? error;
   @override
   void initState() {
@@ -108,8 +107,7 @@ Country? country;
         TextEditingController(text: widget.unitInfo?.supCode.toString() ?? "");
     _unitNameController =
         TextEditingController(text: widget.unitInfo?.supName ?? "");
-    _countryNameController = TextEditingController(
-        text: "");
+    _countryNameController = TextEditingController(text: "");
     _activeStatus = (widget.unitInfo?.supActiveStatus ?? 1) == 1;
     Future.delayed(Duration(milliseconds: 300), () {
       FocusScope.of(context).requestFocus(_suppIdFocus);
@@ -121,7 +119,7 @@ Country? country;
         TextEditingController(text: widget.unitInfo?.supName ?? "");
     _suppAddress1Controller = TextEditingController(
         text: widget.unitInfo?.supAddress1?.toString() ?? "");
-    _supppinCodeController  = TextEditingController(
+    _supppinCodeController = TextEditingController(
         text: widget.unitInfo?.supPinCode?.toString() ?? "");
     _suppMobileController = TextEditingController(
         text: widget.unitInfo?.supMobileNo?.toString() ?? "");
@@ -135,7 +133,6 @@ Country? country;
         text: widget.unitInfo?.supPanNo?.toString() ?? "");
     _createdUserController = TextEditingController(
         text: widget.unitInfo?.createdUserCode?.toString() ?? userId.value!);
-
   }
 
   @override
@@ -164,6 +161,7 @@ Country? country;
       });
     }
   }
+
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -175,52 +173,54 @@ Country? country;
     if (widget.unitInfo == null) {
       // ADD mode
 
-final request = AddSupplierMasterModel(
-  supId: _suppIdController.text.toString(),                // Supplier ID
-  supName: _suppNameController.text.toString(), // Supplier Name
-  supGroupCode: _subGrpCode,              // Group Code (int)
-  supAreaCode: _areaCode,               // Area Code (int)
-  supStateCode: _stateCode,               // State Code (int)
-  supCountryCode: _countryCode,             // Country Code (int) (e.g., India = 91)
-  supAddress1: _suppAddress1Controller.text.toString(), // Address
-  supPinCode: _supppinCodeController.text.toString(),           // Pincode
-  supMobileNo:_suppMobileController.text.toString(),      // Mobile No
-  supEmailId: _suppMailIdController.text.toString(), // Email
-  supGSTINNo: _suppGstNoController.text.toString(),  // GSTIN
-  supLicenseNo: _suppLicenseNoController.text.toString(),      // License No
-  supPanNo: _suppPanNoController.text.toString(),         // PAN No
-  supGSTType: 1,                  // GST Type (e.g., 1=Registered, 2=Unregistered)
-  taxIsIncluded: _isTaxInclusive?1:0,               // Tax Included? (1=yes, 0=no)
-  createdUserCode: userId.value!,        // Created By User Code
-  supActiveStatus: _activeStatus?1:0             // Active (1=Active, 0=Inactive)
-);
-print("request");
-print(request);
+      final request = AddSupplierMasterModel(
+          supId: _suppIdController.text.toString(), // Supplier ID
+          supName: _suppNameController.text.toString(), // Supplier Name
+          supGroupCode: _subGrpCode, // Group Code (int)
+          supAreaCode: _areaCode, // Area Code (int)
+          supStateCode: _stateCode, // State Code (int)
+          supCountryCode: _countryCode, // Country Code (int) (e.g., India = 91)
+          supAddress1: _suppAddress1Controller.text.toString(), // Address
+          supPinCode: _supppinCodeController.text.toString(), // Pincode
+          supMobileNo: _suppMobileController.text.toString(), // Mobile No
+          supEmailId: _suppMailIdController.text.toString(), // Email
+          supGSTINNo: _suppGstNoController.text.toString(), // GSTIN
+          supLicenseNo: _suppLicenseNoController.text.toString(), // License No
+          supPanNo: _suppPanNoController.text.toString(), // PAN No
+          supGSTType: 1, // GST Type (e.g., 1=Registered, 2=Unregistered)
+          taxIsIncluded: _isTaxInclusive ? 1 : 0, // Tax Included? (1=yes, 0=no)
+          createdUserCode: userId.value!, // Created By User Code
+          supActiveStatus:
+              _activeStatus ? 1 : 0 // Active (1=Active, 0=Inactive)
+          );
+      print("request");
+      print(request);
       final response = await _service.addSupplierMaster(request);
       _handleResponse(response.isSuccess, response.error);
     } else {
       // EDIT mode
- final updated = AddSupplierMasterModel(
-     supId: _suppIdController.text.toString(),                // Supplier ID
-     supName: _suppNameController.text.toString(), // Supplier Name
-     supGroupCode: _subGrpCode,              // Group Code (int)
-     supAreaCode: _areaCode,               // Area Code (int)
-     supStateCode: _stateCode,               // State Code (int)
-     supCountryCode: _countryCode,             // Country Code (int) (e.g., India = 91)
-     supAddress1: _suppAddress1Controller.text.toString(), // Address
-     supPinCode: _supppinCodeController.text.toString(),           // Pincode
-     supMobileNo:_suppMobileController.text.toString(),      // Mobile No
-     supEmailId: _suppMailIdController.text.toString(), // Email
-     supGSTINNo: _suppGstNoController.text.toString(),  // GSTIN
-     supLicenseNo: _suppLicenseNoController.text.toString(),      // License No
-     supPanNo: _suppPanNoController.text.toString(),         // PAN No
-     supGSTType: _taxCode,                  // GST Type (e.g., 1=Registered, 2=Unregistered)
-     taxIsIncluded: _isTaxInclusive?1:0,               // Tax Included? (1=yes, 0=no)
-     createdUserCode: userId.value!,        // Created By User Code
-     supActiveStatus: _activeStatus?1:0             // Active (1=Active, 0=Inactive)
- );
-     print("updated");
-     print(updated);
+      final updated = AddSupplierMasterModel(
+          supId: _suppIdController.text.toString(), // Supplier ID
+          supName: _suppNameController.text.toString(), // Supplier Name
+          supGroupCode: _subGrpCode, // Group Code (int)
+          supAreaCode: _areaCode, // Area Code (int)
+          supStateCode: _stateCode, // State Code (int)
+          supCountryCode: _countryCode, // Country Code (int) (e.g., India = 91)
+          supAddress1: _suppAddress1Controller.text.toString(), // Address
+          supPinCode: _supppinCodeController.text.toString(), // Pincode
+          supMobileNo: _suppMobileController.text.toString(), // Mobile No
+          supEmailId: _suppMailIdController.text.toString(), // Email
+          supGSTINNo: _suppGstNoController.text.toString(), // GSTIN
+          supLicenseNo: _suppLicenseNoController.text.toString(), // License No
+          supPanNo: _suppPanNoController.text.toString(), // PAN No
+          supGSTType: _taxCode, // GST Type (e.g., 1=Registered, 2=Unregistered)
+          taxIsIncluded: _isTaxInclusive ? 1 : 0, // Tax Included? (1=yes, 0=no)
+          createdUserCode: userId.value!, // Created By User Code
+          supActiveStatus:
+              _activeStatus ? 1 : 0 // Active (1=Active, 0=Inactive)
+          );
+      print("updated");
+      print(updated);
       final response = await _service.updateSupplierMasterr(
         widget.unitInfo!.supId!,
         updated,
@@ -229,39 +229,40 @@ print(request);
     }
   }
 
-void _handleResponse(bool success, String? error) {
-  setState(() {
-    _loading = false;
-    _message = success ? "Saved successfully!" : error;
-  });
+  void _handleResponse(bool success, String? error) {
+    setState(() {
+      _loading = false;
+      _message = success ? "Saved successfully!" : error;
+    });
 
-  if (success) {
-    // Clear all text fields
-    _suppIdController.clear();
-    _suppNameController.clear();
-    _suppAddress1Controller.clear();
-    _supppinCodeController.clear();
-    _suppMobileController.clear();
-    _suppMailIdController.clear();
-    _suppGstNoController.clear();
-    _suppLicenseNoController.clear();
-    _suppPanNoController.clear();
-    _unitNameController.clear();
-    _unitIdController.clear();
+    if (success) {
+      // Clear all text fields
+      _suppIdController.clear();
+      _suppNameController.clear();
+      _suppAddress1Controller.clear();
+      _supppinCodeController.clear();
+      _suppMobileController.clear();
+      _suppMailIdController.clear();
+      _suppGstNoController.clear();
+      _suppLicenseNoController.clear();
+      _suppPanNoController.clear();
+      _unitNameController.clear();
+      _unitIdController.clear();
 
-    // Reset dropdowns/flags
-    _subGrpCode = 0;
-    _areaCode = 0;
-    _stateCode = 0;
-    _countryCode = 0;
-    _taxCode = 1; // default GST Type
-    _isTaxInclusive = false;
-    _activeStatus = true;
+      // Reset dropdowns/flags
+      _subGrpCode = 0;
+      _areaCode = 0;
+      _stateCode = 0;
+      _countryCode = 0;
+      _taxCode = 1; // default GST Type
+      _isTaxInclusive = false;
+      _activeStatus = true;
 
-    // Notify parent widget
-    widget.onSaved(true);
+      // Notify parent widget
+      widget.onSaved(true);
+    }
   }
-}
+
   void _fieldFocusChange(
       BuildContext context, FocusNode current, FocusNode next) {
     current.unfocus();
@@ -306,20 +307,20 @@ void _handleResponse(bool success, String? error) {
                 runSpacing: 16,
                 children: [
                   // Example fields (replace with all your CustomTextField/Dropdown etc.)
-                  SearchDropdownField<Info>(
+                  SearchDropdownField<SupplierInfo>(
                     hintText: "Search Supplier",
                     prefixIcon: Icons.search,
                     fetchItems: (q) async {
                       final response =
-                      await _service.getSupplierMasterSearch(q);
+                          await _service.getSupplierMasterSearch(q);
                       if (response.isSuccess) {
                         return (response.data?.info ?? [])
-                            .whereType<Info>()
+                            .whereType<SupplierInfo>()
                             .toList();
                       }
                       return [];
                     },
-                    displayString: (unit) => unit.supName?? "",
+                    displayString: (unit) => unit.supName ?? "",
                     onSelected: (country) {
                       setState(() {
                         /*  _itemIdController.text =
@@ -399,10 +400,10 @@ void _handleResponse(bool success, String? error) {
                       hintText: "Choose Supplier Group",
                       items: getAllMasterListModel!.info!.supplierGroups!
                           .map((e) => DropdownMenuItem<int>(
-                        value:
-                        e.supGroupCode, // 🔹 use taxCode as value
-                        child: Text("${e.supGroupName} "),
-                      ))
+                                value:
+                                    e.supGroupCode, // 🔹 use taxCode as value
+                                child: Text("${e.supGroupName} "),
+                              ))
                           .toList(),
                       // initialValue: _taxCode, // int? taxCode
                       onChanged: (value) {
@@ -411,26 +412,34 @@ void _handleResponse(bool success, String? error) {
                           //  _taxCode = value;
                         });
 
-                        final selected = getAllMasterListModel!.info!.supplierGroups!
+                        final selected = getAllMasterListModel!
+                            .info!.supplierGroups!
                             .firstWhere((c) => c.supGroupCode == value,
-                            orElse: () => master.SupplierGroups());
+                                orElse: () => master.SupplierGroups());
 
                         print("Selected GST %: ${selected.supGroupCode}");
                         print("Selected TAX Code: ${selected.supGroupCode}");
                       },
                       isValidate: true,
                       validator: (value) =>
-                      value == null ? "Please select Country" : null,
+                          value == null ? "Please select Country" : null,
                       focusNode: _suppGroupFocus,
                       onEditingComplete: () => _fieldFocusChange(
                         context,
                         _suppGroupFocus,
                         _countryNameFocus,
                       ),
+                      addPage: AddSupplierGroupMasterPage(
+                        onSaved: (success) async {
+                          if (success) {
+                            Navigator.pop(context, true);
+                            await _loadList();
+                          }
+                        },
+                      ),
+                      addTooltip: "Add Item Make",
                     ),
                   ),
-
-
 
                   SizedBox(
                     width: constraints.maxWidth / columns - 20,
@@ -439,10 +448,9 @@ void _handleResponse(bool success, String? error) {
                       hintText: "Choose Country",
                       items: getAllMasterListModel!.info!.countries!
                           .map((e) => DropdownMenuItem<int>(
-                        value:
-                        e.countryCode, // 🔹 use taxCode as value
-                        child: Text("${e.countryName} "),
-                      ))
+                                value: e.countryCode, // 🔹 use taxCode as value
+                                child: Text("${e.countryName} "),
+                              ))
                           .toList(),
                       // initialValue: _taxCode, // int? taxCode
                       onChanged: (value) {
@@ -453,14 +461,14 @@ void _handleResponse(bool success, String? error) {
 
                         final selected = getAllMasterListModel!.info!.countries!
                             .firstWhere((c) => c.countryCode == value,
-                            orElse: () => master.Countries());
+                                orElse: () => master.Countries());
 
                         print("Selected GST %: ${selected.countryCode}");
                         print("Selected TAX Code: ${selected.countryCode}");
                       },
                       isValidate: true,
                       validator: (value) =>
-                      value == null ? "Please select Country" : null,
+                          value == null ? "Please select Country" : null,
                       focusNode: _suppCountryFocus,
                       onEditingComplete: () => _fieldFocusChange(
                         context,
@@ -477,10 +485,9 @@ void _handleResponse(bool success, String? error) {
                       hintText: "Choose State",
                       items: getAllMasterListModel!.info!.states!
                           .map((e) => DropdownMenuItem<int>(
-                        value:
-                        e.stateCode, // 🔹 use taxCode as value
-                        child: Text("${e.stateName} "),
-                      ))
+                                value: e.stateCode, // 🔹 use taxCode as value
+                                child: Text("${e.stateName} "),
+                              ))
                           .toList(),
                       // initialValue: _taxCode, // int? taxCode
                       onChanged: (value) {
@@ -491,20 +498,17 @@ void _handleResponse(bool success, String? error) {
 
                         final selected = getAllMasterListModel!.info!.states!
                             .firstWhere((c) => c.stateCode == value,
-                            orElse: () => master.States());
+                                orElse: () => master.States());
 
                         print("Selected GST %: ${selected.stateCode}");
                         print("Selected TAX Code: ${selected.stateCode}");
                       },
                       isValidate: true,
                       validator: (value) =>
-                      value == null ? "Please select State" : null,
+                          value == null ? "Please select State" : null,
                       focusNode: _suppStateFocus,
                       onEditingComplete: () => _fieldFocusChange(
-                        context,
-                        _suppStateFocus,
-                        _suppAreaFocus
-                      ),
+                          context, _suppStateFocus, _suppAreaFocus),
                     ),
                   ),
 
@@ -515,10 +519,9 @@ void _handleResponse(bool success, String? error) {
                       hintText: "Choose Areas",
                       items: getAllMasterListModel!.info!.areas!
                           .map((e) => DropdownMenuItem<int>(
-                        value:
-                        e.areaCode, // 🔹 use taxCode as value
-                        child: Text("${e.areaName} "),
-                      ))
+                                value: e.areaCode, // 🔹 use taxCode as value
+                                child: Text("${e.areaName} "),
+                              ))
                           .toList(),
                       // initialValue: _taxCode, // int? taxCode
                       onChanged: (value) {
@@ -529,14 +532,14 @@ void _handleResponse(bool success, String? error) {
 
                         final selected = getAllMasterListModel!.info!.areas!
                             .firstWhere((c) => c.stateCode == value,
-                            orElse: () => master.Areas());
+                                orElse: () => master.Areas());
 
                         print("Selected GST %: ${selected.areaCode}");
                         print("Selected TAX Code: ${selected.areaCode}");
                       },
                       isValidate: true,
                       validator: (value) =>
-                      value == null ? "Please select Area" : null,
+                          value == null ? "Please select Area" : null,
                       focusNode: _suppAreaFocus,
                       onEditingComplete: () => _fieldFocusChange(
                         context,
@@ -564,7 +567,6 @@ void _handleResponse(bool success, String? error) {
                       autoFocus: true,
                     ),
                   ),
-
 
                   SizedBox(
                     width: constraints.maxWidth / columns - 20,
@@ -601,7 +603,6 @@ void _handleResponse(bool success, String? error) {
                       autoFocus: true,
                     ),
                   ),
-
 
                   SizedBox(
                     width: constraints.maxWidth / columns - 20,
@@ -656,7 +657,6 @@ void _handleResponse(bool success, String? error) {
                     ),
                   ),
 
-
                   const Divider(),
 
                   SizedBox(
@@ -676,7 +676,7 @@ void _handleResponse(bool success, String? error) {
                       autoFocus: true,
                     ),
                   ),
- SizedBox(
+                  SizedBox(
                     width: constraints.maxWidth / columns - 30,
                     child: CustomDropdownField<int>(
                       title: "Select GST Type",
@@ -731,8 +731,6 @@ void _handleResponse(bool success, String? error) {
                   //   ),
                   // ),
 
-
-
                   SizedBox(
                     width: constraints.maxWidth / columns - 20,
                     child: CustomTextField(
@@ -745,7 +743,7 @@ void _handleResponse(bool success, String? error) {
                       onEditingComplete: _submit,
                     ),
                   ),
-SizedBox(
+                  SizedBox(
                     width: constraints.maxWidth,
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -814,7 +812,7 @@ SizedBox(
                   //                   setState(() {
                   //                     _isTaxInclusive = val;
                   //                   });
- 
+
                   //                 },
                   //               ),
                   //       // CustomSwitch(
@@ -829,7 +827,6 @@ SizedBox(
                   //     ],
                   //   ),
                   // ),
-
 
                   const SizedBox(height: 16),
                   if (_loading)
