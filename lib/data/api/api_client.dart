@@ -3,20 +3,21 @@ import 'package:dio/dio.dart';
 import 'package:facebilling/core/app_globals.dart';
 import 'package:facebilling/core/const.dart';
 import 'package:facebilling/ui/widgets/ErrorPopupWidget.dart';
-import 'package:flutter/material.dart';  
+import 'package:flutter/material.dart';
 
 class ApiClient {
   static final Dio dio = Dio(
     BaseOptions(
-      baseUrl: "https://billingapp.captchatime.com/api/",
-      //baseUrl: "http://127.0.0.1:8000/api/",
+      // baseUrl: "https://billingapp.captchatime.com/api/",
+      baseUrl: "http://127.0.0.1:8000/api/",
       connectTimeout: const Duration(seconds: 10),
       receiveTimeout: const Duration(seconds: 10),
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
       },
-      validateStatus: (status) => true, // ✅ prevent Dio from throwing before we handle
+      validateStatus: (status) =>
+          true, // ✅ prevent Dio from throwing before we handle
     ),
   )..interceptors.addAll([
       LogInterceptor(responseBody: true),

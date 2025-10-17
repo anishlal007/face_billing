@@ -11,6 +11,7 @@ class SearchDropdownField<T> extends StatefulWidget {
   final OnSelected<T> onSelected;
   final OnSubmitted<T>? onSubmitted;
   final String hintText;
+  final FocusNode? focusNode;
   final IconData prefixIcon;
   final TextEditingController? controller;
 
@@ -19,6 +20,7 @@ class SearchDropdownField<T> extends StatefulWidget {
     required this.fetchItems,
     required this.displayString,
     required this.onSelected,
+    this.focusNode,
     this.onSubmitted,
     this.hintText = "Search",
     this.prefixIcon = Icons.search,
@@ -32,6 +34,7 @@ class SearchDropdownField<T> extends StatefulWidget {
 class _SearchDropdownFieldState<T> extends State<SearchDropdownField<T>> {
   late TextEditingController _controller;
   late FocusNode _focusNode;
+  //  FocusNode get _effectiveFocusNode => widget.focusNode ?? _internalFocusNode;
   List<T> _options = [];
   bool _loading = false;
 

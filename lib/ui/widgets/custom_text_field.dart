@@ -80,9 +80,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
               ),
             ),
           SizedBox(
-            height:_errorText!=null
-            ?30
-            :40,
+            height: _errorText != null ? 50 : 30,
             child: Row(
               children: [
                 Expanded(
@@ -94,17 +92,18 @@ class _CustomTextFieldState extends State<CustomTextField> {
                     textInputAction: widget.textInputAction,
                     onEditingComplete: widget.onEditingComplete,
                     obscureText: widget.isPassword ? _obscureText : false,
-                    keyboardType:
-                        widget.isNumeric ? TextInputType.number : TextInputType.text,
+                    keyboardType: widget.isNumeric
+                        ? TextInputType.number
+                        : TextInputType.text,
                     enabled: !widget.isEdit,
                     autofocus: widget.autoFocus,
-                  
+
                     // ✅ Combined onChanged functionality
                     onChanged: (value) {
                       if (widget.isValidate) _validate(value);
                       if (widget.onChanged != null) widget.onChanged!(value);
                     },
-                  
+
                     // ✅ Allow only numbers if numeric
                     inputFormatters: [
                       if (widget.isNumeric)
@@ -113,7 +112,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
                         FilteringTextInputFormatter.deny(
                             RegExp(r'\s')), // ❌ block all whitespace
                     ],
-                  
+
                     decoration: InputDecoration(
                       hintText: widget.hintText,
                       suffixIcon: widget.isPassword
@@ -141,7 +140,9 @@ class _CustomTextFieldState extends State<CustomTextField> {
                     ),
                   ),
                 ),
-                SizedBox(width: 37,) 
+                SizedBox(
+                  width: 37,
+                )
               ],
             ),
           ),

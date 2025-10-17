@@ -1,3 +1,4 @@
+import 'package:facebilling/ui/screens/masters/product_master/product_list_page.dart';
 import 'package:facebilling/ui/screens/pages/product_list_master_master.dart';
 import 'package:flutter/material.dart';
 
@@ -7,6 +8,7 @@ import '../../../data/models/product/product_master_list_model.dart';
 import '../../../data/services/get_serial_no_services.dart';
 import '../../../data/services/product_service.dart';
 import '../masters/product_master/add_product_master_page.dart';
+import '../masters/product_master/product_master_list_screen.dart';
 import '../masters/user_master/add_user_master_page.dart';
 import '../masters/user_master/user_master_list_page.dart';
 
@@ -22,10 +24,8 @@ class _ProductMasterPageState extends State<ProductMasterPage> {
   final GetSerialNoServices _getSerialservice = GetSerialNoServices();
   Info? editingUnit;
   bool refreshList = false;
- bool isLoading = false;
+  bool isLoading = false;
   String message = '';
-
-  
 
   void _onSaved(bool success) {
     if (success) {
@@ -76,7 +76,7 @@ class _ProductMasterPageState extends State<ProductMasterPage> {
 //         children: [
 //           // Text("FaceBilling", style: const TextStyle(color: black)),
 //           // const SizedBox(width: 30),
-          
+
 //         ],
 //       ),
 //       actions: [
@@ -99,7 +99,7 @@ class _ProductMasterPageState extends State<ProductMasterPage> {
 
 //       ],
 //     ),
-      body:  isMobile
+      body: isMobile
           ? Padding(
               padding: const EdgeInsets.all(18.0),
               child: ProductListMasterMaster(
@@ -117,7 +117,7 @@ class _ProductMasterPageState extends State<ProductMasterPage> {
                   flex: 7,
                   child: Padding(
                     padding: const EdgeInsets.all(18.0),
-                    child:  AddProductMasterPage(
+                    child: AddProductMasterPage(
                       unitInfo: editingUnit,
                       onSaved: _onSaved,
                     ),
@@ -131,7 +131,7 @@ class _ProductMasterPageState extends State<ProductMasterPage> {
                   flex: 4,
                   child: Padding(
                     padding: const EdgeInsets.all(18.0),
-                    child:  ProductListMasterMaster(
+                    child: ProductListPage(
                       refreshList: refreshList,
                       onEdit: (country) {
                         setState(() {
@@ -144,7 +144,7 @@ class _ProductMasterPageState extends State<ProductMasterPage> {
                 ),
               ],
             ),
-      
+
       // ProductListMasterMaster()
       //  AddProductMasterPage(
       //   unitInfo: editingUnit,

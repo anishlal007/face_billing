@@ -15,8 +15,8 @@ import '../models/user_master/user_master_list_model.dart';
 
 class ProductService {
   final Dio _dio = ApiClient.dio;
-  
- Future<ApiResponse<Country>> getCountries() async {
+
+  Future<ApiResponse<Country>> getCountries() async {
     try {
       final response = await _dio.get("countrymaster");
 
@@ -29,54 +29,61 @@ class ProductService {
       return ApiResponse(error: e.toString());
     }
   }
-Future<ApiResponse<bool>> uploadProductExcelFile() async {
-  try {
-    // Step 1️⃣ — Pick the Excel file
-    final result = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['xls', 'xlsx'],
-    );
 
-    if (result == null) {
-      return ApiResponse(error: "No file selected");
-    }
-
-    final file = File(result.files.single.path!);
-
-    // Step 2️⃣ — Prepare form data for multipart upload
-    final formData = FormData.fromMap({
-      'file': await MultipartFile.fromFile(
-        file.path,
-        filename: file.path.split('/').last,
-      ),
-    }); 
- final response = await _dio.post("products/bulk-upload", data: formData,onSendProgress: (count, total) {
-        print("Uploading: ${(count / total * 100).toStringAsFixed(0)}%");
-      },); 
-
-    // Step 4️⃣ — Handle response
-    if (response.statusCode == 200) {
-      return ApiResponse(data: true);
-    } else {
-      return ApiResponse(error: "Upload failed: ${response.statusMessage}");
-    }
-  } catch (e) {
-    print("❌ Upload Error: $e");
-    return ApiResponse(error: e.toString());
-  }
-}
-
-
-  Future<ApiResponse<bool>> addProductService(AddProductMasterModel request) async {
+  Future<ApiResponse<bool>> uploadProductExcelFile() async {
     try {
-      final response = await _dio.post("products", data: request.toJson()); 
+      // Step 1️⃣ — Pick the Excel file
+      final result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['xls', 'xlsx'],
+      );
+
+      if (result == null) {
+        return ApiResponse(error: "No file selected");
+      }
+
+      final file = File(result.files.single.path!);
+
+      // Step 2️⃣ — Prepare form data for multipart upload
+      final formData = FormData.fromMap({
+        'file': await MultipartFile.fromFile(
+          file.path,
+          filename: file.path.split('/').last,
+        ),
+      });
+      final response = await _dio.post(
+        "products/bulk-upload",
+        data: formData,
+        onSendProgress: (count, total) {
+          print("Uploading: ${(count / total * 100).toStringAsFixed(0)}%");
+        },
+      );
+
+      // Step 4️⃣ — Handle response
+      if (response.statusCode == 200) {
+        return ApiResponse(data: true);
+      } else {
+        return ApiResponse(error: "Upload failed: ${response.statusMessage}");
+      }
+    } catch (e) {
+      print("❌ Upload Error: $e");
+      return ApiResponse(error: e.toString());
+    }
+  }
+
+  Future<ApiResponse<bool>> addProductService(
+      AddProductMasterModel request) async {
+    try {
+      final response = await _dio.post("products", data: request.toJson());
+
       if (response.statusCode == 200 || response.statusCode == 201) {
         return ApiResponse(data: true);
       } else {
-        return ApiResponse(error: "Failed to add Loction");
+        return ApiResponse(error: "Failed to add product");
       }
     } catch (e) {
-      return ApiResponse(error: e.toString());
+      // ✅ Always return the same message, no matter what the exception is
+      return ApiResponse(error: "Failed to add product");
     }
   }
 
@@ -94,44 +101,46 @@ Future<ApiResponse<bool>> uploadProductExcelFile() async {
     }
   }
 
-Future<ApiResponse<ProductMasterListModel>> getProductServiceSearch(String q) async {
-  try {
-    final response = await _dio.get("item/search?q=$q");
+  Future<ApiResponse<ProductMasterListModel>> getProductServiceSearch(
+      String q) async {
+    try {
+      final response = await _dio.get("item/search?q=$q");
 
-    // ✅ Print the raw response
-    print("===== Raw API Response =====");
-    print(response.data);
+      // ✅ Print the raw response
+      print("===== Raw API Response =====");
+      print(response.data);
 
-    // Make sure response data is not null
-    final responseData = response.data;
-    if (responseData == null) {
-      print("Response data is null!");
-      return ApiResponse(error: "Response data is null");
-    }
-
-    // ✅ Print responseData type
-    print("Response type: ${responseData.runtimeType}");
-
-    // Parse to your model
-    final productResponse = ProductMasterListModel.fromJson(responseData);
-
-    // ✅ Print parsed info list
-    print("Parsed Info list length: ${productResponse.info?.length}");
-    if (productResponse.info != null) {
-      for (var item in productResponse.info!) {
-        print("Item: ${item.itemName}, Code: ${item.itemCode}");
+      // Make sure response data is not null
+      final responseData = response.data;
+      if (responseData == null) {
+        print("Response data is null!");
+        return ApiResponse(error: "Response data is null");
       }
-    }
 
-    return ApiResponse(data: productResponse);
-  } catch (e) {
-    print("Error in getProductServiceSearch: $e");
-    return ApiResponse(error: e.toString());
+      // ✅ Print responseData type
+      print("Response type: ${responseData.runtimeType}");
+
+      // Parse to your model
+      final productResponse = ProductMasterListModel.fromJson(responseData);
+
+      // ✅ Print parsed info list
+      print("Parsed Info list length: ${productResponse.info?.length}");
+      if (productResponse.info != null) {
+        for (var item in productResponse.info!) {
+          print("Item: ${item.itemName}, Code: ${item.itemCode}");
+        }
+      }
+
+      return ApiResponse(data: productResponse);
+    } catch (e) {
+      print("Error in getProductServiceSearch: $e");
+      return ApiResponse(error: e.toString());
+    }
   }
-}
 
   /// INFO Country (GET) -> /countrymaster/{id}
-  Future<ApiResponse<ProductMasterListModel>> getProductServiceById(String id) async {
+  Future<ApiResponse<ProductMasterListModel>> getProductServiceById(
+      String id) async {
     try {
       final response = await _dio.get("products/$id");
       return ApiResponse(data: ProductMasterListModel.fromJson(response.data));
@@ -141,7 +150,8 @@ Future<ApiResponse<ProductMasterListModel>> getProductServiceSearch(String q) as
   }
 
   /// EDIT Country (PUT) -> /countrymaster
-  Future<ApiResponse<bool>> updateProductService(dynamic id, AddProductMasterModel request) async {
+  Future<ApiResponse<bool>> updateProductService(
+      dynamic id, AddProductMasterModel request) async {
     try {
       final response = await _dio.put("products/$id", data: request.toJson());
 

@@ -9,6 +9,7 @@ import 'package:facebilling/ui/screens/masters/item_make_master/add_item_make_ma
 import 'package:facebilling/ui/screens/masters/tax_master/add_tax_master_page.dart';
 import 'package:facebilling/ui/screens/masters/unit/AddUnitScreen.dart';
 import 'package:facebilling/ui/screens/masters/user_master/add_user_master_page.dart';
+import 'package:facebilling/ui/widgets/AutoSearchDropdown.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -59,7 +60,8 @@ class _AddProductMasterPageState extends State<AddProductMasterPage> {
       _itemMake,
       _itemGeneric,
       _unitCode;
-   master.  Units?_selectSubUnit;
+  master.Units? _selectSubUnit;
+  double? tax_persantage = 0;
   bool _activeStatus = true;
   bool _itemIdType = false;
   bool _isItemIdEditable = true;
@@ -164,25 +166,26 @@ class _AddProductMasterPageState extends State<AddProductMasterPage> {
   final FocusNode _gstPercentageFocus = FocusNode();
   final FocusNode _createUserFocus = FocusNode();
 
+  double calculateWithGST({
+    required double amount,
+    // required double gstPercentage,
+  }) {
+    // Calculate GST value
+    double gstAmount = amount * _selectgst!.taxPercentage / 100;
+    _purchaseRateWTaxController.text = gstAmount.toString();
+    // Total = amount + GST
+    double total = amount + gstAmount;
 
-double calculateWithGST({
-  required double amount,
- // required double gstPercentage,
-}) {
-  // Calculate GST value
-  double gstAmount = amount * _selectgst!.taxPercentage / 100;
-_purchaseRateWTaxController.text=gstAmount.toString();
-  // Total = amount + GST
-  double total = amount + gstAmount;
+    return total;
+  }
 
-  return total;
-}
   @override
   void initState() {
-    super.initState();
+    super.initState(); 
     Future.delayed(Duration(milliseconds: 300), () {
-      FocusScope.of(context).requestFocus(_itemNameFocus);
+      FocusScope.of(context).requestFocus(_itemIdFocus);
     });
+
     _loadList();
     _itemIdController =
         TextEditingController(text: widget.unitInfo?.itemID ?? "");
@@ -609,6 +612,13 @@ _purchaseRateWTaxController.text=gstAmount.toString();
     }
   }
 
+  double calculateWithTax({
+    required double amount,
+    required double taxPercent,
+  }) {
+    return amount + (amount * taxPercent / 100);
+  }
+
   @override
   void didUpdateWidget(covariant AddProductMasterPage oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -635,34 +645,33 @@ _purchaseRateWTaxController.text=gstAmount.toString();
     final isEdit = widget.unitInfo != null;
 
     return Shortcuts(
-         shortcuts: <LogicalKeySet, Intent>{
-            LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.keyS):
-        _SubmitIntent(clearValues: true),
+      shortcuts: <LogicalKeySet, Intent>{
+        LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.keyS):
+            _SubmitIntent(clearValues: true),
 
-    // Ctrl + Shift + S → _submit(false)
-    LogicalKeySet(
-      LogicalKeyboardKey.control,
-      LogicalKeyboardKey.shift,
-      LogicalKeyboardKey.keyS,
-    ): _SubmitIntent(clearValues: false),
+        // Ctrl + Shift + S → _submit(false)
+        LogicalKeySet(
+          LogicalKeyboardKey.control,
+          LogicalKeyboardKey.shift,
+          LogicalKeyboardKey.keyS,
+        ): _SubmitIntent(clearValues: false),
         //   LogicalKeySet(LogicalKeyboardKey.digit1): _SubmitIntent(clearValues: true),
-    // Key "2" → _submit(false)
-  //  LogicalKeySet(LogicalKeyboardKey.digit2): _SubmitIntent(clearValues: false),
-      //  LogicalKeySet(LogicalKeyboardKey.f1, LogicalKeyboardKey.fn): const _SubmitIntent(clearValues: true),
-      //  LogicalKeySet(LogicalKeyboardKey.f2, LogicalKeyboardKey.fn): const _SubmitIntent(clearValues: false),
-    },
+        // Key "2" → _submit(false)
+        //  LogicalKeySet(LogicalKeyboardKey.digit2): _SubmitIntent(clearValues: false),
+        //  LogicalKeySet(LogicalKeyboardKey.f1, LogicalKeyboardKey.fn): const _SubmitIntent(clearValues: true),
+        //  LogicalKeySet(LogicalKeyboardKey.f2, LogicalKeyboardKey.fn): const _SubmitIntent(clearValues: false),
+      },
       child: Actions(
-         actions: <Type, Action<Intent>>{
-        _SubmitIntent: CallbackAction<_SubmitIntent>(
-          onInvoke: (_SubmitIntent intent) {
+        actions: <Type, Action<Intent>>{
+          _SubmitIntent: CallbackAction<_SubmitIntent>(
+            onInvoke: (_SubmitIntent intent) {
               print(
                   "Hotkey pressed: ${intent.clearValues ? 'FN+F1 (clear)' : 'FN+F2 (keep)'}");
               _submit(intent.clearValues);
               return null;
             },
-          
-        ),
-      },
+          ),
+        },
         child: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(16.0),
@@ -677,7 +686,7 @@ _purchaseRateWTaxController.text=gstAmount.toString();
                   } else if (constraints.maxWidth > 800) {
                     columns = 1;
                   }
-        
+
                   return Wrap(
                     spacing: 16,
                     runSpacing: 16,
@@ -706,12 +715,12 @@ _purchaseRateWTaxController.text=gstAmount.toString();
                       //       //     country.createdUserCode?.toString() ?? userId.value!;
                       //       // _activeStatus = (country.custActiveStatus ?? 1) == 1;
                       //     });
-        
+
                       //     // ✅ Switch form into "Update mode"
                       //     widget.onSaved(false);
                       //   },
                       // ),
-        
+
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -729,11 +738,12 @@ _purchaseRateWTaxController.text=gstAmount.toString();
                                       color: Colors.black),
                                 ),
                                 const SizedBox(height: 4),
-        
+
                                 // 🔹 Auto / Manual Switch
                                 Row(
                                   crossAxisAlignment: CrossAxisAlignment.center,
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     CustomSwitch(
                                       value: _itemIdType,
@@ -746,7 +756,7 @@ _purchaseRateWTaxController.text=gstAmount.toString();
                                         setState(() {
                                           _itemIdType = val;
                                         });
-        
+
                                         if (val) {
                                           // 🔸 Switch ON → Auto mode
                                           await _loadSerialNumber(); // fetch from API
@@ -783,11 +793,12 @@ _purchaseRateWTaxController.text=gstAmount.toString();
                                       color: Colors.black),
                                 ),
                                 const SizedBox(height: 4),
-        
+
                                 // 🔹 Auto / Manual Switch
                                 Row(
                                   crossAxisAlignment: CrossAxisAlignment.center,
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     CustomSwitch(
                                       value: _activeStatus,
@@ -808,7 +819,7 @@ _purchaseRateWTaxController.text=gstAmount.toString();
                           )
                         ],
                       ),
-        
+
                       SizedBox(
                         width: constraints.maxWidth / columns - 30,
                         child: CustomDropdownField<int>(
@@ -830,7 +841,7 @@ _purchaseRateWTaxController.text=gstAmount.toString();
                                 context, _itemTypeFocus, _itemGroupFocus);
                           },
                         ),
-        
+
                         //   CustomDropdownField<int>(
                         //     key: _productTypeKey, // ✅ add key for direct state update
                         //     title: "Product Type",
@@ -851,136 +862,193 @@ _purchaseRateWTaxController.text=gstAmount.toString();
                         //     },
                         //   ),
                       ),
-        
+
                       SizedBox(
                         width: constraints.maxWidth / columns - 20,
                         child: CustomTextField(
                           title: "Item ID",
                           hintText: "Enter Item ID",
-                          isEdit:
-                              _isItemIdEditable ? false : true, // disable when auto
+                          isEdit: _isItemIdEditable
+                              ? false
+                              : true, // disable when auto
                           controller: _itemIdController,
                           isValidate: true,
-                          // validator: (value) => value == null || value.isEmpty
-                          //     ? "Enter Item Code"
-                          //     : null,
+                          validator: (value) => value == null || value.isEmpty
+                              ? "Enter Item Code"
+                              : null,
                           focusNode: _itemIdFocus,
                           textInputAction: TextInputAction.next,
+                          onEditingComplete: () => _fieldFocusChange(
+                              context, _itemIdFocus, _itemNameFocus),
+                          autoFocus: true,
                         ),
                       ),
-        // 3️⃣ SearchDropdownField Implementation
-        
                       SizedBox(
-                        width: constraints.maxWidth / columns - 30,
-                        child: SearchDropdownField<Info>(
+                        width: constraints.maxWidth / columns - 20,
+                        // 1. Ensure the generic type is your Product model (e.g., ProductMasterInfo)
+                        child: AutoSuggestion<Info>(
                           controller: _itemNameController,
-                          hintText: "Item Name",
-                          // title:  "Item Name",
-                          prefixIcon: Icons.search,
-                          fetchItems: (q) async {
-                            final response =
-                                await _service.getProductServiceSearch(q);
-                            if (response.isSuccess) {
-                              return (response.data?.info ?? [])
-                                  .whereType<Info>()
-                                  .toList();
+                          labelText: 'Item Name',
+                          hintText: 'Search by Item Name or Barcode No',
+
+                          suggestionsCallback: (pattern) async {
+                            final apiResponse =
+                                await _service.getProductServiceSearch(pattern);
+
+                            if (apiResponse.error != null) {
+                              return [];
                             }
-                            return [];
+
+                            return apiResponse.data?.info ?? [];
                           },
-                          displayString: (item) => item.itemName ?? "",
-                          onSelected: (product) {
-                            setState(() {
-                              _itemIdController.text = product.itemCode.toString();
-                              _itemNameController.text = product.itemName ?? "";
-                              _createdUserController.text =
-                                  product.createdUserCode?.toString() ??
-                                      userId.value!;
-                              selectedPaymentType =
-                                  int.tryParse(product.itemType ?? '') ?? 0;
-                              priceTakenFrom =
-                                  int.tryParse(product.priceTakenFrom ?? '') ?? 0;
-          print('Selected Product RAW: ${jsonEncode(product.toJson())}');
-                              print(product.itemGroupCode);
-                              print(product.itemGroupCode);
-                              final int itemGroupCode =
-                                  int.tryParse(product.itemGroupCode ?? '') ??
-                                      0; // Use a local variable
-                              print(
-                                  'Item Group Code from Product: $itemGroupCode (Raw: ${product.itemGroupCode})');
-                              _itemGroup = itemGroupCode;
-                              _selectedItemGroup = getAllMasterListModel
-                                  ?.info?.itemGroups
-                                  ?.firstWhere(
-                                (g) => g.itemGroupCode == itemGroupCode,
-                                orElse: () => master.ItemGroups(
-                                    itemGroupCode: itemGroupCode,
-                                    itemGroupName: 'Unknown Group'),
-                              );
-        
-                              final int itemMakeCode =
-                                  int.tryParse(product.itemMakeCode ?? '') ?? 0;
-                              _itemMake = itemMakeCode;
-                              _selectItemMake = getAllMasterListModel
-                                  ?.info?.itemMakes
-                                  ?.firstWhere(
-                                (g) => g.itemMakeCode == itemMakeCode,
-                                orElse: () => master.ItemMakes(
-                                    itemMakeCode: itemMakeCode,
-                                    itemMaketName: 'Unknown Group'),
-                              );
-        
-                              final int itemHSNCode =
-                                  int.tryParse(product.hSNCode ?? '') ?? 0;
-                              _hsntaxCode = itemHSNCode;
-                              _selectHSN = getAllMasterListModel?.info?.hsnMasters
-                                  ?.firstWhere(
-                                (g) => g.hsnCode == itemHSNCode,
-                                orElse: () => master.HsnMasters(
-                                    hsnCode: itemHSNCode, hsnName: 'Unknown Group'),
-                              );
-                            });
-                            widget.onSaved(false);
+
+                          // 🎯 FIX: Use Product-specific fields
+                          itemBuilder: (context, suggestion) {
+                            // Assuming suggestion is now ProductMasterInfo
+                            return ListTile(
+                              title: Text(suggestion.itemName), // Use item name
+                              subtitle: Text(
+                                  'Code: ${suggestion.itemCode}'), // Use item code
+                            );
                           },
-                          onSubmitted: (typedValue) {
-                            // ✅ Manual entry (not in list)
-                            setState(() {
-                              if (_activeStatus) {
-                                _loadList();
-                              } else {
-                                // Print("sd");
-                              }
-        
-                              _itemNameController.text = typedValue;
-                              _createdUserController.text = userId.value!;
-                              _activeStatus = true;
-                            });
-                            widget.onSaved(false);
-                            print(_itemNameController.text);
+
+                          onSuggestionSelected: (product) {
+                            // Assuming you have a ProductMasterInfo variable like _selectedProduct
+                            // setState(() => _selectedProduct = product);
+                            print('Selected Product: ${product.itemCode}');
+                            // You should update your product-related state here, not a customer state
                           },
+
+                          // 🎯 FIX: Use Product-specific text extractor
+                          getDisplayString: (product) => product.itemName,
+                          isbutton: Addgroupscreen(
+                            onSaved: (success) async {
+                              // if (success) {
+                              //   Navigator.pop(context, true);
+                              //   await _loadList();
+                              // }
+                            },
+                          ),
+                          // addTooltip: "Add Item Group",
                         ),
                       ),
-        
+                      // 3️⃣ SearchDropdownField Implementation
+
+                      //             SizedBox(
+                      //               width: constraints.maxWidth / columns - 30,
+                      //               child: SearchDropdownField<Info>(
+                      //                 controller: _itemNameController,
+                      //                 hintText: "Item Name",
+                      //                 // title:  "Item Name",
+                      //                 focusNode: _itemNameFocus,
+                      //                 prefixIcon: Icons.search,
+                      //                 fetchItems: (q) async {
+                      //                   final response =
+                      //                       await _service.getProductServiceSearch(q);
+                      //                   if (response.isSuccess) {
+                      //                     return (response.data?.info ?? [])
+                      //                         .whereType<Info>()
+                      //                         .toList();
+                      //                   }
+                      //                   return [];
+                      //                 },
+                      //                 displayString: (item) => item.itemName ?? "",
+                      //                 onSelected: (product) {
+                      //                   setState(() {
+                      //                     _itemIdController.text = product.itemCode.toString();
+                      //                     _itemNameController.text = product.itemName ?? "";
+                      //                     _createdUserController.text =
+                      //                         product.createdUserCode?.toString() ??
+                      //                             userId.value!;
+                      //                     selectedPaymentType =
+                      //                         int.tryParse(product.itemType ?? '') ?? 0;
+                      //                     priceTakenFrom =
+                      //                         int.tryParse(product.priceTakenFrom ?? '') ?? 0;
+                      // print('Selected Product RAW: ${jsonEncode(product.toJson())}');
+                      //                     print(product.itemGroupCode);
+                      //                     print(product.itemGroupCode);
+                      //                     final int itemGroupCode =
+                      //                         int.tryParse(product.itemGroupCode ?? '') ??
+                      //                             0; // Use a local variable
+                      //                     print(
+                      //                         'Item Group Code from Product: $itemGroupCode (Raw: ${product.itemGroupCode})');
+                      //                     _itemGroup = itemGroupCode;
+                      //                     _selectedItemGroup = getAllMasterListModel
+                      //                         ?.info?.itemGroups
+                      //                         ?.firstWhere(
+                      //                       (g) => g.itemGroupCode == itemGroupCode,
+                      //                       orElse: () => master.ItemGroups(
+                      //                           itemGroupCode: itemGroupCode,
+                      //                           itemGroupName: 'Unknown Group'),
+                      //                     );
+
+                      //                     final int itemMakeCode =
+                      //                         int.tryParse(product.itemMakeCode ?? '') ?? 0;
+                      //                     _itemMake = itemMakeCode;
+                      //                     _selectItemMake = getAllMasterListModel
+                      //                         ?.info?.itemMakes
+                      //                         ?.firstWhere(
+                      //                       (g) => g.itemMakeCode == itemMakeCode,
+                      //                       orElse: () => master.ItemMakes(
+                      //                           itemMakeCode: itemMakeCode,
+                      //                           itemMaketName: 'Unknown Group'),
+                      //                     );
+
+                      //                     final int itemHSNCode =
+                      //                         int.tryParse(product.hSNCode ?? '') ?? 0;
+                      //                     _hsntaxCode = itemHSNCode;
+                      //                     _selectHSN = getAllMasterListModel?.info?.hsnMasters
+                      //                         ?.firstWhere(
+                      //                       (g) => g.hsnCode == itemHSNCode,
+                      //                       orElse: () => master.HsnMasters(
+                      //                           hsnCode: itemHSNCode, hsnName: 'Unknown Group'),
+                      //                     );
+                      //                   });
+                      //                   widget.onSaved(false);
+                      //                 },
+                      //                 onSubmitted: (typedValue) {
+                      //                   // ✅ Manual entry (not in list)
+                      //                   setState(() {
+                      //                     if (_activeStatus) {
+                      //                       _loadList();
+                      //                     } else {
+                      //                       // Print("sd");
+                      //                     }
+
+                      //                     _itemNameController.text = typedValue;
+                      //                     _createdUserController.text = userId.value!;
+                      //                     _activeStatus = true;
+                      //                   });
+                      //                   widget.onSaved(false);
+                      //                   print(_itemNameController.text);
+                      //                 },
+                      //               ),
+                      //             ),
+
                       SizedBox(
                         width: constraints.maxWidth / columns - 20,
                         child: SearchableDropdown<master.ItemGroups>(
                           hintText: "Item Group",
                           items: getAllMasterListModel!.info!.itemGroups!,
+                          focusNode: _itemGroupFocus,
                           initialValue: _selectedItemGroup,
                           itemLabel: (group) => group.itemGroupName ?? "",
+
+                          // 🔹 When a group is selected, update your state
                           onChanged: (group) {
                             setState(() {
                               _itemGroup = group.itemGroupCode;
                               _selectedItemGroup = group;
                             });
                           },
-        
-                          onEditingComplete: () => _fieldFocusChange(
-                            context,
-                            _itemGroupFocus,
-                            _itemUnitCodeFocus,
-                          ),
-        
-                          // Add page popup
+
+                          // 🔹 When user presses Enter or selects an item via keyboard/mouse
+                          onEditingComplete: () {
+                            _fieldFocusChange(
+                                context, _itemGroupFocus, _itemMakeCodeFocus);
+                          },
+
+                          // 🔹 Add (+) popup for groups
                           addPage: Addgroupscreen(
                             onSaved: (success) async {
                               if (success) {
@@ -992,7 +1060,7 @@ _purchaseRateWTaxController.text=gstAmount.toString();
                           addTooltip: "Add Item Group",
                         ),
                       ),
-        
+
                       // SizedBox(
                       //   width: constraints.maxWidth / columns - 20,
                       //   child:
@@ -1012,7 +1080,7 @@ _purchaseRateWTaxController.text=gstAmount.toString();
                       //         _itemGroup = value;
                       //         //  _taxCode = value;
                       //       });
-        
+
                       //       final selected = getAllMasterListModel!
                       //           .info!.itemGroups!
                       //           .firstWhere((c) => c.itemGroupCode == value,
@@ -1048,16 +1116,19 @@ _purchaseRateWTaxController.text=gstAmount.toString();
                             if (group != null) {
                               _itemMake = group.itemMakeCode;
                               _selectItemMake = group;
-                              print("Selected Code: ${group.itemMakeCode}");
-                              print("Selected Name: ${group.itemMaketName}");
                             }
                           },
                           focusNode: _itemMakeCodeFocus,
-                          onEditingComplete: () => _fieldFocusChange(
-                            context,
-                            _itemMakeCodeFocus,
-                            _itemGenericCodeFocus,
-                          ),
+                          onEditingComplete: () {
+                            if (selectedPaymentType == 0) {
+                              _fieldFocusChange(context, _itemMakeCodeFocus,
+                                  _itemGenericCodeFocus);
+                            } else {
+                              _fieldFocusChange(context, _itemMakeCodeFocus,
+                                  _itemUnitCodeFocus);
+                            }
+                          },
+
                           // Add page popup
                           addPage: AddItemMakeMaster(
                             onSaved: (success) async {
@@ -1070,7 +1141,7 @@ _purchaseRateWTaxController.text=gstAmount.toString();
                           addTooltip: "Add Item Make",
                         ),
                       ),
-        
+
                       selectedPaymentType == 0
                           ? SizedBox(
                               width: constraints.maxWidth / columns - 20,
@@ -1090,13 +1161,14 @@ _purchaseRateWTaxController.text=gstAmount.toString();
                                     _itemGeneric = value;
                                     //  _taxCode = value;
                                   });
-        
+
                                   final selected = getAllMasterListModel!
                                       .info!.generics!
                                       .firstWhere((c) => c.genericCode == value,
                                           orElse: () => master.Generics());
-        
-                                  print("Selected GST %: ${selected.genericCode}");
+
+                                  print(
+                                      "Selected GST %: ${selected.genericCode}");
                                   print(
                                       "Selected TAX Code: ${selected.genericName}");
                                 },
@@ -1108,8 +1180,9 @@ _purchaseRateWTaxController.text=gstAmount.toString();
                                 onEditingComplete: () => _fieldFocusChange(
                                   context,
                                   _itemGenericCodeFocus,
-                                  _nonScheduleItemFocus,
+                                  _itemUnitCodeFocus,
                                 ),
+
                                 addPage: AddGenericsMasterPage(
                                   onSaved: (success) async {
                                     if (success) {
@@ -1122,7 +1195,7 @@ _purchaseRateWTaxController.text=gstAmount.toString();
                               ),
                             )
                           : SizedBox(),
-        
+
                       SizedBox(
                         width: constraints.maxWidth / columns - 20,
                         child: SearchableDropdown<master.Units>(
@@ -1131,12 +1204,13 @@ _purchaseRateWTaxController.text=gstAmount.toString();
                           itemLabel: (group) => group.unitName ?? "",
                           onChanged: (group) {
                             if (group != null) {
-                              _selectSubUnit=group;
+                              _selectSubUnit = group;
                               _unitCode = group.unitCode;
-                              
-                              _subUnitCodeController.text=group.unitCode.toString();
+
+                              _subUnitCodeController.text =
+                                  group.unitCode.toString();
                               print(" _subUnitCodeController.text");
-                              print( _subUnitCodeController.text);
+                              print(_subUnitCodeController.text);
                               print("Selected Code: ${group.unitCode}");
                               print("Selected Name: ${group.unitName}");
                             }
@@ -1158,7 +1232,7 @@ _purchaseRateWTaxController.text=gstAmount.toString();
                           addTooltip: "Add Unit",
                         ),
                       ),
-        
+
                       selectedPaymentType == 0
                           ? SizedBox(
                               width: constraints.maxWidth / columns - 20,
@@ -1174,15 +1248,17 @@ _purchaseRateWTaxController.text=gstAmount.toString();
                                 onChanged: (value) {
                                   // ✅ Automatically update formal digit based on conversion value
                                   if (value.isEmpty) return;
-        
-                                  final double? conversion = double.tryParse(value);
+
+                                  final double? conversion =
+                                      double.tryParse(value);
                                   if (conversion == null) return;
-        
+
                                   int formalDigit = 1;
-        
+
                                   if (conversion >= 1 && conversion <= 9) {
                                     formalDigit = 1;
-                                  } else if (conversion >= 10 && conversion <= 99) {
+                                  } else if (conversion >= 10 &&
+                                      conversion <= 99) {
                                     formalDigit = 2;
                                   } else if (conversion >= 100 &&
                                       conversion <= 999) {
@@ -1190,7 +1266,7 @@ _purchaseRateWTaxController.text=gstAmount.toString();
                                   } else {
                                     formalDigit = 0; // default fallback
                                   }
-        
+
                                   setState(() {
                                     _formaldigitController.text =
                                         formalDigit.toString();
@@ -1199,7 +1275,8 @@ _purchaseRateWTaxController.text=gstAmount.toString();
                                 focusNode: _subQtyFocus,
                                 textInputAction: TextInputAction.next,
                                 onEditingComplete: () {
-                                  FocusScope.of(context).requestFocus(_subQtyFocus);
+                                  FocusScope.of(context)
+                                      .requestFocus(_subQtyFocus);
                                 },
                               ),
                             )
@@ -1212,9 +1289,10 @@ _purchaseRateWTaxController.text=gstAmount.toString();
                                 hintText: "Format Digit",
                                 controller: _formaldigitController,
                                 isValidate: true,
-                                validator: (value) => value == null || value.isEmpty
-                                    ? "Format Qty"
-                                    : null,
+                                validator: (value) =>
+                                    value == null || value.isEmpty
+                                        ? "Format Qty"
+                                        : null,
                                 focusNode: _subQtyFormat,
                                 textInputAction: TextInputAction.next,
                                 onEditingComplete: () {
@@ -1224,34 +1302,34 @@ _purchaseRateWTaxController.text=gstAmount.toString();
                               ),
                             )
                           : SizedBox(),
-          
+
                       selectedPaymentType == 0
-                          ?  SizedBox(
-                        width: constraints.maxWidth / columns - 30,
-                        child: CustomTextField(
-                          title: "Sub Unit",
-                          hintText: "Sub Unit",
-                          controller: _subUnitCodeController,
-                          isValidate: true,
-                          isEdit: true,
-                          // validator: (value) => value == null || value.isEmpty
-                          //     ? "Enter Minimum Stock Quantity"
-                          //     : null,
-                          focusNode: _itemUnitCodeFocus,
-                          isNumeric: true,
-                          textInputAction: TextInputAction.next,
-                          onEditingComplete: () => _fieldFocusChange(
+                          ? SizedBox(
+                              width: constraints.maxWidth / columns - 30,
+                              child: CustomTextField(
+                                title: "Sub Unit",
+                                hintText: "Sub Unit",
+                                controller: _subUnitCodeController,
+                                isValidate: true,
+                                isEdit: true,
+                                // validator: (value) => value == null || value.isEmpty
+                                //     ? "Enter Minimum Stock Quantity"
+                                //     : null,
+                                focusNode: _itemUnitCodeFocus,
+                                isNumeric: true,
+                                textInputAction: TextInputAction.next,
+                                onEditingComplete: () => _fieldFocusChange(
                                   context,
                                   _itemUnitCodeFocus,
                                   _itemMakeCodeFocus,
                                 ),
-                        ),
-                      )
+                              ),
+                            )
                           // SizedBox(
                           //     width: constraints.maxWidth / columns - 20,
                           //     child: SearchableDropdown<master.Units>(
                           //       hintText: "Sub unit",
-                                
+
                           //       controller: _subUnitCodeController,
                           //       initialValue: _selectSubUnit,
                           //       items: getAllMasterListModel!.info!.units!,
@@ -1279,7 +1357,7 @@ _purchaseRateWTaxController.text=gstAmount.toString();
                           //     ),
                           //   )
                           : SizedBox(),
-        
+
                       selectedPaymentType == 0
                           ? SizedBox(
                               width: constraints.maxWidth,
@@ -1294,7 +1372,8 @@ _purchaseRateWTaxController.text=gstAmount.toString();
                                                 CrossAxisAlignment.center,
                                             children: [
                                               CustomCheckbox(
-                                                label: "Is Batch Number Required",
+                                                label:
+                                                    "Is Batch Number Required",
                                                 value: _isBatchNumbeRequired,
                                                 onChanged: (val) {
                                                   setState(() {
@@ -1310,7 +1389,8 @@ _purchaseRateWTaxController.text=gstAmount.toString();
                                   const SizedBox(width: 20),
                                   Flexible(
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         CustomCheckbox(
                                           label: "Is  Narcotic Item",
@@ -1327,7 +1407,8 @@ _purchaseRateWTaxController.text=gstAmount.toString();
                                   const SizedBox(width: 20),
                                   Flexible(
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         CustomCheckbox(
                                           label: "Scheduled Item",
@@ -1344,7 +1425,8 @@ _purchaseRateWTaxController.text=gstAmount.toString();
                                   const SizedBox(width: 20),
                                   Flexible(
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         CustomCheckbox(
                                           label: "Expiry Required",
@@ -1360,7 +1442,8 @@ _purchaseRateWTaxController.text=gstAmount.toString();
                                   ),
                                   Flexible(
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         CustomCheckbox(
                                           label: "MFGDateRequired",
@@ -1380,33 +1463,85 @@ _purchaseRateWTaxController.text=gstAmount.toString();
                           : SizedBox(),
                       _expiryRequired
                           ? SizedBox(
-                              width: constraints.maxWidth / columns - 30,
+                              width: constraints.maxWidth / columns - 20,
                               child: CustomDropdownField<int>(
-                                title: "Expiry Date Format",
-                                hintText: "Expiry Date Format",
-                                items: const [
-                                  DropdownMenuItem(value: 0, child: Text("DD/YY")),
-                                  DropdownMenuItem(
-                                      value: 1, child: Text("DD/MM/YY")),
-                                  DropdownMenuItem(
-                                      value: 2, child: Text("DD/MM/YYYY")),
-                                ],
-                                initialValue: selectedExpiryType,
-                                onChanged: (val) {
-                                  setState(() => selectedExpiryType = val);
-                                  print("Selected PaymentType: $val");
+                                title: "Select Item Generic",
+                                hintText: "Choose  IItem Generic",
+                                items: getAllMasterListModel!.info!.generics!
+                                    .map((e) => DropdownMenuItem<int>(
+                                          value: e
+                                              .genericCode, // 🔹 use taxCode as value
+                                          child: Text("${e.genericName} "),
+                                        ))
+                                    .toList(),
+                                // initialValue: _taxCode, // int? taxCode
+                                onChanged: (value) {
+                                  setState(() {
+                                    _itemGeneric = value;
+                                    //  _taxCode = value;
+                                  });
+
+                                  final selected = getAllMasterListModel!
+                                      .info!.generics!
+                                      .firstWhere((c) => c.genericCode == value,
+                                          orElse: () => master.Generics());
+
+                                  print(
+                                      "Selected GST %: ${selected.genericCode}");
+                                  print(
+                                      "Selected TAX Code: ${selected.genericName}");
                                 },
-                                focusNode: _itemTypeFocus,
-                                onEditingComplete: () {
-                                  _fieldFocusChange(
-                                      context, _itemTypeFocus, _itemGroupFocus);
-                                },
+                                // isValidate: true,
+                                // validator: (value) => value == null
+                                //     ? "Please select Item Make Code"
+                                //     : null,
+                                focusNode: _itemGenericCodeFocus,
+                                onEditingComplete: () => _fieldFocusChange(
+                                  context,
+                                  _itemGenericCodeFocus,
+                                  _itemUnitCodeFocus,
+                                ),
+
+                                addPage: AddGenericsMasterPage(
+                                  onSaved: (success) async {
+                                    if (success) {
+                                      Navigator.pop(context, true);
+                                      await _loadList();
+                                    }
+                                  },
+                                ),
+                                addTooltip: "Add Item Generic",
                               ),
                             )
-                          : SizedBox(
-                              width: 0,
-                            ),
-        
+                          : SizedBox(),
+                      // _expiryRequired
+                      //     ? SizedBox(
+                      //         width: constraints.maxWidth / columns - 30,
+                      //         child: CustomDropdownField<int>(
+                      //           title: "Expiry Date Format",
+                      //           hintText: "Expiry Date Format",
+                      //           items: const [
+                      //             DropdownMenuItem(
+                      //                 value: 0, child: Text("DD/YY")),
+                      //             DropdownMenuItem(
+                      //                 value: 1, child: Text("DD/MM/YY")),
+                      //             DropdownMenuItem(
+                      //                 value: 2, child: Text("DD/MM/YYYY")),
+                      //           ],
+                      //           initialValue: selectedExpiryType,
+                      //           onChanged: (val) {
+                      //             setState(() => selectedExpiryType = val);
+                      //             print("Selected PaymentType: $val");
+                      //           },
+                      //           focusNode: _itemTypeFocus,
+                      //           onEditingComplete: () {
+                      //             _fieldFocusChange(
+                      //                 context, _itemTypeFocus, _itemGroupFocus);
+                      //           },
+                      //         ),
+                      //       )
+                      //     : SizedBox(),
+
                       SizedBox(
                         width: constraints.maxWidth / columns - 20,
                         child: CustomTextField(
@@ -1492,24 +1627,38 @@ _purchaseRateWTaxController.text=gstAmount.toString();
                             setState(() {
                               _hsntaxCode = group.hsnCode;
                               _selectHSN = group;
-        
-                              final int itemGSTCode = group.hsnCode ?? 0;
-                              _gsttaxCode = itemGSTCode;
-                              _selectgst = getAllMasterListModel?.info?.taxMasters
-                                  ?.firstWhere(
-                                (g) => g.taxCode == itemGSTCode,
+
+                              final matchedGST = getAllMasterListModel!
+                                  .info!.taxMasters!
+                                  .firstWhere(
+                                (tax) =>
+                                    tax.taxCode == group.hsnCode ||
+                                    tax.taxPercentage == group.gstPercentage,
                                 orElse: () => master.TaxMasters(
-                                    taxCode: itemGSTCode, taxName: 'Unknown Group'),
+                                  taxCode: 0,
+                                  taxName: "Unknown GST",
+                                  taxPercentage: 0,
+                                ),
                               );
+
+                              _selectgst =
+                                  matchedGST; // ✅ this triggers GST dropdown update
+                              _gstPercentageController.text =
+                                  matchedGST.taxPercentage?.toString() ?? "0";
+                              tax_persantage =
+                                  double.parse(matchedGST.taxPercentage);
+                              print(tax_persantage);
+                              _gsttaxCode = matchedGST.taxCode;
                             });
                           },
+
                           // focusNode: _itemUnitCodeFocus,
                           //               onEditingComplete: () => _fieldFocusChange(
                           //                 context,
                           //                 _itemUnitCodeFocus,
                           //                 _itemMakeCodeFocus,
                           //               ),
-        
+
                           addPage: AddHnsMasterPage(
                             onSaved: (success) async {
                               if (success) {
@@ -1526,23 +1675,22 @@ _purchaseRateWTaxController.text=gstAmount.toString();
                         child: SearchableDropdown<master.TaxMasters>(
                           hintText: "Choose a GST",
                           items: getAllMasterListModel!.info!.taxMasters!,
+                          controller: _gstPercentageController,
                           itemLabel: (group) => group.taxName ?? "",
-                          initialValue: _selectgst,
+                          initialValue: _selectgst, // ✅ dynamic link
                           onChanged: (group) {
                             setState(() {
-                              _hsntaxCode = group.taxCode;
+                              _gsttaxCode = group.taxCode;
                               _selectgst = group;
-                              print(_selectgst!.taxPercentage);
+                              _gstPercentageController.text =
+                                  group.taxPercentage?.toString() ?? "0";
+                              tax_persantage =
+                                  double.parse(group.taxPercentage);
                             });
                           },
-                          // focusNode: _itemUnitCodeFocus,
-                          //               onEditingComplete: () => _fieldFocusChange(
-                          //                 context,
-                          //                 _itemUnitCodeFocus,
-                          //                 _itemMakeCodeFocus,
-                          //               ),
                         ),
                       ),
+
                       // SizedBox(
                       //   width: constraints.maxWidth / columns - 20,
                       //   child: CustomDropdownField<int>(
@@ -1560,23 +1708,23 @@ _purchaseRateWTaxController.text=gstAmount.toString();
                       //       setState(() {
                       //        _gsttaxCode = value.ta;
                       //          _selectHSN = group;
-        
+
                       //         _hsntaxCode = value;
                       //         //  _taxCode = value;
                       //       });
-        
+
                       //       final selected = getAllMasterListModel!
                       //           .info!.taxMasters!
                       //           .firstWhere((c) => c.taxCode == value,
                       //               orElse: () => master.TaxMasters());
-        
+
                       //       print("Selected GST %: ${selected.taxPercentage}");
                       //       print("Selected TAX Code: ${selected.taxCode}");
                       //     },
                       //     isValidate: true,
                       //     validator: (value) =>
                       //         value == null ? "Please select a GST" : null,
-        
+
                       //     // addPage: AddTaxMasterPage(
                       //     //   onSaved: (success) {
                       //     //     if (success) {
@@ -1642,19 +1790,36 @@ _purchaseRateWTaxController.text=gstAmount.toString();
                           focusNode: _purchaseRateFocus,
                           isNumeric: true,
                           textInputAction: TextInputAction.next,
+                          onChanged: (value) {
+                            final totalWithTax = calculateWithTax(
+                              amount: double.parse(value),
+                              taxPercent: tax_persantage ?? 0.00,
+                            );
+                            print(totalWithTax);
+                            print(value);
+                            setState(() {
+                              _purchaseRateWTaxController.text =
+                                  totalWithTax.toStringAsFixed(2);
+                            });
+                          },
                           onEditingComplete: () {
-                                final purchaseRate = double.tryParse(_purchaseRateController.text) ?? 0;
-      final gstPercent = 18.0; // Example GST value, you can make it dynamic
+                            final purchaseRate =
+                                double.tryParse(_purchaseRateController.text) ??
+                                    0;
+                            final taxPercent =
+                                tax_persantage; // your dynamic variable
 
-      calculateWithGST(amount: purchaseRate,);
+                            final totalWithTax = calculateWithTax(
+                              amount: purchaseRate,
+                              taxPercent: taxPercent ?? 0.00,
+                            );
+                            print(totalWithTax);
+                            // Update the Purchase Rate With Tax TextField
+                            _purchaseRateWTaxController.text =
+                                totalWithTax.toStringAsFixed(2);
 
-      // print("GST Amount: ${result['gst']}");
-      // print("Total Amount: ${result['total']}");
-
-      // Optionally, update another TextField for total
-     // _purchaseRateWTaxController.text = result['total']?.toStringAsFixed(2) ?? "0.00";
-     _fieldFocusChange(context, _purchaseRateFocus, _purchaseRateWTaxFocus);
-                          //  FocusScope.of(context).requestFocus();
+                            _fieldFocusChange(context, _purchaseRateFocus,
+                                _purchaseRateWTaxFocus);
                           },
                         ),
                       ),
@@ -1678,7 +1843,7 @@ _purchaseRateWTaxController.text=gstAmount.toString();
                           },
                         ),
                       ),
-        
+
                       SizedBox(
                         width: constraints.maxWidth / columns - 20,
                         child: CustomTextField(
@@ -1693,7 +1858,8 @@ _purchaseRateWTaxController.text=gstAmount.toString();
                           isNumeric: true,
                           textInputAction: TextInputAction.next,
                           onEditingComplete: () {
-                            FocusScope.of(context).requestFocus(_salesRateFocus);
+                            FocusScope.of(context)
+                                .requestFocus(_salesRateFocus);
                           },
                         ),
                       ),
@@ -1715,7 +1881,7 @@ _purchaseRateWTaxController.text=gstAmount.toString();
                           },
                         ),
                       ),
-        
+
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         mainAxisAlignment: MainAxisAlignment.end,
@@ -1739,47 +1905,47 @@ _purchaseRateWTaxController.text=gstAmount.toString();
                           const SizedBox(width: 20),
                         ],
                       ),
-        
-                      // _isDiscountReq
-                      //     ? SizedBox(
-                      //         width: constraints.maxWidth / columns - 20,
-                      //         child: CustomTextField(
-                      //           title: "Discount %",
-                      //           hintText: "Enter Discount Percentage",
-                      //           controller: _itemDiscountPercentageController,
-                      //           isValidate: true,
-                      //           // validator: (value) => value == null || value.isEmpty
-                      //           //     ? "Enter Discount Percentage"
-                      //           //     : null,
-                      //           focusNode: _itemDiscountPercentageFocus,
-                      //           isNumeric: true,
-                      //           textInputAction: TextInputAction.next,
-                      //           onEditingComplete: () {
-                      //             FocusScope.of(context)
-                      //                 .requestFocus(_itemDiscountPercentageFocus);
-                      //           },
-                      //         ))
-                      //     : SizedBox(),
-                      // _isDiscountReq
-                      //     ? SizedBox(
-                      //         width: constraints.maxWidth / columns - 20,
-                      //         child: CustomTextField(
-                      //           title: "Discount Value",
-                      //           hintText: "Enter Discount value",
-                      //           controller: _itemDiscountValueController,
-                      //           isValidate: true,
-                      //           // validator: (value) => value == null || value.isEmpty
-                      //           //     ? "Enter Discount Value"
-                      //           //     : null,
-                      //           focusNode: _itemDiscountValueFocus,
-                      //           isNumeric: true,
-                      //           textInputAction: TextInputAction.next,
-                      //           onEditingComplete: () {
-                      //             FocusScope.of(context)
-                      //                 .requestFocus(_itemDiscountValueFocus);
-                      //           },
-                      //         ))
-                      //     : SizedBox(),
+
+                      _isDiscountReq
+                          ? SizedBox(
+                              width: constraints.maxWidth / columns - 20,
+                              child: CustomTextField(
+                                title: "Discount %",
+                                hintText: "Enter Discount Percentage",
+                                controller: _itemDiscountPercentageController,
+                                isValidate: true,
+                                // validator: (value) => value == null || value.isEmpty
+                                //     ? "Enter Discount Percentage"
+                                //     : null,
+                                focusNode: _itemDiscountPercentageFocus,
+                                isNumeric: true,
+                                textInputAction: TextInputAction.next,
+                                onEditingComplete: () {
+                                  FocusScope.of(context).requestFocus(
+                                      _itemDiscountPercentageFocus);
+                                },
+                              ))
+                          : SizedBox(),
+                      _isDiscountReq
+                          ? SizedBox(
+                              width: constraints.maxWidth / columns - 20,
+                              child: CustomTextField(
+                                title: "Discount Value",
+                                hintText: "Enter Discount value",
+                                controller: _itemDiscountValueController,
+                                isValidate: true,
+                                // validator: (value) => value == null || value.isEmpty
+                                //     ? "Enter Discount Value"
+                                //     : null,
+                                focusNode: _itemDiscountValueFocus,
+                                isNumeric: true,
+                                textInputAction: TextInputAction.next,
+                                onEditingComplete: () {
+                                  FocusScope.of(context)
+                                      .requestFocus(_itemDiscountValueFocus);
+                                },
+                              ))
+                          : SizedBox(),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -1793,7 +1959,7 @@ _purchaseRateWTaxController.text=gstAmount.toString();
                           ),
                         ],
                       ),
-        
+
                       // SizedBox(
                       //   width: constraints.maxWidth / columns - 20,
                       //   child: CustomTextField(
@@ -1822,13 +1988,15 @@ _purchaseRateWTaxController.text=gstAmount.toString();
                               alignment: WrapAlignment.center,
                               children: [
                                 GradientButton(
-                                  text: isEdit ? "Update Product" : "Add Product",
+                                  text: isEdit
+                                      ? "Update Product"
+                                      : "Add Product (Shift + S)",
                                   onPressed: () => _submit(true),
                                 ),
                                 GradientButton(
                                   text: isEdit
                                       ? "Update Product (Keep Entry)"
-                                      : "Add Product (Keep Entry)",
+                                      : "Add Product (Keep Entry) - (ctrl + Shift + S)",
                                   onPressed: () => _submit(false),
                                 ),
                               ],
@@ -1848,7 +2016,6 @@ _purchaseRateWTaxController.text=gstAmount.toString();
                           ],
                         ],
                       ),
-                   
                     ],
                   );
                 },

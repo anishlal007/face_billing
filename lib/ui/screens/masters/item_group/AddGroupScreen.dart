@@ -28,7 +28,7 @@ class _AddgroupscreenState extends State<Addgroupscreen> {
   bool _activeStatus = true;
   bool _loading = false;
   String? _message;
-bool _isEditMode = false;
+  bool _isEditMode = false;
   late TextEditingController _itemGroupNameController;
   // late TextEditingController _countryNameController;
   late TextEditingController _createdUserController;
@@ -40,11 +40,13 @@ bool _isEditMode = false;
   @override
   void initState() {
     super.initState();
-
+    print(userId.value ?? "21");
     _itemGroupNameController =
         TextEditingController(text: widget.groupInfo?.itemGroupName ?? "");
     _createdUserController = TextEditingController(
-        text: widget.groupInfo?.cratedUserCode?.toString() ?? userId.value!);
+        text: widget.groupInfo?.cratedUserCode?.toString() ??
+            userId.value ??
+            "1");
     _activeStatus = (widget.groupInfo?.activeStatus ?? 1) == 1;
     _isEditMode = widget.groupInfo != null;
   }
@@ -65,16 +67,16 @@ bool _isEditMode = false;
       _loading = true;
       _message = null;
     });
-  final request = AddGroupRequest(
-        itemGroupName: _itemGroupNameController.text.trim(),
-        createdUserCode:  _createdUserController.text.trim(),
-        createdDate:
-            '${DateTime.now().year}-${DateTime.now().month}-${DateTime.now().day}',
-        updatedUserCode: _createdUserController.text.trim(),
-        activeStatus: _activeStatus ? 1 : 0,
-      );
-print(request.createdUserCode);
-    if (_isEditMode && widget.groupInfo != null) {  
+    final request = AddGroupRequest(
+      itemGroupName: _itemGroupNameController.text.trim(),
+      createdUserCode: _createdUserController.text.trim(),
+      createdDate:
+          '${DateTime.now().year}-${DateTime.now().month}-${DateTime.now().day}',
+      updatedUserCode: _createdUserController.text.trim(),
+      activeStatus: _activeStatus ? 1 : 0,
+    );
+    print(request.createdUserCode);
+    if (_isEditMode && widget.groupInfo != null) {
       // EDIT mode
       final response = await _service.updateItemGroup(
         widget.groupInfo!.itemGroupCode!,
@@ -86,31 +88,30 @@ print(request.createdUserCode);
       final response = await _service.addItemGroup(request);
       _handleResponse(response.isSuccess, response.error);
     }
-  
   }
 
-void _handleResponse(bool isSuccess, String? error) {
-  setState(() => _loading = false);
+  void _handleResponse(bool isSuccess, String? error) {
+    setState(() => _loading = false);
 
-  if (isSuccess) {
-    // ✅ Clear all text fields
-    _itemGroupNameController.clear();
-    _createdUserController.clear();
-    _activeStatus = true; // or default false, depending on your logic
+    if (isSuccess) {
+      // ✅ Clear all text fields
+      _itemGroupNameController.clear();
+      _createdUserController.clear();
+      _activeStatus = true; // or default false, depending on your logic
 
-    setState(() {});
+      setState(() {});
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Group saved successfully!")),
-    );
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Group saved successfully!")),
+      );
 
-    widget.onSaved(true); // notify parent to refresh list
-  } else {
-    setState(() {
-      _message = error ?? "Something went wrong.";
-    });
+      widget.onSaved(true); // notify parent to refresh list
+    } else {
+      setState(() {
+        _message = error ?? "Something went wrong.";
+      });
+    }
   }
-}
 
   @override
   void didUpdateWidget(covariant Addgroupscreen oldWidget) {
@@ -121,7 +122,7 @@ void _handleResponse(bool isSuccess, String? error) {
       _createdUserController.text =
           widget.groupInfo?.cratedUserCode?.toString() ?? userId.value!;
       _activeStatus = (widget.groupInfo?.activeStatus ?? 1) == 1;
-       _isEditMode = widget.groupInfo != null; // update button too
+      _isEditMode = widget.groupInfo != null; // update button too
     }
   }
 
@@ -146,7 +147,7 @@ void _handleResponse(bool isSuccess, String? error) {
               },
             ),
             const SizedBox(height: 26),
-             SearchDropdownField<ItemGroupInfo>(
+            SearchDropdownField<ItemGroupInfo>(
               hintText: "Group Name",
               controller: _itemGroupNameController,
               prefixIcon: Icons.search,
@@ -161,81 +162,33 @@ void _handleResponse(bool isSuccess, String? error) {
               },
               displayString: (unit) => unit.itemGroupName ?? "",
               onSelected: (country) {
-                if(country != null){
+                if (country != null) {
                   setState(() {
-                 _itemGroupNameController.text =
-                      country.itemGroupName.toString();
-                  _createdUserController.text =
-                      country.cratedUserCode?.toString() ?? userId.value!;
-                  _activeStatus = (country.activeStatus ?? 1) == 1;
-                   _isEditMode = true;
-                });
+                    _itemGroupNameController.text =
+                        country.itemGroupName.toString();
+                    _createdUserController.text =
+                        country.cratedUserCode?.toString() ?? userId.value!;
+                    _activeStatus = (country.activeStatus ?? 1) == 1;
+                    _isEditMode = true;
+                  });
 
-                // ✅ Switch form into "Update mode"
-                widget.onSaved(false);
+                  // ✅ Switch form into "Update mode"
+                  widget.onSaved(false);
                 }
-             
               },
-                 onSubmitted: (typedValue) {
+              onSubmitted: (typedValue) {
                 setState(() {
-                    _itemGroupNameController.clear(); // no id since not from API
-      _itemGroupNameController.text = typedValue; 
-      print("_itemGroupNameController.text");// use typed text
-      print(_itemGroupNameController.text);// use typed text
-      _createdUserController.text = userId.value!;
-      _activeStatus = true;
-       _isEditMode = false;
-                }); 
+                  _itemGroupNameController.clear(); // no id since not from API
+                  _itemGroupNameController.text = typedValue;
+                  print("_itemGroupNameController.text"); // use typed text
+                  print(_itemGroupNameController.text); // use typed text
+                  _createdUserController.text = userId.value!;
+                  _activeStatus = true;
+                  _isEditMode = false;
+                });
                 widget.onSaved(false);
               },
             ),
-  //           SearchDropdownField<ItemGroupInfo>(
-  //             hintText: "Group Name",
-  //             controller: _itemGroupNameController,
-  //             prefixIcon: Icons.search,
-  //             fetchItems: (q) async {
-  //               final response = await _service.getItemGroupSearch(q);
-  //               if (response.isSuccess) {
-  //                 return (response.data?.info ?? [])
-  //                     .whereType<ItemGroupInfo>()
-  //                     .toList();
-  //               }
-  //               return [];
-  //             },
-  //             displayString: (country) => country.itemGroupName ?? "",
-  //             onSelected: (country) {
-  //               if(country !=null){
-  //                 setState(() {
-  //                 _itemGroupNameController.text =
-  //                     country.itemGroupName.toString();
-  //                 _createdUserController.text =
-  //                     country.cratedUserCode?.toString() ?? userId.value!;
-  //                 _activeStatus = (country.activeStatus ?? 1) == 1;
-  //                  _isEditMode = true;
-  //               });
-
-  //               // ✅ Switch form into "Update mode"
-  //               widget.onSaved(false); 
-  //               }
-               
-  //             },
-  //               onSubmitted: (typedValue) {
-  //   // ✅ User pressed enter or confirmed text without selecting
-  //   setState(() {
-  //     _itemGroupNameController.clear(); // no id since not from API
-  //     _itemGroupNameController.text = typedValue; 
-  //     print("_itemGroupNameController.text");// use typed text
-  //     print(_itemGroupNameController.text);// use typed text
-  //     _createdUserController.text = userId.value!;
-  //     _activeStatus = true;
-  //      _isEditMode = false;
-  //   });
-  //   widget.onSaved(false);
-  // },
-  //           ),
- 
-            
-             
             const SizedBox(height: 16),
             if (_loading)
               const CircularProgressIndicator()

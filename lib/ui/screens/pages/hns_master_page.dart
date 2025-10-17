@@ -2,25 +2,20 @@ import 'package:flutter/material.dart';
 
 import '../../../core/colors.dart';
 
-
-
 import '../../../data/models/hns_master/hns_master_list_model.dart';
 import '../masters/hns_master/add_hns_master_page.dart';
 import '../masters/hns_master/hns_master_list_page.dart' show HnsMasterListPage;
 import '../masters/tax_master/tax_master_list_page.dart';
 
-
-
 class HnsMasterPage extends StatefulWidget {
   const HnsMasterPage({super.key});
 
   @override
-  State<HnsMasterPage> createState() =>
-      _HnsMasterPageState();
+  State<HnsMasterPage> createState() => _HnsMasterPageState();
 }
 
 class _HnsMasterPageState extends State<HnsMasterPage> {
-   Info? editingUnit;
+  Info? editingUnit;
   bool refreshList = false;
 
   void _onSaved(bool success) {
@@ -115,7 +110,7 @@ class _HnsMasterPageState extends State<HnsMasterPage> {
               backgroundColor: primary,
               foregroundColor: white,
               onPressed: () => _showAddEditBottomSheet(null), // ✅ Add Country
-              label: const Text("Add Country"),
+              label: const Text("Add HSN"),
               icon: const Icon(Icons.add),
             )
           : null,
