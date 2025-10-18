@@ -60,6 +60,7 @@ class _AddProductMasterPageState extends State<AddProductMasterPage> {
       _itemMake,
       _itemGeneric,
       _unitCode;
+  String?hsnNo;
   master.Units? _selectSubUnit;
   double? tax_persantage = 0;
   bool _activeStatus = true;
@@ -482,6 +483,7 @@ class _AddProductMasterPageState extends State<AddProductMasterPage> {
           itemGroupCode: _itemGroup,
           itemUnitCode: _unitCode,
           itemMakeCode: _itemMake,
+          hsnCode: hsnNo,
           itemGenericCode:
               "1", //int.tryParse(_itemGenericCodeController.text.trim()),
           nonScheduleItem: _nonScheduledItem ? 0 : 1,
@@ -512,10 +514,12 @@ class _AddProductMasterPageState extends State<AddProductMasterPage> {
               double.tryParse(_purchaseRateWTaxController.text.trim()),
           salesRate: int.tryParse(_salesRateController.text.trim()),
           mRPRate: int.tryParse(_mRPRateController.text.trim()),
-          gstPercentage: _gsttaxCode,
+          gstPercentage: tax_persantage,
           createdDate: DateTime.now().toIso8601String(),
           createdUserCode: 1,
           updatedUserCode: 1,
+          subQtyFormalDigits: int.tryParse(_formaldigitController.text),
+          
         );
 
         print("🟢 Request JSON: ${request.toJson()}");
@@ -1625,7 +1629,10 @@ class _AddProductMasterPageState extends State<AddProductMasterPage> {
                           initialValue: _selectHSN,
                           onChanged: (group) {
                             setState(() {
-                              _hsntaxCode = group.hsnCode;
+                              _hsntaxCode = group.hsnCode!;
+                              hsnNo=group.hsnNo!;
+                              print("hsnNo");
+                              print(hsnNo);
                               _selectHSN = group;
 
                               final matchedGST = getAllMasterListModel!

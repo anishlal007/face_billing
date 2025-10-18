@@ -1334,9 +1334,16 @@ class _AddPurchaseMasterPageState extends State<AddPurchaseMasterPage> {
                                       style: TextStyle(color: white))),
                             ],
                             rows: List.generate(items.length, (index) {
-                              if (index >= controllers.length) {
-                                controllers.add(ItemRowControllers());
-                              }
+                              // if (index >= controllers.length) {
+                              //   controllers.add(ItemRowControllers());
+                              // }
+                              if (controllers.length < items.length) {
+  for (int i = controllers.length; i < items.length; i++) {
+    controllers.add(ItemRowControllers());
+  }
+} else if (controllers.length > items.length) {
+  controllers.removeRange(items.length, controllers.length);
+}
                               final controller = controllers[index];
                               final item = items[index];
 
@@ -1419,7 +1426,7 @@ class _AddPurchaseMasterPageState extends State<AddPurchaseMasterPage> {
 
                                 DataCell(TextFormField(
                                   style: TextStyle(fontSize: 12),
-                                  controller: controller.purchaseRate,
+                                  controller: controller.purchaseRateController,
                                   keyboardType: TextInputType.number,
                                   decoration: const InputDecoration(
                                       border: InputBorder.none),
@@ -1691,6 +1698,10 @@ class _AddPurchaseMasterPageState extends State<AddPurchaseMasterPage> {
                                                     item.expiryDateFormat ?? '';
                                                 controller.hsnController.text =
                                                     item.hSNCode ?? '';
+                                                 controller.purchaseRateController.text=item.purchaseRate??"";
+                                                 controller.discountPercentageController.text=item.itemDiscountPercentage??"0";
+                                                 controller.netRateController.text=item.salesRate ;
+    //                                           
                                                 controller.qtyController.text =
                                                     item.maximumStockQty
                                                         .toString();
@@ -1702,10 +1713,28 @@ class _AddPurchaseMasterPageState extends State<AddPurchaseMasterPage> {
                                                 controller.gstController.text =
                                                     item.gstPercentage
                                                         .toString();
-                                                controller.gstValueController
-                                                        .text =
-                                                    item.gstPercentage
-                                                        .toString();
+                                                // controller.gstValueController
+                                                //         .text =
+                                                //     item.gstPercentage
+                                                //         .toString();
+                                        double salesRate = double.tryParse(item.salesRate.toString()) ?? 0;
+double qty = double.tryParse(item.maximumStockQty.toString()) ?? 0;
+controller.netValueController.text = (salesRate * qty).toStringAsFixed(2);
+double gstPercentage = double.tryParse(item.gstPercentage.toString()) ?? 0;
+
+print("Net Value: ${controller.netValueController.text}");
+double gstAmount = salesRate * gstPercentage / 100;
+
+// Assign to controller
+double discountPercentage = double.tryParse(item.itemDiscountPercentage.toString()) ?? 0;
+
+controller.gstValueController.text = gstAmount.toStringAsFixed(2);
+
+print("GST Amount: ${controller.gstValueController.text}");
+double discountAmount = salesRate * discountPercentage / 100;
+
+controller.discountValueController.text = discountAmount.toStringAsFixed(2);
+
                                                 _calculateTotalSalesRate();
                                                 // Convert Info to Items
                                                 final newItem = Items(

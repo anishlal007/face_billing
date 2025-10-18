@@ -3,7 +3,9 @@ class AddProductMasterModel {
   dynamic itemID;
   dynamic itemName;
   dynamic itemType;
+  dynamic subQtyFormalDigits;
   dynamic itemGroupCode;
+  dynamic hsnCode;
   dynamic itemUnitCode;
   dynamic itemMakeCode;
   dynamic itemGenericCode;
@@ -38,8 +40,10 @@ class AddProductMasterModel {
       this.itemID,
       this.itemName,
       this.itemType,
+      this.subQtyFormalDigits,
       this.itemGroupCode,
       this.itemUnitCode,
+      this.hsnCode,
       this.itemMakeCode,
       this.itemGenericCode,
       this.nonScheduleItem,
@@ -69,9 +73,11 @@ class AddProductMasterModel {
 
   AddProductMasterModel.fromJson(Map<String, dynamic> json) {
     idtype = json['Idtype'];
+    hsnCode = json['HSNCode'];
     itemID = json['ItemID'];
     itemName = json['ItemName'];
     itemType = json['ItemType'];
+    subQtyFormalDigits = json['SubQtyFormalDigits'];
     itemGroupCode = json['ItemGroupCode'];
     itemUnitCode = json['ItemUnitCode'];
     itemMakeCode = json['ItemMakeCode'];
@@ -106,10 +112,12 @@ class AddProductMasterModel {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['Idtype'] = this.idtype;
     data['ItemID'] = this.itemID;
+    data['HSNCode'] = this.hsnCode;
     data['ItemName'] = this.itemName;
     data['ItemType'] = this.itemType;
     data['ItemGroupCode'] = this.itemGroupCode;
     data['ItemUnitCode'] = this.itemUnitCode;
+    data['SubQtyFormalDigits'] = this.subQtyFormalDigits;
     data['ItemMakeCode'] = this.itemMakeCode;
     data['ItemGenericCode'] = this.itemGenericCode;
     data['NonScheduleItem'] = this.nonScheduleItem;

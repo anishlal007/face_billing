@@ -8,7 +8,7 @@ class ItemRowControllers {
   final TextEditingController expiryController;
   final TextEditingController hsnController;
   final TextEditingController qtyController;
-  final TextEditingController purchaseRate;
+  final TextEditingController purchaseRateController;
   final TextEditingController mrpController;
   final TextEditingController salesRateController;
   final TextEditingController gstController;
@@ -30,9 +30,18 @@ class ItemRowControllers {
   final FocusNode expiryFocus;
   final FocusNode hsnFocus;
   final FocusNode qtyFocus;
+  final FocusNode purchaseRateFocus;
   final FocusNode mrpFocus;
   final FocusNode salesRateFocus;
   final FocusNode gstFocus;
+  final FocusNode discountPercentageFocus;
+  final FocusNode discountValueFocus;
+  final FocusNode gstPercentageFocus;
+  final FocusNode gstValueFocus;
+  final FocusNode taxableValueFocus;
+  final FocusNode netRateFocus;
+  final FocusNode netValueFocus;
+  final FocusNode remarkFocus;
 
   ItemRowControllers({
     String? itemCode,
@@ -41,9 +50,9 @@ class ItemRowControllers {
     String? expiry,
     String? hsn,
     String? qty,
+    String? purchaseRate,
     String? mrp,
     String? salesRate,
-    String? purchaseRate,
     String? gst,
     String? discountPercentage,
     String? discountValue,
@@ -59,7 +68,7 @@ class ItemRowControllers {
         expiryController = TextEditingController(text: expiry),
         hsnController = TextEditingController(text: hsn),
         qtyController = TextEditingController(text: qty),
-        purchaseRate = TextEditingController(text: purchaseRate),
+        purchaseRateController = TextEditingController(text: purchaseRate),
         mrpController = TextEditingController(text: mrp),
         salesRateController = TextEditingController(text: salesRate),
         gstController = TextEditingController(text: gst),
@@ -78,9 +87,18 @@ class ItemRowControllers {
         expiryFocus = FocusNode(),
         hsnFocus = FocusNode(),
         qtyFocus = FocusNode(),
+        purchaseRateFocus = FocusNode(),
         mrpFocus = FocusNode(),
         salesRateFocus = FocusNode(),
-        gstFocus = FocusNode();
+        gstFocus = FocusNode(),
+        discountPercentageFocus = FocusNode(),
+        discountValueFocus = FocusNode(),
+        gstPercentageFocus = FocusNode(),
+        gstValueFocus = FocusNode(),
+        taxableValueFocus = FocusNode(),
+        netRateFocus = FocusNode(),
+        netValueFocus = FocusNode(),
+        remarkFocus = FocusNode();
 
   void dispose() {
     itemCodeController.dispose();
@@ -89,7 +107,7 @@ class ItemRowControllers {
     expiryController.dispose();
     hsnController.dispose();
     qtyController.dispose();
-    purchaseRate.dispose();
+    purchaseRateController.dispose();
     mrpController.dispose();
     salesRateController.dispose();
     gstController.dispose();
@@ -108,8 +126,17 @@ class ItemRowControllers {
     expiryFocus.dispose();
     hsnFocus.dispose();
     qtyFocus.dispose();
+    purchaseRateFocus.dispose();
     mrpFocus.dispose();
     salesRateFocus.dispose();
     gstFocus.dispose();
+    discountPercentageFocus.dispose();
+    discountValueFocus.dispose();
+    gstPercentageFocus.dispose();
+    gstValueFocus.dispose();
+    taxableValueFocus.dispose();
+    netRateFocus.dispose();
+    netValueFocus.dispose();
+    remarkFocus.dispose();
   }
 }
