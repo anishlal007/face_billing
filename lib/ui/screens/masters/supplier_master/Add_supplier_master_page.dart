@@ -1,3 +1,4 @@
+import 'package:facebilling/data/services/get_serial_no_services.dart';
 import 'package:facebilling/ui/screens/masters/supplier_group_master/add_supplier_group_master_page.dart';
 import 'package:flutter/material.dart';
 
@@ -15,6 +16,8 @@ import '../../../widgets/custom_switch.dart';
 import '../../../widgets/custom_text_field.dart';
 import '../../../widgets/gradient_button.dart';
 import '../../../widgets/search_dropdown_field.dart';
+import '../../../../data/models/get_all_master_list_model.dart' as master;
+import '../../../../data/models/get_serial_no_model.dart' as serialno;
 
 class AddSupplierMasterPage extends StatefulWidget {
   final SupplierInfo? unitInfo;
@@ -30,11 +33,13 @@ class AddSupplierMasterPage extends StatefulWidget {
 }
 
 class _AddSupplierMasterPageState extends State<AddSupplierMasterPage> {
+  serialno.GetSerialNoModel? serialNo;
   final _formKey = GlobalKey<FormState>();
   final SupplierMasterService _service = SupplierMasterService();
   final GetAllMasterService _getAllMasterService = GetAllMasterService();
-  int? _areaCode, _cityCode, _stateCode, _countryCode, _subGrpCode;
+  int? _areaCode, _cityCode, _stateCode, _countryCode = 1, _subGrpCode;
   bool _activeStatus = true, _isTaxInclusive = false;
+  final GetSerialNoServices _getSerialservice = GetSerialNoServices();
   bool _loading = false;
   String? _message;
   bool _getAllLoading = true;
@@ -92,6 +97,7 @@ class _AddSupplierMasterPageState extends State<AddSupplierMasterPage> {
   late TextEditingController _countryNameController;
   // late TextEditingController _createdUserController;
 
+  String? serialError;
   final FocusNode _unitIdFocus = FocusNode();
   final FocusNode _unitNameFocus = FocusNode();
   final FocusNode _countryNameFocus = FocusNode();
@@ -153,11 +159,55 @@ class _AddSupplierMasterPageState extends State<AddSupplierMasterPage> {
         getAllMasterListModel = response.data!;
         _getAllLoading = false;
         error = null;
+        if (response.data != null &&
+            response.data!.info!.supplierGroups!.isNotEmpty) {
+          _subGrpCode ??=
+              response.data!.info!.supplierGroups!.first.supGroupCode;
+        }
+        if (response.data != null && response.data!.info!.states!.isNotEmpty) {
+          _stateCode ??= response.data!.info!.states!.first.stateCode;
+        }
+        if (response.data != null && response.data!.info!.areas!.isNotEmpty) {
+          _areaCode ??= response.data!.info!.areas!.first.areaCode;
+        }
       });
     } else {
       setState(() {
         error = response.error;
         _getAllLoading = false;
+      });
+    }
+
+    try {
+      final serialNoResponse = await _getSerialservice.getSerialNo();
+      if (serialNoResponse.isSuccess) {
+        final serialData = serialNoResponse.data;
+        if (serialData != null && serialData.info != null) {
+          setState(() {
+            serialNo = serialData;
+            _suppIdController.text = serialNo!.info!.supId ?? "";
+            serialError = null;
+          });
+        } else {
+          setState(() {
+            serialNo = null;
+            _suppIdController.clear();
+            serialError = "Number initialization record not found";
+          });
+        }
+      } else {
+        setState(() {
+          serialNo = null;
+          _suppIdController.clear();
+          serialError =
+              serialNoResponse.error ?? "Failed to fetch serial number";
+        });
+      }
+    } catch (e) {
+      setState(() {
+        serialNo = null;
+        _suppIdController.clear();
+        serialError = "Error fetching serial number: $e";
       });
     }
   }
@@ -363,6 +413,7 @@ class _AddSupplierMasterPageState extends State<AddSupplierMasterPage> {
                       hintText: "Enter Supplier ID",
                       controller: _suppIdController,
                       prefixIcon: Icons.flag_circle,
+                      isEdit: true,
                       isValidate: true,
                       isWhitspace: true,
                       //  validator: (value) {
@@ -379,6 +430,7 @@ class _AddSupplierMasterPageState extends State<AddSupplierMasterPage> {
                   SizedBox(
                     width: constraints.maxWidth / columns - 20,
                     child: CustomTextField(
+                      ismandatory: true,
                       title: "Supplier Name",
                       hintText: "Enter Supplier Name",
                       controller: _suppNameController,
@@ -396,33 +448,31 @@ class _AddSupplierMasterPageState extends State<AddSupplierMasterPage> {
                   SizedBox(
                     width: constraints.maxWidth / columns - 20,
                     child: CustomDropdownField<int>(
+                      ismandatory: true,
                       title: "Select Supplier Group",
                       hintText: "Choose Supplier Group",
                       items: getAllMasterListModel!.info!.supplierGroups!
                           .map((e) => DropdownMenuItem<int>(
-                                value:
-                                    e.supGroupCode, // 🔹 use taxCode as value
+                                value: e.supGroupCode,
                                 child: Text("${e.supGroupName} "),
                               ))
                           .toList(),
-                      // initialValue: _taxCode, // int? taxCode
+                      initialValue: _subGrpCode,
                       onChanged: (value) {
                         setState(() {
                           _subGrpCode = value;
-                          //  _taxCode = value;
                         });
 
                         final selected = getAllMasterListModel!
                             .info!.supplierGroups!
-                            .firstWhere((c) => c.supGroupCode == value,
-                                orElse: () => master.SupplierGroups());
-
-                        print("Selected GST %: ${selected.supGroupCode}");
-                        print("Selected TAX Code: ${selected.supGroupCode}");
+                            .firstWhere(
+                          (c) => c.supGroupCode == value,
+                          orElse: () => master.SupplierGroups(),
+                        );
                       },
                       isValidate: true,
                       validator: (value) =>
-                          value == null ? "Please select Country" : null,
+                          value == null ? "Please select Group" : null,
                       focusNode: _suppGroupFocus,
                       onEditingComplete: () => _fieldFocusChange(
                         context,
@@ -434,47 +484,20 @@ class _AddSupplierMasterPageState extends State<AddSupplierMasterPage> {
                           if (success) {
                             Navigator.pop(context, true);
                             await _loadList();
+
+                            // ✅ Refresh default if new list loaded
+                            final supplierGroups =
+                                getAllMasterListModel?.info?.supplierGroups;
+                            if (supplierGroups != null &&
+                                supplierGroups.isNotEmpty) {
+                              setState(() {
+                                _subGrpCode = supplierGroups.first.supGroupCode;
+                              });
+                            }
                           }
                         },
                       ),
-                      addTooltip: "Add Item Make",
-                    ),
-                  ),
-
-                  SizedBox(
-                    width: constraints.maxWidth / columns - 20,
-                    child: CustomDropdownField<int>(
-                      title: "Select Country",
-                      hintText: "Choose Country",
-                      items: getAllMasterListModel!.info!.countries!
-                          .map((e) => DropdownMenuItem<int>(
-                                value: e.countryCode, // 🔹 use taxCode as value
-                                child: Text("${e.countryName} "),
-                              ))
-                          .toList(),
-                      // initialValue: _taxCode, // int? taxCode
-                      onChanged: (value) {
-                        setState(() {
-                          _countryCode = value;
-                          //  _taxCode = value;
-                        });
-
-                        final selected = getAllMasterListModel!.info!.countries!
-                            .firstWhere((c) => c.countryCode == value,
-                                orElse: () => master.Countries());
-
-                        print("Selected GST %: ${selected.countryCode}");
-                        print("Selected TAX Code: ${selected.countryCode}");
-                      },
-                      isValidate: true,
-                      validator: (value) =>
-                          value == null ? "Please select Country" : null,
-                      focusNode: _suppCountryFocus,
-                      onEditingComplete: () => _fieldFocusChange(
-                        context,
-                        _suppCountryFocus,
-                        _suppStateFocus,
-                      ),
+                      addTooltip: "Add Group",
                     ),
                   ),
 
@@ -489,7 +512,7 @@ class _AddSupplierMasterPageState extends State<AddSupplierMasterPage> {
                                 child: Text("${e.stateName} "),
                               ))
                           .toList(),
-                      // initialValue: _taxCode, // int? taxCode
+                      initialValue: _stateCode,
                       onChanged: (value) {
                         setState(() {
                           _stateCode = value;
@@ -523,7 +546,7 @@ class _AddSupplierMasterPageState extends State<AddSupplierMasterPage> {
                                 child: Text("${e.areaName} "),
                               ))
                           .toList(),
-                      // initialValue: _taxCode, // int? taxCode
+                      initialValue: _areaCode, // int? taxCode
                       onChanged: (value) {
                         setState(() {
                           _areaCode = value;
@@ -646,6 +669,7 @@ class _AddSupplierMasterPageState extends State<AddSupplierMasterPage> {
                       hintText: "Enter Supplier License Number",
                       controller: _suppLicenseNoController,
                       isValidate: true,
+                      ismandatory: true,
                       // validator: (value) => value == null || value.isEmpty
                       //     ? "Enter Supplier License Number"
                       //     : null,

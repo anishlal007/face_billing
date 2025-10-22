@@ -1,7 +1,18 @@
+import 'dart:convert';
+
+List<ProductMasterListModel> stockProductMasterFromJson(List<dynamic> src) {
+  // print("hjkhjkh ${json.decode(str)}");
+  return List<ProductMasterListModel>.from(
+      src.map((x) => ProductMasterListModel.fromJson(x)));
+}
+
+String stockProductMasterToJson(List<ProductMasterListModel> data) =>
+    json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
+
 class ProductMasterListModel {
   bool? status;
   dynamic message;
-  List<Info>? info;
+  List<productListInfo>? info;
 
   ProductMasterListModel({this.status, this.message, this.info});
 
@@ -9,9 +20,9 @@ class ProductMasterListModel {
     status = json['status'];
     message = json['message'];
     if (json['info'] != null) {
-      info = <Info>[];
+      info = <productListInfo>[];
       json['info'].forEach((v) {
-        info!.add(new Info.fromJson(v));
+        info!.add(new productListInfo.fromJson(v));
       });
     }
   }
@@ -27,7 +38,7 @@ class ProductMasterListModel {
   }
 }
 
-class Info {
+class productListInfo {
   dynamic itemCode;
   dynamic itemID;
   dynamic itemName;
@@ -72,7 +83,7 @@ class Info {
   Group? group;
   Make? make;
 
-  Info(
+  productListInfo(
       {this.itemCode,
       this.itemID,
       this.itemName,
@@ -117,7 +128,7 @@ class Info {
       this.group,
       this.make});
 
-  Info.fromJson(Map<String, dynamic> json) {
+  productListInfo.fromJson(Map<String, dynamic> json) {
     itemCode = json['ItemCode'];
     itemID = json['ItemID'];
     itemName = json['ItemName'];

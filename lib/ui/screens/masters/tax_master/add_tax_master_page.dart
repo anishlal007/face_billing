@@ -1,6 +1,7 @@
 import 'package:facebilling/data/models/unit/add_unit_request.dart';
 import 'package:facebilling/data/models/unit/unit_response.dart';
 import 'package:facebilling/data/services/unit_service.dart';
+import 'package:facebilling/ui/screens/masters/item_group/AddGroupScreen.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../core/const.dart';
@@ -9,6 +10,7 @@ import '../../../../data/models/unit/add_location_master_req.dart';
 import '../../../../data/models/unit/add_tax_unit_model.dart';
 import '../../../../data/services/location_master_service.dart';
 import '../../../../data/services/tax_master_service.dart';
+import '../../../widgets/AutoSearchDropdown.dart';
 import '../../../widgets/custom_switch.dart';
 import '../../../widgets/custom_text_field.dart';
 import '../../../widgets/gradient_button.dart';
@@ -149,43 +151,43 @@ class _AddTaxMasterPageState extends State<AddTaxMasterPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            SearchDropdownField<Info>(
-              hintText: "TAX Name",
-              prefixIcon: Icons.search,
-              fetchItems: (q) async {
-                final response = await _service.getTaxMasterSearch(q);
-                if (response.isSuccess) {
-                  return (response.data?.info ?? []).whereType<Info>().toList();
-                }
-                return [];
-              },
-              displayString: (unit) => unit.taxName ?? "",
-              onSelected: (country) {
-                if (country != null) {
-                  setState(() {
-                    _unitIdController.text = country.taxCode.toString() ?? "";
-                    _unitNameController.text = country.taxName ?? "";
-                    _taxPercentageController.text =
-                        country.taxPercentage?.toString() ?? "";
-                    _activeStatus = (country.activeStatus ?? 1) == 1;
-                    _isEditMode = true;
-                  });
+            // SearchDropdownField<Info>(
+            //   hintText: "TAX Name",
+            //   prefixIcon: Icons.search,
+            //   fetchItems: (q) async {
+            //     final response = await _service.getTaxMasterSearch(q);
+            //     if (response.isSuccess) {
+            //       return (response.data?.info ?? []).whereType<Info>().toList();
+            //     }
+            //     return [];
+            //   },
+            //   displayString: (unit) => unit.taxName ?? "",
+            //   onSelected: (country) {
+            //     if (country != null) {
+            //       setState(() {
+            //         _unitIdController.text = country.taxCode.toString() ?? "";
+            //         _unitNameController.text = country.taxName ?? "";
+            //         _taxPercentageController.text =
+            //             country.taxPercentage?.toString() ?? "";
+            //         _activeStatus = (country.activeStatus ?? 1) == 1;
+            //         _isEditMode = true;
+            //       });
 
-                  // ✅ Switch form into "Update mode"
-                  widget.onSaved(false);
-                }
-              },
-              onSubmitted: (typedValue) {
-                setState(() {
-                  _unitIdController.clear();
-                  _unitNameController.text = typedValue;
-                  _taxPercentageController.text = _taxPercentageController.text;
-                  _activeStatus = true;
-                  _isEditMode = false;
-                });
-                widget.onSaved(false);
-              },
-            ),
+            //       // ✅ Switch form into "Update mode"
+            //       widget.onSaved(false);
+            //     }
+            //   },
+            //   onSubmitted: (typedValue) {
+            //     setState(() {
+            //       _unitIdController.clear();
+            //       _unitNameController.text = typedValue;
+            //       _taxPercentageController.text = _taxPercentageController.text;
+            //       _activeStatus = true;
+            //       _isEditMode = false;
+            //     });
+            //     widget.onSaved(false);
+            //   },
+            // ),
 
             const SizedBox(height: 26),
             // SwitchListTile(
@@ -202,7 +204,45 @@ class _AddTaxMasterPageState extends State<AddTaxMasterPage> {
                 });
               },
             ),
+            AutoSuggestion<Info>(
+              controller: _unitNameController,
+              labelText: 'Item Name',
+              hintText: 'Search by Item Name or Barcode No',
 
+              suggestionsCallback: (pattern) async {
+                final apiResponse = await _service.getTaxMasterSearch(pattern);
+
+                if (apiResponse.error != null) {
+                  return [];
+                }
+
+                return apiResponse.data?.info ?? [];
+              },
+
+              // 🎯 FIX: Use Product-specific fields
+              itemBuilder: (context, suggestion) {
+                // Assuming suggestion is now ProductMasterInfo
+                return ListTile(
+                  title: Text(suggestion.taxName ?? ""), // Use item name
+                  subtitle:
+                      Text('Code: ${suggestion.taxCode}'), // Use item code
+                );
+              },
+
+              onSuggestionSelected: (tax) {
+                _unitIdController.text = tax.taxCode.toString() ?? "";
+                _unitNameController.text = tax.taxName ?? "";
+                _taxPercentageController.text =
+                    tax.taxPercentage?.toString() ?? "";
+                _activeStatus = (tax.activeStatus ?? 1) == 1;
+                _isEditMode = true;
+              },
+
+              // 🎯 FIX: Use Product-specific text extractor
+              getDisplayString: (product) => product.taxName ?? "",
+
+              // addTooltip: "Add Item Group",
+            ),
             const SizedBox(height: 16),
             // CustomTextField(
             //   title: "TAX Name",

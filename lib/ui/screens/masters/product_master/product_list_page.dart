@@ -20,7 +20,7 @@ import '../../../widgets/list_card_widget.dart';
 
 class ProductListPage extends StatefulWidget {
   final bool refreshList;
-  final Function(Info) onEdit;
+  final Function(productListInfo) onEdit;
   const ProductListPage({
     super.key,
     required this.refreshList,

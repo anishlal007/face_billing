@@ -132,7 +132,7 @@ class AutoSuggestion<T> extends StatefulWidget {
   const AutoSuggestion({
     super.key,
     required this.controller,
-     this.items,
+    this.items,
     required this.suggestionsCallback,
     required this.itemBuilder,
     required this.onSuggestionSelected,
@@ -152,9 +152,9 @@ class AutoSuggestion<T> extends StatefulWidget {
 
 class _AutoSuggestionState<T> extends State<AutoSuggestion<T>> {
   // ⭐️ 1. Define the function to open the popup/dialog
-  
+
   T? _selectedItem;
- void _openAddPopup() {
+  void _openAddPopup() {
     if (widget.addPage != null) {
       showDialog(
         context: context,
@@ -189,7 +189,7 @@ class _AutoSuggestionState<T> extends State<AutoSuggestion<T>> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.only(bottom: 8.0),
+          padding: const EdgeInsets.only(bottom: 0.0),
           child: Text(
             widget.labelText,
             style: const TextStyle(fontSize: 12, color: Colors.black),

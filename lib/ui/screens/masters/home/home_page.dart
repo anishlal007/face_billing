@@ -222,9 +222,7 @@ class _HomePageState extends State<HomePage> {
           MenuItemData(
             title: "Purchase Entry Report",
             icon: Icons.account_balance,
-            page: const DemoPage(
-              title: "Purchase Entry Report",
-            ),
+            page: ReportMasterPage(),
           ),
           MenuItemData(
             title: "Purchase Return Report",

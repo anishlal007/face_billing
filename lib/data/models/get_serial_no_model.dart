@@ -26,13 +26,22 @@ class Info {
   String? productNextId;
   String? purchaseNextId;
   String? salesNextId;
+  String? custId;
+  String? supId;
 
-  Info({this.productNextId, this.purchaseNextId, this.salesNextId});
+  Info(
+      {this.productNextId,
+      this.purchaseNextId,
+      this.salesNextId,
+      this.custId,
+      this.supId});
 
   Info.fromJson(Map<String, dynamic> json) {
     productNextId = json['product_next_id'];
     purchaseNextId = json['purchase_next_id'];
     salesNextId = json['sales_next_id'];
+    custId = json['customer_next_id'];
+    supId = json['supplier_next_id'];
   }
 
   Map<String, dynamic> toJson() {
@@ -40,6 +49,8 @@ class Info {
     data['product_next_id'] = this.productNextId;
     data['purchase_next_id'] = this.purchaseNextId;
     data['sales_next_id'] = this.salesNextId;
+    data['customer_next_id'] = this.custId;
+    data['supplier_next_id'] = this.supId;
     return data;
   }
 }

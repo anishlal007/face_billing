@@ -10,5 +10,6 @@ const Color black = Color.fromARGB(255, 0, 0, 0);
 const Color white = Color.fromARGB(255, 255, 255, 255);
 const Color red = Color.fromARGB(255, 183, 3, 3);
 const Color lightgray = Color.fromARGB(255, 250, 251, 254);
+const Color blueAccent = Color.fromARGB(255, 6, 71, 132);
 
 class Colors {}

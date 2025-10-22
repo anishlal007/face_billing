@@ -1,17 +1,13 @@
+import 'package:facebilling/data/models/product/product_master_list_model.dart';
 import 'package:flutter/material.dart';
 
 import '../../../core/colors.dart';
 
-import '../../../../data/models/product/product_master_list_model.dart';
-
-
-
 import '../masters/product_master/product_master_list_screen.dart';
-import '../masters/sales_master/sales_list_page.dart';
 
 class ProductListMasterMaster extends StatefulWidget {
   final bool refreshList;
-  final Function(Info) onEdit;
+  final Function(productListInfo) onEdit;
   const ProductListMasterMaster({
     super.key,
     required this.refreshList,
@@ -24,7 +20,7 @@ class ProductListMasterMaster extends StatefulWidget {
 }
 
 class _ProductListMasterMasterState extends State<ProductListMasterMaster> {
-   Info? editingUnit;
+  productListInfo? editingUnit;
   bool refreshList = false;
 
   void _onSaved(bool success) {

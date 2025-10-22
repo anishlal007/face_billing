@@ -85,33 +85,41 @@ class _GstDataTableWidgetState extends State<GstDataTableWidget> {
             DataColumn(
                 label: Text(
               'GST%',
-              style: TextStyle(color: white),
+              style: const TextStyle(fontSize: 12.0, height: 2.0, color: white),
             )),
             DataColumn(
                 label: Text(
               'GST Amount',
-              style: TextStyle(color: white),
+              style: const TextStyle(fontSize: 12.0, height: 2.0, color: white),
             )),
             DataColumn(
                 label: Text(
               'Total Amount',
-              style: TextStyle(color: white),
+              style: const TextStyle(fontSize: 12.0, height: 2.0, color: white),
             )),
           ],
           rows: List.generate(gstRates.length, (index) {
             return DataRow(cells: [
-              DataCell(Text("${gstRates[index]}%")),
+              DataCell(Text(
+                "${gstRates[index]}%",
+                style:
+                    const TextStyle(fontSize: 12.0, height: 2.0, color: black),
+              )),
               DataCell(
                 SizedBox(
                   width: 100,
                   child: TextField(
+                    style: const TextStyle(
+                        fontSize: 12.0, height: 2.0, color: black),
                     controller: _gstAmountControllers[index],
                     readOnly: true,
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(2),
+                      ),
                       isDense: true,
-                      contentPadding:
-                          EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 8),
                     ),
                   ),
                 ),
@@ -120,10 +128,14 @@ class _GstDataTableWidgetState extends State<GstDataTableWidget> {
                 SizedBox(
                   width: 100,
                   child: TextField(
+                    style: const TextStyle(
+                        fontSize: 12.0, height: 2.0, color: black),
                     controller: _totalAmountControllers[index],
                     readOnly: true,
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(2),
+                      ),
                       isDense: true,
                       contentPadding:
                           EdgeInsets.symmetric(horizontal: 8, vertical: 8),

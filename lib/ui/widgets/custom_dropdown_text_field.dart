@@ -17,6 +17,7 @@ class CustomDropdownField<T> extends StatefulWidget {
   final Widget? addPage;
   final String addTooltip;
   final TextEditingController? controller;
+  final bool? ismandatory;
 
   const CustomDropdownField({
     super.key,
@@ -34,6 +35,8 @@ class CustomDropdownField<T> extends StatefulWidget {
     this.addPage,
     this.addTooltip = "Add new",
     this.controller,
+    required,
+    this.ismandatory = false,
   });
 
   @override
@@ -146,12 +149,25 @@ class _CustomDropdownFieldState<T> extends State<CustomDropdownField<T>> {
         if (widget.title != null)
           Padding(
             padding: const EdgeInsets.only(bottom: 0),
-            child: Text(
-              widget.title!,
-              style: const TextStyle(
-                fontSize: 12,
-                color: black,
-              ),
+            child: Row(
+              children: [
+                Text(
+                  widget.title!,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: black,
+                  ),
+                ),
+                widget.ismandatory == true
+                    ? const Text(
+                        " *",
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: red,
+                        ),
+                      )
+                    : const SizedBox(),
+              ],
             ),
           ),
         SizedBox(
@@ -169,7 +185,8 @@ class _CustomDropdownFieldState<T> extends State<CustomDropdownField<T>> {
                         ? Icon(widget.prefixIcon, size: 16)
                         : null,
                     hintText: widget.hintText ?? "Select",
-                    hintStyle: const TextStyle(fontSize: 12.0, color: Color.fromARGB(136, 0, 0, 0)),
+                    hintStyle: const TextStyle(
+                        fontSize: 12.0, color: Color.fromARGB(136, 0, 0, 0)),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(2),
                     ),
@@ -201,16 +218,20 @@ class _CustomDropdownFieldState<T> extends State<CustomDropdownField<T>> {
 
               // 🔹 Add button (optional)
               // if (widget.addPage != null)
-              
-               widget.addPage != null ? IconButton(
-                  tooltip: widget.addTooltip,
-                  icon: const Icon(
-                    Icons.add_circle,
-                    color: Color(0xFF0B2046),
-                    size: 20,
-                  ),
-                  onPressed: _openPopup,
-                ) : SizedBox(width: 31,)  
+
+              widget.addPage != null
+                  ? IconButton(
+                      tooltip: widget.addTooltip,
+                      icon: const Icon(
+                        Icons.add_circle,
+                        color: Color(0xFF0B2046),
+                        size: 20,
+                      ),
+                      onPressed: _openPopup,
+                    )
+                  : SizedBox(
+                      width: 31,
+                    )
             ],
           ),
         ),

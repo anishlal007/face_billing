@@ -1457,8 +1457,15 @@ class Units {
   String? unitId;
   String? unitName;
   dynamic activStatus;
+  String? parentUnitCode;
 
-  Units({this.unitCode, this.unitId, this.unitName, this.activStatus});
+  Units({
+    this.unitCode,
+    this.unitId,
+    this.unitName,
+    this.activStatus,
+    this.parentUnitCode,
+  });
 
   Units.fromJson(Map<String, dynamic> json) {
     unitCode = json['UnitCode'];

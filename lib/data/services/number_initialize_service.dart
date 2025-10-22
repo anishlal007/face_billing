@@ -1,10 +1,11 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import 'package:facebilling/data/models/number_initialize/NumberInitializationResponse.dart';
 import 'package:facebilling/data/models/number_initialize/add_number_initlize_model.dart';
 
 import '../api/api_client.dart';
-import '../api/api_response.dart'; 
+import '../api/api_response.dart';
 import '../models/area_master/add_area_master_model.dart';
 import '../models/area_master/area_master_list_model.dart';
 import '../models/country/country_response.dart';
@@ -14,12 +15,13 @@ import '../models/user_master/user_master_list_model.dart';
 
 class NumberInitializeService {
   final Dio _dio = ApiClient.dio;
-  
 
-  Future<ApiResponse<bool>> addNumberInitialize(AddNumberInitializeModel request) async {
+  Future<ApiResponse<bool>> addNumberInitialize(
+      AddNumberInitializeModel request) async {
     try {
-      final response = await _dio.post("numberinitialize", data: request.toJson());
-print("Sending JSON: ${jsonEncode(request.toJson())}");
+      final response =
+          await _dio.post("numberinitialize", data: request.toJson());
+      print("Sending JSON: ${jsonEncode(request.toJson())}");
       if (response.statusCode == 200 || response.statusCode == 201) {
         return ApiResponse(data: true);
       } else {
@@ -30,13 +32,13 @@ print("Sending JSON: ${jsonEncode(request.toJson())}");
     }
   }
 
-  Future<ApiResponse<AreaMasterListModel>> getSAreaMaster() async {
+  Future<ApiResponse<NumberSerilizationResponse>> getNumberInitialize() async {
     try {
-      final response = await _dio.get("areamaster");
+      final response = await _dio.get("numberinitialize");
 
       final responseData = response.data;
-
-      final countryResponse = AreaMasterListModel.fromJson(responseData);
+      print(response.data.toString());
+      final countryResponse = NumberSerilizationResponse.fromJson(responseData);
 
       return ApiResponse(data: countryResponse);
     } catch (e) {
@@ -69,9 +71,11 @@ print("Sending JSON: ${jsonEncode(request.toJson())}");
   }
 
   /// EDIT Country (PUT) -> /countrymaster
-  Future<ApiResponse<bool>> updateNumberiitialize(dynamic id, AddNumberInitializeModel request) async {
+  Future<ApiResponse<bool>> updateNumberiitialize(
+      dynamic id, AddNumberInitializeModel request) async {
     try {
-      final response = await _dio.put("areamaster/$id", data: request.toJson());
+      final response =
+          await _dio.put("numberinitialize/$id", data: request.toJson());
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         return ApiResponse(data: true);

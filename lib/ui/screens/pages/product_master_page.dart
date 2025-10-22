@@ -22,7 +22,7 @@ class ProductMasterPage extends StatefulWidget {
 class _ProductMasterPageState extends State<ProductMasterPage> {
   final ProductService _service = ProductService();
   final GetSerialNoServices _getSerialservice = GetSerialNoServices();
-  Info? editingUnit;
+  productListInfo? editingUnit;
   bool refreshList = false;
   bool isLoading = false;
   String message = '';
@@ -36,7 +36,7 @@ class _ProductMasterPageState extends State<ProductMasterPage> {
     }
   }
 
-  void _showAddEditBottomSheet(Info? unit) {
+  void _showAddEditBottomSheet(productListInfo? unit) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true, // ensures full-screen height
@@ -105,8 +105,8 @@ class _ProductMasterPageState extends State<ProductMasterPage> {
               child: ProductListMasterMaster(
                 refreshList: refreshList,
                 onEdit: (country) {
-                  _showAddEditBottomSheet(
-                      country as Info?); // ✅ open bottom sheet for edit
+                  _showAddEditBottomSheet(country
+                      as productListInfo?); // ✅ open bottom sheet for edit
                 },
               ),
             )

@@ -150,9 +150,11 @@ class _SearchDropdownFieldState<T> extends State<SearchDropdownField<T>> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(widget.hintText, style: const TextStyle(fontSize: 12, color: Colors.black)),
+          Text(widget.hintText,
+              style: const TextStyle(fontSize: 12, color: Colors.black)),
           const SizedBox(height: 4),
           TextField(
+            textCapitalization: TextCapitalization.characters,
             controller: _controller,
             focusNode: _focusNode,
             style: const TextStyle(fontSize: 14),
@@ -169,8 +171,10 @@ class _SearchDropdownFieldState<T> extends State<SearchDropdownField<T>> {
                       ),
                     )
                   : null,
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(4)),
-              contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+              border:
+                  OutlineInputBorder(borderRadius: BorderRadius.circular(4)),
+              contentPadding:
+                  const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
             ),
             onChanged: (value) => _fetchSuggestions(value),
             onSubmitted: (value) {

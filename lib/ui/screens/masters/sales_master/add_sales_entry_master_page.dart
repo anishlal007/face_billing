@@ -55,7 +55,7 @@ class _AddSalesEntryMasterPageState extends State<AddSalesEntryMasterPage> {
   final GetAllMasterService _getAllMasterService = GetAllMasterService();
   final ProductService _productService = ProductService();
   final GetSerialNoServices _getSerialservice = GetSerialNoServices();
-  product.Info? editingUnit;
+  product.productListInfo? editingUnit;
   bool refreshList = false;
   bool _activeStatus = true;
   bool _loading = false;
@@ -72,7 +72,7 @@ class _AddSalesEntryMasterPageState extends State<AddSalesEntryMasterPage> {
   int? selectedGstType;
   serialno.GetSerialNoModel? serialNo;
   bool _isAltColor = false;
-    final FocusNode _focusNode = FocusNode();
+  final FocusNode _focusNode = FocusNode();
   void _handleKey(RawKeyEvent event) {
     // Detect "Ctrl + 1" press (works for both Web & Desktop)
     if (event.isControlPressed &&
@@ -83,32 +83,32 @@ class _AddSalesEntryMasterPageState extends State<AddSalesEntryMasterPage> {
     }
   }
 
-void _calculateTotalSalesRate() {
-  double total = 0.0;
-  for (var item in items) {
-    double rate = 0.0;
+  void _calculateTotalSalesRate() {
+    double total = 0.0;
+    for (var item in items) {
+      double rate = 0.0;
 
-    if (item.salesRate != null) {
-      // Safely parse string or number
-      if (item.salesRate is String) {
-        rate = double.tryParse(item.salesRate) ?? 0.0;
-      } else if (item.salesRate is num) {
-        rate = (item.salesRate as num).toDouble();
+      if (item.salesRate != null) {
+        // Safely parse string or number
+        if (item.salesRate is String) {
+          rate = double.tryParse(item.salesRate) ?? 0.0;
+        } else if (item.salesRate is num) {
+          rate = (item.salesRate as num).toDouble();
+        }
       }
+
+      total += rate;
     }
 
-    total += rate;
+    setState(() {
+      _totalSalesRate = total;
+      print("_totalSalesRate: $_totalSalesRate");
+
+      // Suppose GST = 18% and Sales Rate = 1000
+      _setGSTValues("18%", _totalSalesRate);
+      _calculateInvoiceFromTotalSalesRate(_totalSalesRate);
+    });
   }
-
-  setState(() {
-    _totalSalesRate = total;
-    print("_totalSalesRate: $_totalSalesRate");
-
-    // Suppose GST = 18% and Sales Rate = 1000
-    _setGSTValues("18%", _totalSalesRate);
-    _calculateInvoiceFromTotalSalesRate(_totalSalesRate);
-  });
-}
 
   void _setGSTValues(String gstRate, double totalSalesRate) {
     final gstPercent = double.tryParse(gstRate.replaceAll('%', '')) ?? 0;
@@ -178,7 +178,7 @@ void _calculateTotalSalesRate() {
   master.GetAllMasterListModel? getAllMasterListModel;
   product.ProductMasterListModel? productMasterListModel;
   AddPurchaseMasterModel? addPurchaseMasterModel;
-  List<product.Info> _searchResults = [];
+  List<product.productListInfo> _searchResults = [];
   bool _showSubTable = false;
   int? _activeRowIndex; // to know which row we are editing
 
@@ -211,18 +211,20 @@ void _calculateTotalSalesRate() {
 
   // final TextEditingController itemCodeController = TextEditingController();
   // final TextEditingController itemNameController = TextEditingController();
-///this screen 
-  final TextEditingController _salesOrderDateController = TextEditingController();
-  final TextEditingController _basedOnEntryDateController = TextEditingController();
-  final TextEditingController _basedOnEntryNoController = TextEditingController();
-    final TextEditingController taxTypeController = TextEditingController();
-  
-///this screen focus node
-/// 
- final FocusNode _salesOrderDateFocus = FocusNode();
- final FocusNode _basedOnEntryDateFocus = FocusNode();
- final FocusNode _basedOnEntryNoFocus = FocusNode();
+  ///this screen
+  final TextEditingController _salesOrderDateController =
+      TextEditingController();
+  final TextEditingController _basedOnEntryDateController =
+      TextEditingController();
+  final TextEditingController _basedOnEntryNoController =
+      TextEditingController();
+  final TextEditingController taxTypeController = TextEditingController();
 
+  ///this screen focus node
+  ///
+  final FocusNode _salesOrderDateFocus = FocusNode();
+  final FocusNode _basedOnEntryDateFocus = FocusNode();
+  final FocusNode _basedOnEntryNoFocus = FocusNode();
 
   final TextEditingController batchNoController = TextEditingController();
   final TextEditingController expiryController = TextEditingController();
@@ -301,7 +303,7 @@ void _calculateTotalSalesRate() {
     Future.delayed(Duration(milliseconds: 300), () {
       FocusScope.of(context).requestFocus(_spurchaseNoFocus);
     });
-     WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       _focusNode.requestFocus();
     });
     _loadList();
@@ -388,7 +390,7 @@ void _calculateTotalSalesRate() {
         _getAllLoading = false;
         error = null;
         print("error");
-print(error);
+        print(error);
       });
     } else {
       setState(() {
@@ -404,14 +406,14 @@ print(error);
         _getAllLoading = false;
         error = null;
         print("error");
-print(error);
+        print(error);
       });
     } else {
       setState(() {
         error = response.error;
         _getAllLoading = false;
         print("error");
-print(error);
+        print(error);
       });
     }
     final serialNoResponse = await _getSerialservice.getSerialNo();
@@ -422,14 +424,14 @@ print(error);
         _getAllLoading = false;
         error = null;
         print("error");
-print(error);
+        print(error);
       });
     } else {
       setState(() {
         error = serialNoResponse.error;
         _getAllLoading = false;
         print("error");
-print(error);
+        print(error);
       });
     }
   }
@@ -490,8 +492,8 @@ print(error);
     super.dispose();
   }
 
-  List<product.Info> items = [
-    product.Info(
+  List<product.productListInfo> items = [
+    product.productListInfo(
       itemCode: null, // Item Code
       itemName: '', // Item Name
       batchNoRequired: 0, // Batch Number
@@ -517,7 +519,7 @@ print(error);
     final response = await _productService.getProductServiceSearch("");
     if (response.isSuccess) {
       items = (response.data?.info ?? [])
-          .map((e) => product.Info(
+          .map((e) => product.productListInfo(
                 itemCode: e.itemCode!,
                 itemName: e.itemName ?? '',
                 // barcode: e.barcode ?? '',
@@ -548,57 +550,57 @@ print(error);
       // String? userPassword;
       // int? userType;
       // int? activeStatus;
-    
-final request =detail. AddSalesReqModel(
-   salesNo: salesNoController.text.trim(),
-  salesDate: _salesDateController.text.trim(),
-  salesOrderNo:orderNoController.text.trim(),
-  salesOrderDate: _salesOrderDateController.text.trim(),
-  receiptType: 1,
-  custCode: 1,
-  salesTaxableAmount: 2000,
-  salesGstAmount: _gstValueController.text.trim(),
-  sGSTAmount: int.tryParse(_sgstAmtController.text) ?? 0,
-  cGSTAmount: int.tryParse(_cgstAmtController.text) ?? 0,
-  iGSTAmount: int.tryParse(_igstAmtController.text) ?? 0,
-  salesNetAmount: int.tryParse(_netAmountController.text)??0,
-  subTotalBeforeDiscount: 2000,
-  salesEntryType: 1,
-  salesEntryMode: 1,
-  createdUserCode: int.tryParse(userId.value!),
-   createdDateTime: DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now()),
-  computerName: "computerName",
-  finYearCode: "FY25",
-  coCode: 1,
-  salesAccCode: 1,
-  latitude: "11.001",
-  longtitude: "77.001",
-  basedOnEntry: 1,
-  basedOnEntryNo: "INV-1001",
-  basedOnEntryDate: "2025-10-09",
-  cashAmount: 2240,
-  creditAmount: 0,
-  chequeAmount: 0,
-  cardAmount: 0,
-  freeAmount: 0,
-  walletAmount: 0,
-  roundOffAmount: 3.33,
-  receivedAmount: 3.33,
-  advanceReceivedAmount: 0,
-  advanceReceiptNo: "1",
-  updatedUserCode: "1",
-  salesDiscoutPercentage: 0,
-  cashDiscountPercentage: 0,
-  cashDiscountValue: 2,
-  salesDiscountValue: 5,
-  frieghtChargesAddWithTotal: 0,
-  frieghtChargesAddWithoutTotal: 0,
-  taxType: "1",
-  details: itemsList,
 
-  // List of item details
+      final request = detail.AddSalesReqModel(
+        salesNo: salesNoController.text.trim(),
+        salesDate: _salesDateController.text.trim(),
+        salesOrderNo: orderNoController.text.trim(),
+        salesOrderDate: _salesOrderDateController.text.trim(),
+        receiptType: 1,
+        custCode: 1,
+        salesTaxableAmount: 2000,
+        salesGstAmount: _gstValueController.text.trim(),
+        sGSTAmount: int.tryParse(_sgstAmtController.text) ?? 0,
+        cGSTAmount: int.tryParse(_cgstAmtController.text) ?? 0,
+        iGSTAmount: int.tryParse(_igstAmtController.text) ?? 0,
+        salesNetAmount: int.tryParse(_netAmountController.text) ?? 0,
+        subTotalBeforeDiscount: 2000,
+        salesEntryType: 1,
+        salesEntryMode: 1,
+        createdUserCode: int.tryParse(userId.value!),
+        createdDateTime:
+            DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now()),
+        computerName: "computerName",
+        finYearCode: "FY25",
+        coCode: 1,
+        salesAccCode: 1,
+        latitude: "11.001",
+        longtitude: "77.001",
+        basedOnEntry: 1,
+        basedOnEntryNo: "INV-1001",
+        basedOnEntryDate: "2025-10-09",
+        cashAmount: 2240,
+        creditAmount: 0,
+        chequeAmount: 0,
+        cardAmount: 0,
+        freeAmount: 0,
+        walletAmount: 0,
+        roundOffAmount: 3.33,
+        receivedAmount: 3.33,
+        advanceReceivedAmount: 0,
+        advanceReceiptNo: "1",
+        updatedUserCode: "1",
+        salesDiscoutPercentage: 0,
+        cashDiscountPercentage: 0,
+        cashDiscountValue: 2,
+        salesDiscountValue: 5,
+        frieghtChargesAddWithTotal: 0,
+        frieghtChargesAddWithoutTotal: 0,
+        taxType: "1",
+        details: itemsList,
 
-);
+        // List of item details
+      );
 
 // Print the full request as JSON
       print("Add sales entry request:");
@@ -656,7 +658,7 @@ final request =detail. AddSalesReqModel(
         purchaseAccCode: 0,
 
         // Items list
-      //  items: itemsList, // List<Items> you've populated earlier
+        //  items: itemsList, // List<Items> you've populated earlier
       );
       print("updated sales entry");
       print(updated);
@@ -693,20 +695,22 @@ final request =detail. AddSalesReqModel(
     current.unfocus();
     FocusScope.of(context).requestFocus(next);
   }
-Future<void> _pickDate(TextEditingController controller) async {
-  DateTime? pickedDate = await showDatePicker(
-    context: context,
-    initialDate: DateTime.now(), // default date
-    firstDate: DateTime(2000),   // earliest date allowed
-    lastDate: DateTime(2100),    // latest date allowed
-  );
 
-  if (pickedDate != null) {
-    setState(() {
-      controller.text = DateFormat('yyyy-MM-dd').format(pickedDate);
-    });
+  Future<void> _pickDate(TextEditingController controller) async {
+    DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(), // default date
+      firstDate: DateTime(2000), // earliest date allowed
+      lastDate: DateTime(2100), // latest date allowed
+    );
+
+    if (pickedDate != null) {
+      setState(() {
+        controller.text = DateFormat('yyyy-MM-dd').format(pickedDate);
+      });
+    }
   }
-}
+
   @override
   Widget build(BuildContext context) {
     if (_getAllLoading) return const Center(child: CircularProgressIndicator());
@@ -716,11 +720,11 @@ Future<void> _pickDate(TextEditingController controller) async {
     final isEdit = widget.unitInfo != null;
 
     return RawKeyboardListener(
-       onKey: _handleKey,
+      onKey: _handleKey,
       focusNode: _focusNode,
       child: Scaffold(
           backgroundColor: _isAltColor ? gray : white,
-         // backgroundColor: white,
+          // backgroundColor: white,
           body: SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.all(16.0),
@@ -741,7 +745,7 @@ Future<void> _pickDate(TextEditingController controller) async {
                         width: constraints.maxWidth / columns - 20,
                         child: SearchableDropdown<master.Customers>(
                           hintText: "Customer Name",
-      
+
                           items: getAllMasterListModel!.info!.customers!,
                           itemLabel: (group) => group.custName ?? "",
                           onChanged: (group) {
@@ -818,7 +822,7 @@ Future<void> _pickDate(TextEditingController controller) async {
                       SizedBox(
                         width: constraints.maxWidth / columns - 20,
                         child: GestureDetector(
-                          onTap: (){
+                          onTap: () {
                             _pickDate(_salesDateController);
                           },
                           child: CustomTextField(
@@ -834,22 +838,22 @@ Future<void> _pickDate(TextEditingController controller) async {
                         ),
                       ),
                       SizedBox(
-                      width: constraints.maxWidth / columns - 20,
-                      child: CustomTextField(
-                        title: "Tax Type",
-                        controller: taxTypeController,
-                        // prefixIcon: Icons.person,
-                        isEdit: true,
-                        focusNode: _invoiceDateFocus,
-                        textInputAction: TextInputAction.done,
-                        onEditingComplete: () => _fieldFocusChange(
-                            context, _invoiceDateFocus, _gstTypeFocus),
+                        width: constraints.maxWidth / columns - 20,
+                        child: CustomTextField(
+                          title: "Tax Type",
+                          controller: taxTypeController,
+                          // prefixIcon: Icons.person,
+                          isEdit: true,
+                          focusNode: _invoiceDateFocus,
+                          textInputAction: TextInputAction.done,
+                          onEditingComplete: () => _fieldFocusChange(
+                              context, _invoiceDateFocus, _gstTypeFocus),
+                        ),
                       ),
-                    ),
                       SizedBox(
                         width: constraints.maxWidth / columns - 20,
                         child: GestureDetector(
-                          onTap: (){
+                          onTap: () {
                             _pickDate(_salesOrderDateController);
                           },
                           child: CustomTextField(
@@ -859,15 +863,15 @@ Future<void> _pickDate(TextEditingController controller) async {
                             isEdit: true,
                             focusNode: _salesOrderDateFocus,
                             textInputAction: TextInputAction.done,
-                            onEditingComplete: () => _fieldFocusChange(
-                                context, _salesDateFocus, _basedOnEntryDateFocus),
+                            onEditingComplete: () => _fieldFocusChange(context,
+                                _salesDateFocus, _basedOnEntryDateFocus),
                           ),
                         ),
                       ),
                       SizedBox(
                         width: constraints.maxWidth / columns - 20,
                         child: GestureDetector(
-                          onTap: (){
+                          onTap: () {
                             _pickDate(_basedOnEntryDateController);
                           },
                           child: CustomTextField(
@@ -877,8 +881,8 @@ Future<void> _pickDate(TextEditingController controller) async {
                             isEdit: true,
                             focusNode: _basedOnEntryDateFocus,
                             textInputAction: TextInputAction.done,
-                            onEditingComplete: () => _fieldFocusChange(
-                                context, _basedOnEntryDateFocus, _basedOnEntryNoFocus),
+                            onEditingComplete: () => _fieldFocusChange(context,
+                                _basedOnEntryDateFocus, _basedOnEntryNoFocus),
                           ),
                         ),
                       ),
@@ -895,23 +899,23 @@ Future<void> _pickDate(TextEditingController controller) async {
                               context, _basedOnEntryNoFocus, _salesPersonFocus),
                         ),
                       ),
-                       SizedBox(
-                      width: constraints.maxWidth / columns - 20,
-                      child: CustomDropdownField<int>(
-                        title: "Purchase Entry Type",
-                        hintText: "Select Entry Type",
-                        items: const [
-                          DropdownMenuItem(value: 0, child: Text("Opening")),
-                          DropdownMenuItem(value: 1, child: Text("Entry")),
-                          DropdownMenuItem(value: 2, child: Text("Order")),
-                        ],
-                        initialValue: selectedEntryType,
-                        onChanged: (val) {
-                          setState(() => selectedEntryType = val);
-                          print("Selected EntryType: $val");
-                        },
+                      SizedBox(
+                        width: constraints.maxWidth / columns - 20,
+                        child: CustomDropdownField<int>(
+                          title: "Purchase Entry Type",
+                          hintText: "Select Entry Type",
+                          items: const [
+                            DropdownMenuItem(value: 0, child: Text("Opening")),
+                            DropdownMenuItem(value: 1, child: Text("Entry")),
+                            DropdownMenuItem(value: 2, child: Text("Order")),
+                          ],
+                          initialValue: selectedEntryType,
+                          onChanged: (val) {
+                            setState(() => selectedEntryType = val);
+                            print("Selected EntryType: $val");
+                          },
+                        ),
                       ),
-                    ),
                       SizedBox(
                         width: constraints.maxWidth / columns - 20,
                         child: CustomTextField(
@@ -942,13 +946,14 @@ Future<void> _pickDate(TextEditingController controller) async {
                           onEditingComplete: _submit,
                         ),
                       ),
-      
+
                       // const SizedBox(height: 26),
-      
+
                       const SizedBox(
                         height: 20,
                       ),
-      ///product tabel
+
+                      ///product tabel
                       SizedBox(
                         width: double.infinity,
                         child: DataTable(
@@ -978,14 +983,14 @@ Future<void> _pickDate(TextEditingController controller) async {
                                         color: white, size: 20),
                                     onPressed: () {
                                       _showAddEditBottomSheet(editingUnit);
-      
+
                                       //_showAddProductPopup(context);
                                     },
                                   ), // NON-INTERACTIVE
                                 ],
                               ),
                             ),
-      
+
                             const DataColumn(
                                 label: Text(
                               "Batch No",
@@ -1044,7 +1049,7 @@ Future<void> _pickDate(TextEditingController controller) async {
                                 style: const TextStyle(
                                     fontSize: 12.0, height: 1.0, color: black),
                               )),
-      
+
                               // Item Code
                               DataCell(TextFormField(
                                 controller: controller.itemCodeController,
@@ -1062,7 +1067,9 @@ Future<void> _pickDate(TextEditingController controller) async {
                               DataCell(
                                 TextFormField(
                                   style: const TextStyle(
-                                      fontSize: 12.0, height: 1.0, color: black),
+                                      fontSize: 12.0,
+                                      height: 1.0,
+                                      color: black),
                                   focusNode: controller.itemNameFocus,
                                   controller: controller.itemNameController,
                                   decoration: const InputDecoration(
@@ -1071,9 +1078,10 @@ Future<void> _pickDate(TextEditingController controller) async {
                                   ),
                                   textInputAction: TextInputAction
                                       .next, // ✅ show "Next" on keyboard
-                                  onEditingComplete: () => FocusScope.of(context)
-                                      .requestFocus(controller
-                                          .batchNoFocus), // ✅ jump to batch
+                                  onEditingComplete: () =>
+                                      FocusScope.of(context).requestFocus(
+                                          controller
+                                              .batchNoFocus), // ✅ jump to batch
                                   onChanged: (val) async {
                                     if (val.isNotEmpty) {
                                       final response = await _productService
@@ -1103,7 +1111,7 @@ Future<void> _pickDate(TextEditingController controller) async {
                               //   keyboardType: TextInputType.number,
                               //   onChanged: (val) => item.itemCode = int.tryParse(val),
                               // )),
-      
+
                               // Batch No
                               DataCell(TextFormField(
                                 style: const TextStyle(
@@ -1112,13 +1120,13 @@ Future<void> _pickDate(TextEditingController controller) async {
                                 focusNode: controller.batchNoFocus,
                                 decoration: const InputDecoration(
                                     border: InputBorder.none),
-                                onChanged: (val) =>
-                                    item.batchNoRequired = int.tryParse(val) ?? 0,
+                                onChanged: (val) => item.batchNoRequired =
+                                    int.tryParse(val) ?? 0,
                                 textInputAction: TextInputAction.next,
                                 onEditingComplete: () => FocusScope.of(context)
                                     .requestFocus(controller.expiryFocus),
                               )),
-      
+
                               // Expiry
                               DataCell(TextFormField(
                                 style: const TextStyle(
@@ -1132,7 +1140,7 @@ Future<void> _pickDate(TextEditingController controller) async {
                                 onEditingComplete: () => FocusScope.of(context)
                                     .requestFocus(controller.hsnFocus),
                               )),
-      
+
                               // HSN Code
                               DataCell(TextFormField(
                                 style: const TextStyle(
@@ -1146,7 +1154,7 @@ Future<void> _pickDate(TextEditingController controller) async {
                                 onEditingComplete: () => FocusScope.of(context)
                                     .requestFocus(controller.qtyFocus),
                               )),
-      
+
                               // Qty
                               DataCell(TextFormField(
                                 style: const TextStyle(
@@ -1156,13 +1164,13 @@ Future<void> _pickDate(TextEditingController controller) async {
                                 keyboardType: TextInputType.number,
                                 decoration: const InputDecoration(
                                     border: InputBorder.none),
-                                onChanged: (val) =>
-                                    item.maximumStockQty = int.tryParse(val) ?? 0,
+                                onChanged: (val) => item.maximumStockQty =
+                                    int.tryParse(val) ?? 0,
                                 textInputAction: TextInputAction.next,
                                 onEditingComplete: () => FocusScope.of(context)
                                     .requestFocus(controller.mrpFocus),
                               )),
-      
+
                               // MRP/Rate
                               DataCell(TextFormField(
                                 style: const TextStyle(
@@ -1178,7 +1186,7 @@ Future<void> _pickDate(TextEditingController controller) async {
                                 onEditingComplete: () => FocusScope.of(context)
                                     .requestFocus(controller.salesRateFocus),
                               )),
-      
+
                               // Sales Rate
                               DataCell(TextFormField(
                                 style: const TextStyle(
@@ -1196,7 +1204,7 @@ Future<void> _pickDate(TextEditingController controller) async {
                                 onEditingComplete: () => FocusScope.of(context)
                                     .requestFocus(controller.gstFocus),
                               )),
-      
+
                               // GST %
                               DataCell(TextFormField(
                                 style: const TextStyle(
@@ -1225,7 +1233,7 @@ Future<void> _pickDate(TextEditingController controller) async {
                                 keyboardType: TextInputType.number,
                                 onChanged: (val) =>
                                     item.gstPercentage = int.tryParse(val) ?? 0,
-      
+
                                 // 🔹 Jump to next row's itemCode when Enter pressed
                                 onEditingComplete: () {
                                   final currentIndex =
@@ -1233,7 +1241,8 @@ Future<void> _pickDate(TextEditingController controller) async {
                                   if (currentIndex < controllers.length - 1) {
                                     // go to next row's itemCode
                                     FocusScope.of(context).requestFocus(
-                                      controllers[currentIndex + 1].itemCodeFocus,
+                                      controllers[currentIndex + 1]
+                                          .itemCodeFocus,
                                     );
                                   } else {
                                     // last row → just unfocus
@@ -1241,7 +1250,7 @@ Future<void> _pickDate(TextEditingController controller) async {
                                   }
                                 },
                               )),
-      
+
                               // Delete
                               DataCell(
                                 controller.itemNameController.text.isNotEmpty
@@ -1258,7 +1267,7 @@ Future<void> _pickDate(TextEditingController controller) async {
                                               print("Edit row $index");
                                             },
                                           ),
-      
+
                                           // ✅ Delete icon
                                           IconButton(
                                             icon: const Icon(Icons.delete,
@@ -1271,7 +1280,8 @@ Future<void> _pickDate(TextEditingController controller) async {
                                                   controllers.removeAt(index);
                                                 } else {
                                                   // ✅ If it's the last row, just reset it instead of deleting
-                                                  items[0] = product.Info();
+                                                  items[0] =
+                                                      product.productListInfo();
                                                   controllers[0] =
                                                       ItemRowControllers();
                                                 }
@@ -1280,13 +1290,14 @@ Future<void> _pickDate(TextEditingController controller) async {
                                           ),
                                         ],
                                       )
-                                    : const SizedBox.shrink(), // nothing if empty
+                                    : const SizedBox
+                                        .shrink(), // nothing if empty
                               ),
                             ]);
                           }),
                         ),
                       ),
-      
+
                       const SizedBox(
                         height: 0,
                       ),
@@ -1370,11 +1381,11 @@ Future<void> _pickDate(TextEditingController controller) async {
                                           .asMap()
                                           .entries
                                           .map((entry) {
-                                        final index =
-                                            entry.key; // <-- gives you the index
+                                        final index = entry
+                                            .key; // <-- gives you the index
                                         final p = entry
                                             .value; // <-- this is your Info object
-      
+
                                         return DataRow(
                                           onSelectChanged: (_) {
                                             setState(() {
@@ -1382,10 +1393,11 @@ Future<void> _pickDate(TextEditingController controller) async {
                                                 // final p = _searchResults[_activeRowIndex!];
                                                 final item =
                                                     items[_activeRowIndex!];
-                                                final controller =
-                                                    controllers[_activeRowIndex!];
+                                                final controller = controllers[
+                                                    _activeRowIndex!];
                                                 item.itemID = p.itemID;
-                                                item.itemName = p.itemName ?? '';
+                                                item.itemName =
+                                                    p.itemName ?? '';
                                                 item.batchNoRequired =
                                                     p.batchNoRequired ?? 0;
                                                 item.expiryDateFormat =
@@ -1394,21 +1406,24 @@ Future<void> _pickDate(TextEditingController controller) async {
                                                 item.maximumStockQty =
                                                     p.maximumStockQty ?? 0;
                                                 item.mRPRate = p.mRPRate ?? 0;
-                                                item.salesRate = p.salesRate ?? 0;
+                                                item.salesRate =
+                                                    p.salesRate ?? 0;
                                                 item.gstPercentage =
                                                     p.gstPercentage ?? 0;
-      
+
                                                 // Update controllers
-                                                controller
-                                                        .itemCodeController.text =
-                                                    item.itemID?.toString() ?? '';
+                                                controller.itemCodeController
+                                                        .text =
+                                                    item.itemID?.toString() ??
+                                                        '';
                                                 controller.itemNameController
                                                     .text = item.itemName ?? '';
-                                                controller
-                                                        .batchNoController.text =
+                                                controller.batchNoController
+                                                        .text =
                                                     item.batchNoRequired
                                                         .toString();
-                                                controller.expiryController.text =
+                                                controller
+                                                        .expiryController.text =
                                                     item.expiryDateFormat ?? '';
                                                 controller.hsnController.text =
                                                     item.hSNCode ?? '';
@@ -1421,136 +1436,176 @@ Future<void> _pickDate(TextEditingController controller) async {
                                                         .text =
                                                     item.salesRate.toString();
                                                 controller.gstController.text =
-                                                    item.gstPercentage.toString();
-                                                controller
-                                                        .gstValueController.text =
-                                                    item.gstPercentage.toString();
+                                                    item.gstPercentage
+                                                        .toString();
+                                                controller.gstValueController
+                                                        .text =
+                                                    item.gstPercentage
+                                                        .toString();
                                                 _calculateTotalSalesRate();
                                                 // Convert Info to Items
-                                                final newItem =detail. Details(
+                                                final newItem = detail.Details(
                                                   itemCode: p.itemCode ?? 0,
-  itemID: p.itemID ?? 0,
-  itemNotes:  '',
-  itemGroupCode: p.itemGroupCode ?? 0,
-  itemMakeCode: p.itemMakeCode ?? 0,
-  itemGenericCode: p.itemGenericCode ?? 0,
-  barCodeId: 'BC001',
-  itemName: p.itemName ?? '',
-  batchNo: 'B001',
-  mFGDate: '2025-01-01',
-  expiryDate:'2026-01-01',
-  hsnCode: int.tryParse(p.hSNCode ?? '0') ?? 0,
-  gstPercentage: double.tryParse(p.gstPercentage?.toString() ?? '0') ?? 0,
-  itemQuantity: int.tryParse(p.maximumStockQty?.toString() ?? '0') ?? 0,
-  freeQuantity: 0,
-  itemUnitCode: p.itemUnitCode ?? 0,
-  subQuantity:  0,
-  subQtyUnitCode: 0,
-  subQtySalesRate:  0.0,
-  decimalDigits:  2,
-  itemSaleRate: double.tryParse(p.salesRate?.toString() ?? '0') ?? 0,
-  salesRateBeforeTax:  0.0,
-  itemDiscountPercentage: p.itemDiscountPercentage ?? 0,
-  itemDiscountValue: p.itemDiscountValue ?? 0,
-  itemGstValue: 0,
-  itemValue:  0,
-  actualSalesRate:  0,
-  itemMRPRate: double.tryParse(p.mRPRate?.toString() ?? '0') ?? 0,
-  itemPurchaseRate: double.tryParse(p.purchaseRate?.toString() ?? '0') ?? 0,
-  actualPurchaseRate: 0,
-  purchaseNo: 'P001',
-  purchaseFinyearCode:  1,
-  purchaseEntryMode:  0,
-  itemSGSTPercentage:  0,
-  itemCGSTPercentage: 0,
-  itemIGSTPercentage:  0,
-  itemSGSTAmount: 0,
-  itemCGSTAmount: 0,
-  itemIGSTAmount:  0,
-  salesEntryMode:  1,
-  salesEntryType: 1,
-  createdUserCode: p.createdUserCode ?? 0,
-  createdDate: p.createdDate ?? DateTime.now().toIso8601String(),
-  updatedUserCode: p.updatedUserCode ?? '1',
-  updatedDate: p.updatedDate ?? DateTime.now().toIso8601String(),
-  coCode:1,
-  computerName: 'SERVER01',
-  finYearCode:  'FY25',
-  stockRequiredEffect:  0,
-  itemProfitPercentage:  0,
-  itemProfitValue:  0,
-  itemRowOrderNo:  0,
-  purchaseSupCode:  0,
-  salesPersonCode:  0,
-                                                //   itemCode: p.itemCode,
-                                                //   itemID: p.itemID ?? '',
-                                                //   itemName: p.itemName ?? '',
-                                                //   itemGroupCode:
-                                                //       p.itemGroupCode ?? 0,
-                                                //   itemMakeCode:
-                                                //       p.itemMakeCode ?? 0,
-                                                //   itemGenericCode:
-                                                //       p.itemGenericCode ?? 0,
-                                                //   barCodeId: '',
-                                                 
-                                                //   mFGDate: '',
-                                                //   expiryDate:
-                                                //       p.expiryDateFormat ?? '',
-                                                //   hsnCode: int.tryParse(
-                                                //           p.hSNCode ?? '0') ??
-                                                //       0,
-                                                //   gstPercentage:
-                                                //       p.gstPercentage ?? 0,
-                                                //   itemQuantity:
-                                                //       p.maximumStockQty ?? 0,
-                                                //   freeQuantity: 0,
-                                                //   itemUnitCode:
-                                                //       p.itemUnitCode ?? 0,
-                                                //   subQuantity: 0,
-                                                //   subQtyUnitCode: 0,
-                                                //  // subQtyPurchaseRate: 0,
-                                                //   itemPurchaseRate:
-                                                //       p.purchaseRate ?? 0,
-                                                //   salesRateBeforeTax: 0.0,
-                                                //   itemDiscountPercentage: 0,
-                                                //   itemDiscountValue: 0,
-                                                //   itemGstValue: 0,
-                                                //   itemValue: 0,
-                                                //   actualPurchaseRate: 0.0,
-                                                //   itemSaleRate: p.salesRate ?? 0,
-                                                //   itemMRPRate: p.mRPRate ?? 0,
-                                                //   itemSGSTPercentage: 0,
-                                                //   itemCGSTPercentage: 0,
-                                                //   itemIGSTPercentage: 0,
-                                                //   itemSGSTAmount: 0,
-                                                //   itemCGSTAmount: 0,
-                                                //   itemIGSTAmount: 0,
-                                                //   purchaseEntryMode: 0,
-                                                //   purchaseNo: "P001",
-                                                //   salesEntryMode: 1,
-                                                //   //purchaseEntryType: 0,
-                                                //   createdUserCode:
-                                                //       p.createdUserCode ?? 0,
-                                                //   createdDate: p.createdDate ??
-                                                //       DateTime.now()
-                                                //           .toIso8601String(),
-                                                //   updatedUserCode: null,
-                                                //   updatedDate: null,
-                                                //   coCode: 0,
-                                                //   computerName: 'SERVER01',
-                                                //   finYearCode: 'FY25',
-                                                //   stockRequiredEffect: 0,
+                                                  itemID: p.itemID ?? 0,
+                                                  itemNotes: '',
+                                                  itemGroupCode:
+                                                      p.itemGroupCode ?? 0,
+                                                  itemMakeCode:
+                                                      p.itemMakeCode ?? 0,
+                                                  itemGenericCode:
+                                                      p.itemGenericCode ?? 0,
+                                                  barCodeId: 'BC001',
+                                                  itemName: p.itemName ?? '',
+                                                  batchNo: 'B001',
+                                                  mFGDate: '2025-01-01',
+                                                  expiryDate: '2026-01-01',
+                                                  hsnCode: int.tryParse(
+                                                          p.hSNCode ?? '0') ??
+                                                      0,
+                                                  gstPercentage:
+                                                      double.tryParse(p
+                                                                  .gstPercentage
+                                                                  ?.toString() ??
+                                                              '0') ??
+                                                          0,
+                                                  itemQuantity: int.tryParse(p
+                                                              .maximumStockQty
+                                                              ?.toString() ??
+                                                          '0') ??
+                                                      0,
+                                                  freeQuantity: 0,
+                                                  itemUnitCode:
+                                                      p.itemUnitCode ?? 0,
+                                                  subQuantity: 0,
+                                                  subQtyUnitCode: 0,
+                                                  subQtySalesRate: 0.0,
+                                                  decimalDigits: 2,
+                                                  itemSaleRate: double.tryParse(p
+                                                              .salesRate
+                                                              ?.toString() ??
+                                                          '0') ??
+                                                      0,
+                                                  salesRateBeforeTax: 0.0,
+                                                  itemDiscountPercentage:
+                                                      p.itemDiscountPercentage ??
+                                                          0,
+                                                  itemDiscountValue:
+                                                      p.itemDiscountValue ?? 0,
+                                                  itemGstValue: 0,
+                                                  itemValue: 0,
+                                                  actualSalesRate: 0,
+                                                  itemMRPRate: double.tryParse(p
+                                                              .mRPRate
+                                                              ?.toString() ??
+                                                          '0') ??
+                                                      0,
+                                                  itemPurchaseRate:
+                                                      double.tryParse(p
+                                                                  .purchaseRate
+                                                                  ?.toString() ??
+                                                              '0') ??
+                                                          0,
+                                                  actualPurchaseRate: 0,
+                                                  purchaseNo: 'P001',
+                                                  purchaseFinyearCode: 1,
+                                                  purchaseEntryMode: 0,
+                                                  itemSGSTPercentage: 0,
+                                                  itemCGSTPercentage: 0,
+                                                  itemIGSTPercentage: 0,
+                                                  itemSGSTAmount: 0,
+                                                  itemCGSTAmount: 0,
+                                                  itemIGSTAmount: 0,
+                                                  salesEntryMode: 1,
+                                                  salesEntryType: 1,
+                                                  createdUserCode:
+                                                      p.createdUserCode ?? 0,
+                                                  createdDate: p.createdDate ??
+                                                      DateTime.now()
+                                                          .toIso8601String(),
+                                                  updatedUserCode:
+                                                      p.updatedUserCode ?? '1',
+                                                  updatedDate: p.updatedDate ??
+                                                      DateTime.now()
+                                                          .toIso8601String(),
+                                                  coCode: 1,
+                                                  computerName: 'SERVER01',
+                                                  finYearCode: 'FY25',
+                                                  stockRequiredEffect: 0,
+                                                  itemProfitPercentage: 0,
+                                                  itemProfitValue: 0,
+                                                  itemRowOrderNo: 0,
+                                                  purchaseSupCode: 0,
+                                                  salesPersonCode: 0,
+                                                  //   itemCode: p.itemCode,
+                                                  //   itemID: p.itemID ?? '',
+                                                  //   itemName: p.itemName ?? '',
+                                                  //   itemGroupCode:
+                                                  //       p.itemGroupCode ?? 0,
+                                                  //   itemMakeCode:
+                                                  //       p.itemMakeCode ?? 0,
+                                                  //   itemGenericCode:
+                                                  //       p.itemGenericCode ?? 0,
+                                                  //   barCodeId: '',
+
+                                                  //   mFGDate: '',
+                                                  //   expiryDate:
+                                                  //       p.expiryDateFormat ?? '',
+                                                  //   hsnCode: int.tryParse(
+                                                  //           p.hSNCode ?? '0') ??
+                                                  //       0,
+                                                  //   gstPercentage:
+                                                  //       p.gstPercentage ?? 0,
+                                                  //   itemQuantity:
+                                                  //       p.maximumStockQty ?? 0,
+                                                  //   freeQuantity: 0,
+                                                  //   itemUnitCode:
+                                                  //       p.itemUnitCode ?? 0,
+                                                  //   subQuantity: 0,
+                                                  //   subQtyUnitCode: 0,
+                                                  //  // subQtyPurchaseRate: 0,
+                                                  //   itemPurchaseRate:
+                                                  //       p.purchaseRate ?? 0,
+                                                  //   salesRateBeforeTax: 0.0,
+                                                  //   itemDiscountPercentage: 0,
+                                                  //   itemDiscountValue: 0,
+                                                  //   itemGstValue: 0,
+                                                  //   itemValue: 0,
+                                                  //   actualPurchaseRate: 0.0,
+                                                  //   itemSaleRate: p.salesRate ?? 0,
+                                                  //   itemMRPRate: p.mRPRate ?? 0,
+                                                  //   itemSGSTPercentage: 0,
+                                                  //   itemCGSTPercentage: 0,
+                                                  //   itemIGSTPercentage: 0,
+                                                  //   itemSGSTAmount: 0,
+                                                  //   itemCGSTAmount: 0,
+                                                  //   itemIGSTAmount: 0,
+                                                  //   purchaseEntryMode: 0,
+                                                  //   purchaseNo: "P001",
+                                                  //   salesEntryMode: 1,
+                                                  //   //purchaseEntryType: 0,
+                                                  //   createdUserCode:
+                                                  //       p.createdUserCode ?? 0,
+                                                  //   createdDate: p.createdDate ??
+                                                  //       DateTime.now()
+                                                  //           .toIso8601String(),
+                                                  //   updatedUserCode: null,
+                                                  //   updatedDate: null,
+                                                  //   coCode: 0,
+                                                  //   computerName: 'SERVER01',
+                                                  //   finYearCode: 'FY25',
+                                                  //   stockRequiredEffect: 0,
                                                 );
-      
+
                                                 // Add to itemsList
                                                 itemsList.add(newItem);
                                                 if (_activeRowIndex ==
                                                     items.length - 1) {
-                                                  items.add(product.Info());
-                                                  controllers
-                                                      .add(ItemRowControllers());
+                                                  items.add(product
+                                                      .productListInfo());
+                                                  controllers.add(
+                                                      ItemRowControllers());
                                                 }
-      
+
                                                 // Hide sub-table & clear selection
                                                 _showSubTable = false;
                                                 _searchResults.clear();
@@ -1685,7 +1740,7 @@ Future<void> _pickDate(TextEditingController controller) async {
                     ),
                   ],
                 ),
-      
+
                 child: SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Column(
@@ -1701,113 +1756,100 @@ Future<void> _pickDate(TextEditingController controller) async {
                           children: [
                             GstDataTableWidget(totalAmount: _totalSalesRate),
                             const SizedBox(width: 16),
-      
+
                             // First column
                             Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 LabeledTextField(
-                                  focusNode: _sgstpreFocus,
                                   label: "SGST %",
-                                  controller: _sgstpreController,
+                                  calculateValue: 0.00,
                                 ),
                                 LabeledTextField(
-                                  focusNode: _cgstpreFocus,
                                   label: "CGST %",
-                                  controller: _cgstpreController,
+                                  calculateValue: 0.00,
                                   readOnly: true,
                                 ),
                                 LabeledTextField(
-                                  focusNode: _igstpreFocus,
                                   label: "IGST %",
-                                  controller: _igstpreController,
+                                  calculateValue: 0.00,
                                   readOnly: true,
                                 ),
                               ],
                             ),
-      
+
                             const SizedBox(width: 16),
-      
+
                             // Second column
                             Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 LabeledTextField(
-                                  focusNode: _sgstAmtFocus,
                                   label: "SGST Amount",
-                                  controller: _sgstAmtController,
+                                  calculateValue: 0.00,
                                   readOnly: true,
                                 ),
                                 LabeledTextField(
-                                  focusNode: _cgstAmtFocus,
                                   label: "CGST Amount",
-                                  controller: _cgstAmtController,
+                                  calculateValue: 0.00,
                                   readOnly: true,
                                 ),
                                 LabeledTextField(
-                                  focusNode: _igstAmtFocus,
                                   label: "IGST Amount",
-                                  controller: _igstAmtController,
+                                  calculateValue: 0.00,
                                   readOnly: true,
                                 ),
                                 LabeledTextField(
-                                  focusNode: _totalGstAmtFocus,
                                   label: "Total GST Amount",
-                                  controller: _totalGstAmtController,
+                                  calculateValue: 0.00,
                                   readOnly: true,
                                 ),
                               ],
                             ),
-      
+
                             const SizedBox(width: 16),
-      
+
                             // Third column
                             Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 LabeledTextField(
-                                  focusNode: _subTotalFocus,
+                                  calculateValue: 0.00,
                                   label: "Sub Total Value",
-                                  controller: _subTotalValueController,
                                   readOnly: true,
                                 ),
                                 LabeledTextField(
-                                  focusNode: _gstValueFocus,
                                   label: "GST Value",
-                                  controller: _gstValueController,
+                                  calculateValue: 0.00,
                                   readOnly: true,
                                 ),
                                 LabeledTextField(
-                                  focusNode: _discountFocus,
                                   label: "Discount",
-                                  controller: _discountController,
+                                  calculateValue: 0.00,
                                   readOnly: true,
                                 ),
                                 LabeledTextField(
-                                  focusNode: _roundOFfFocus,
                                   label: "Round Off",
-                                  controller: _roundOffController,
+                                  calculateValue: 0.00,
                                   readOnly: true,
                                 ),
                                 LabeledTextField(
-                                  focusNode: _frightFocus,
                                   label: "Freight Charges",
-                                  controller: _frightChargesController,
+                                  calculateValue: 0.00,
                                   readOnly: true,
                                 ),
                                 LabeledTextField(
-                                  focusNode: _roundOFfFocus,
                                   label: "Net Amount",
-                                  controller: _netAmountController,
+                                  calculateValue: 0.00,
                                   readOnly: true,
                                 ),
                               ],
                             ),
                           ],
                         ),
-      
+
                         const SizedBox(height: 16),
-      
+
                         // Save / Edit / Delete buttons
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -1857,7 +1899,7 @@ Future<void> _pickDate(TextEditingController controller) async {
                   ),
                 ),
               ),
-      
+
               // Toggle Button
               Positioned(
                 right: 50,
@@ -2038,7 +2080,7 @@ Future<void> _pickDate(TextEditingController controller) async {
     );
   }
 
-  void _showAddEditBottomSheet(product.Info? unit) {
+  void _showAddEditBottomSheet(product.productListInfo? unit) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true, // almost full screen

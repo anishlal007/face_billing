@@ -21,10 +21,12 @@ class CustomTextField extends StatefulWidget {
   final String? Function(String?)? validator;
   final bool isEdit;
   final bool autoFocus;
+  final bool? ismandatory;
 
   const CustomTextField({
     super.key,
     required this.controller,
+    this.ismandatory = false,
     this.title,
     this.isWhitspace = false,
     this.hintText,
@@ -71,12 +73,25 @@ class _CustomTextFieldState extends State<CustomTextField> {
           if (widget.title != null)
             Padding(
               padding: const EdgeInsets.only(bottom: 0),
-              child: Text(
-                widget.title!,
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: Colors.black87,
-                ),
+              child: Row(
+                children: [
+                  Text(
+                    widget.title!,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  widget.ismandatory == true
+                      ? const Text(
+                          " *",
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Colors.red,
+                          ),
+                        )
+                      : const SizedBox(),
+                ],
               ),
             ),
           SizedBox(

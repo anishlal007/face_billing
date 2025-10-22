@@ -33,7 +33,7 @@ import '../../../widgets/search_dropdown.dart';
 import '../../../widgets/search_dropdown_field.dart';
 
 class AddProductMasterPage extends StatefulWidget {
-  final Info? unitInfo;
+  final productListInfo? unitInfo;
   final Function(bool success) onSaved;
   const AddProductMasterPage({
     super.key,
@@ -60,8 +60,7 @@ class _AddProductMasterPageState extends State<AddProductMasterPage> {
       _itemMake,
       _itemGeneric,
       _unitCode;
-  String?hsnNo;
-  master.Units? _selectSubUnit;
+  String? hsnNo;
   double? tax_persantage = 0;
   bool _activeStatus = true;
   bool _itemIdType = false;
@@ -84,11 +83,14 @@ class _AddProductMasterPageState extends State<AddProductMasterPage> {
   int? selectedExpiryType;
   String? error;
   String? serialError;
+  List<master.Units> _filteredSubUnits = [];
 
   master.ItemGroups? _selectedItemGroup;
   master.ItemMakes? _selectItemMake;
   master.HsnMasters? _selectHSN;
   master.TaxMasters? _selectgst;
+  master.Units? _selectSubUnit;
+  master.Units? _selectunit;
   String? groumName;
 
   ///model
@@ -182,7 +184,7 @@ class _AddProductMasterPageState extends State<AddProductMasterPage> {
 
   @override
   void initState() {
-    super.initState(); 
+    super.initState();
     Future.delayed(Duration(milliseconds: 300), () {
       FocusScope.of(context).requestFocus(_itemIdFocus);
     });
@@ -519,7 +521,6 @@ class _AddProductMasterPageState extends State<AddProductMasterPage> {
           createdUserCode: 1,
           updatedUserCode: 1,
           subQtyFormalDigits: int.tryParse(_formaldigitController.text),
-          
         );
 
         print("🟢 Request JSON: ${request.toJson()}");
@@ -890,7 +891,7 @@ class _AddProductMasterPageState extends State<AddProductMasterPage> {
                       SizedBox(
                         width: constraints.maxWidth / columns - 20,
                         // 1. Ensure the generic type is your Product model (e.g., ProductMasterInfo)
-                        child: AutoSuggestion<Info>(
+                        child: AutoSuggestion<productListInfo>(
                           controller: _itemNameController,
                           labelText: 'Item Name',
                           hintText: 'Search by Item Name or Barcode No',
@@ -917,13 +918,9 @@ class _AddProductMasterPageState extends State<AddProductMasterPage> {
                           },
 
                           onSuggestionSelected: (product) {
-                            // Assuming you have a ProductMasterInfo variable like _selectedProduct
-                            // setState(() => _selectedProduct = product);
                             print('Selected Product: ${product.itemCode}');
-                            // You should update your product-related state here, not a customer state
                           },
 
-                          // 🎯 FIX: Use Product-specific text extractor
                           getDisplayString: (product) => product.itemName,
                           isbutton: Addgroupscreen(
                             onSaved: (success) async {
@@ -1146,77 +1143,32 @@ class _AddProductMasterPageState extends State<AddProductMasterPage> {
                         ),
                       ),
 
-                      selectedPaymentType == 0
-                          ? SizedBox(
-                              width: constraints.maxWidth / columns - 20,
-                              child: CustomDropdownField<int>(
-                                title: "Select Item Generic",
-                                hintText: "Choose  IItem Generic",
-                                items: getAllMasterListModel!.info!.generics!
-                                    .map((e) => DropdownMenuItem<int>(
-                                          value: e
-                                              .genericCode, // 🔹 use taxCode as value
-                                          child: Text("${e.genericName} "),
-                                        ))
-                                    .toList(),
-                                // initialValue: _taxCode, // int? taxCode
-                                onChanged: (value) {
-                                  setState(() {
-                                    _itemGeneric = value;
-                                    //  _taxCode = value;
-                                  });
-
-                                  final selected = getAllMasterListModel!
-                                      .info!.generics!
-                                      .firstWhere((c) => c.genericCode == value,
-                                          orElse: () => master.Generics());
-
-                                  print(
-                                      "Selected GST %: ${selected.genericCode}");
-                                  print(
-                                      "Selected TAX Code: ${selected.genericName}");
-                                },
-                                // isValidate: true,
-                                // validator: (value) => value == null
-                                //     ? "Please select Item Make Code"
-                                //     : null,
-                                focusNode: _itemGenericCodeFocus,
-                                onEditingComplete: () => _fieldFocusChange(
-                                  context,
-                                  _itemGenericCodeFocus,
-                                  _itemUnitCodeFocus,
-                                ),
-
-                                addPage: AddGenericsMasterPage(
-                                  onSaved: (success) async {
-                                    if (success) {
-                                      Navigator.pop(context, true);
-                                      await _loadList();
-                                    }
-                                  },
-                                ),
-                                addTooltip: "Add Item Generic",
-                              ),
-                            )
-                          : SizedBox(),
-
                       SizedBox(
                         width: constraints.maxWidth / columns - 20,
                         child: SearchableDropdown<master.Units>(
                           hintText: "Select unit",
                           items: getAllMasterListModel!.info!.units!,
-                          itemLabel: (group) => group.unitName ?? "",
-                          onChanged: (group) {
-                            if (group != null) {
-                              _selectSubUnit = group;
-                              _unitCode = group.unitCode;
+                          itemLabel: (unit) => unit.unitName ?? "",
+                          onChanged: (unit) {
+                            if (unit != null) {
+                              setState(() {
+                                _selectSubUnit = unit;
+                                _unitCode = unit.unitCode;
 
-                              _subUnitCodeController.text =
-                                  group.unitCode.toString();
-                              print(" _subUnitCodeController.text");
-                              print(_subUnitCodeController.text);
-                              print("Selected Code: ${group.unitCode}");
-                              print("Selected Name: ${group.unitName}");
+                                // Update controller
+                                _subUnitCodeController.text =
+                                    unit.unitId?.toString() ?? "0";
+
+                                // 🔹 Filter related subunits based on parentUnitCode
+                                _filteredSubUnits = getAllMasterListModel!
+                                    .info!.units!
+                                    .where((u) =>
+                                        u.parentUnitCode == unit.unitCode)
+                                    .toList();
+
+                                // 🔹 Reset selected subunit to force UI refresh
+                                _selectunit = null;
+                              });
                             }
                           },
                           focusNode: _itemUnitCodeFocus,
@@ -1244,13 +1196,7 @@ class _AddProductMasterPageState extends State<AddProductMasterPage> {
                                 title: "Conversion Quantity",
                                 hintText: "Enter Conversion Quantity",
                                 controller: _subQtyController,
-                                // isNumeric: true,
-                                // isValidate: true,
-                                // validator: (value) => value == null || value.isEmpty
-                                //     ? "Enter Conversion Quantity"
-                                //     : null,
                                 onChanged: (value) {
-                                  // ✅ Automatically update formal digit based on conversion value
                                   if (value.isEmpty) return;
 
                                   final double? conversion =
@@ -1309,26 +1255,55 @@ class _AddProductMasterPageState extends State<AddProductMasterPage> {
 
                       selectedPaymentType == 0
                           ? SizedBox(
-                              width: constraints.maxWidth / columns - 30,
-                              child: CustomTextField(
-                                title: "Sub Unit",
-                                hintText: "Sub Unit",
+                              width: constraints.maxWidth / columns - 20,
+                              child: SearchableDropdown<master.Units>(
+                                hintText: "Select Sub unit",
+                                items: _filteredSubUnits.isNotEmpty
+                                    ? _filteredSubUnits
+                                    : getAllMasterListModel!.info!.units!,
                                 controller: _subUnitCodeController,
-                                isValidate: true,
-                                isEdit: true,
-                                // validator: (value) => value == null || value.isEmpty
-                                //     ? "Enter Minimum Stock Quantity"
-                                //     : null,
-                                focusNode: _itemUnitCodeFocus,
-                                isNumeric: true,
-                                textInputAction: TextInputAction.next,
+                                itemLabel: (unit) => unit.unitId ?? "",
+                                initialValue: _selectunit,
+                                onChanged: (unit) {
+                                  if (unit != null) {
+                                    setState(() {
+                                      _selectunit = unit;
+                                      _subUnitCodeController.text =
+                                          unit.unitId?.toString() ?? "0";
+                                      _unitCode = unit.unitCode;
+                                    });
+                                  }
+                                },
+                                focusNode: _subUnitCodeFocus,
                                 onEditingComplete: () => _fieldFocusChange(
                                   context,
-                                  _itemUnitCodeFocus,
+                                  _subUnitCodeFocus,
                                   _itemMakeCodeFocus,
                                 ),
                               ),
                             )
+
+                          // SizedBox(
+                          //     width: constraints.maxWidth / columns - 30,
+                          //     child: CustomTextField(
+                          //       title: "Sub Unit",
+                          //       hintText: "Sub Unit",
+                          //       controller: _subUnitCodeController,
+                          //       isValidate: true,
+                          //       isEdit: true,
+                          //       // validator: (value) => value == null || value.isEmpty
+                          //       //     ? "Enter Minimum Stock Quantity"
+                          //       //     : null,
+                          //       focusNode: _itemUnitCodeFocus,
+                          //       isNumeric: true,
+                          //       textInputAction: TextInputAction.next,
+                          //       onEditingComplete: () => _fieldFocusChange(
+                          //         context,
+                          //         _itemUnitCodeFocus,
+                          //         _itemMakeCodeFocus,
+                          //       ),
+                          //     ),
+                          //   )
                           // SizedBox(
                           //     width: constraints.maxWidth / columns - 20,
                           //     child: SearchableDropdown<master.Units>(
@@ -1630,7 +1605,7 @@ class _AddProductMasterPageState extends State<AddProductMasterPage> {
                           onChanged: (group) {
                             setState(() {
                               _hsntaxCode = group.hsnCode!;
-                              hsnNo=group.hsnNo!;
+                              hsnNo = group.hsnNo!;
                               print("hsnNo");
                               print(hsnNo);
                               _selectHSN = group;

@@ -13,16 +13,16 @@ import '../models/supplier_master/supplier_master_list_model.dart';
 
 class SupplierMasterService {
   final Dio _dio = ApiClient.dio;
-  
 
-  Future<ApiResponse<bool>> addSupplierMaster(AddSupplierMasterModel request) async {
+  Future<ApiResponse<bool>> addSupplierMaster(
+      AddSupplierMasterModel request) async {
     try {
       final response = await _dio.post("suppliers", data: request.toJson());
-print("Sending JSON: ${jsonEncode(request.toJson())}");
+      print("Sending JSON: ${jsonEncode(request.toJson())}");
       if (response.statusCode == 200 || response.statusCode == 201) {
         return ApiResponse(data: true);
       } else {
-        return ApiResponse(error: "Failed to add Loction");
+        return ApiResponse(error: "Failed to add Supplier");
       }
     } catch (e) {
       return ApiResponse(error: e.toString());
@@ -56,8 +56,6 @@ print("Sending JSON: ${jsonEncode(request.toJson())}");
   //     return ApiResponse(error: e.toString());
   //   }
   // }
-
-  
 
   Future<ApiResponse<SupplierMasterListModel>> getSupplierMasterSearch(
       String q) async {
@@ -97,7 +95,8 @@ print("Sending JSON: ${jsonEncode(request.toJson())}");
   }
 
   /// INFO Country (GET) -> /countrymaster/{id}
-  Future<ApiResponse<SupplierMasterListModel>> getSupplierMasterById(String id) async {
+  Future<ApiResponse<SupplierMasterListModel>> getSupplierMasterById(
+      String id) async {
     try {
       final response = await _dio.get("suppliers/$id");
       return ApiResponse(data: SupplierMasterListModel.fromJson(response.data));
@@ -107,14 +106,15 @@ print("Sending JSON: ${jsonEncode(request.toJson())}");
   }
 
   /// EDIT Country (PUT) -> /countrymaster
-  Future<ApiResponse<bool>> updateSupplierMasterr(dynamic id, AddSupplierMasterModel request) async {
+  Future<ApiResponse<bool>> updateSupplierMasterr(
+      dynamic id, AddSupplierMasterModel request) async {
     try {
       final response = await _dio.put("suppliers/$id", data: request.toJson());
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         return ApiResponse(data: true);
       } else {
-        return ApiResponse(error: "Failed to update country");
+        return ApiResponse(error: "Failed to update Supplier");
       }
     } catch (e) {
       print(e.toString());

@@ -1,11 +1,15 @@
 import 'package:facebilling/core/colors.dart';
+import 'package:facebilling/data/services/get_serial_no_services.dart';
 import 'package:facebilling/ui/screens/masters/area_master/add_area_master_page.dart';
 import 'package:facebilling/ui/screens/masters/country/AddCountryScreen.dart';
+import 'package:facebilling/ui/screens/masters/custmer_group_master/add_customer_group_master_page.dart';
 import 'package:facebilling/ui/screens/masters/state_master/add_state_master_page.dart';
+import 'package:facebilling/ui/widgets/DatePickerField.dart';
 import 'package:flutter/material.dart';
 import 'package:facebilling/core/const.dart';
 import 'package:intl/intl.dart';
 import '../../../../data/models/get_all_master_list_model.dart' as master;
+import '../../../../data/models/get_serial_no_model.dart' as serialno;
 import '../../../../data/models/customer_master/add_customer_master_model.dart';
 import '../../../../data/models/customer_master/customer_master_list_model.dart';
 import '../../../../data/services/customer_master_service.dart';
@@ -33,12 +37,20 @@ class AddCustomerMasterPage extends StatefulWidget {
 class _AddCustomerMasterPageState extends State<AddCustomerMasterPage> {
   final _formKey = GlobalKey<FormState>();
   final CustomerMasterService _service = CustomerMasterService();
+  final GetSerialNoServices _getSerialservice = GetSerialNoServices();
   final GetAllMasterService _getAllMasterService = GetAllMasterService();
+
+  serialno.GetSerialNoModel? serialNo;
   bool _isEditMode = false;
   bool _loading = false;
   String? _message;
   bool _getAllLoading = true;
-  int? _areaCode, _cityCode, _stateCode, _countryCode, _subGrpCode, _gender;
+  int? _areaCode,
+      _cityCode,
+      _stateCode = 1,
+      _countryCode = 1,
+      _subGrpCode,
+      _gender;
 
   int? _taxCode = 1;
   bool _activeStatus = true, _isTaxInclusive = true;
@@ -113,6 +125,8 @@ class _AddCustomerMasterPageState extends State<AddCustomerMasterPage> {
       });
     }
   }
+
+  String? serialError;
 
   int _taxOption = 1;
   @override
@@ -203,6 +217,39 @@ class _AddCustomerMasterPageState extends State<AddCustomerMasterPage> {
       setState(() {
         error = response.error;
         _getAllLoading = false;
+      });
+    }
+
+    try {
+      final serialNoResponse = await _getSerialservice.getSerialNo();
+      if (serialNoResponse.isSuccess) {
+        final serialData = serialNoResponse.data;
+        if (serialData != null && serialData.info != null) {
+          setState(() {
+            serialNo = serialData;
+            _suppIdController.text = serialNo!.info!.custId ?? "";
+            serialError = null;
+          });
+        } else {
+          setState(() {
+            serialNo = null;
+            _suppIdController.clear();
+            serialError = "Number initialization record not found";
+          });
+        }
+      } else {
+        setState(() {
+          serialNo = null;
+          _suppIdController.clear();
+          serialError =
+              serialNoResponse.error ?? "Failed to fetch serial number";
+        });
+      }
+    } catch (e) {
+      setState(() {
+        serialNo = null;
+        _suppIdController.clear();
+        serialError = "Error fetching serial number: $e";
       });
     }
   }
@@ -441,24 +488,30 @@ class _AddCustomerMasterPageState extends State<AddCustomerMasterPage> {
                     SizedBox(
                       width: constraints.maxWidth / columns - 20,
                       child: GestureDetector(
-                        onTap: () {
-                          _pickDate();
-                        },
-                        child: CustomTextField(
-                          title: "Pataint Date Of Birth",
-                          hintText: " Pataint Date Of Birth",
-                          controller: _customerDobController,
-                          isValidate: true,
-                          isEdit: false,
-                          validator: (value) => value == null || value.isEmpty
-                              ? " Pataint Date Of Birth"
-                              : null,
-                          focusNode: _supDobFocus,
-                          textInputAction: TextInputAction.next,
-                          onEditingComplete: () => _fieldFocusChange(
-                              context, _supDobFocus, _suppGroupFocus),
-                        ),
-                      ),
+                          onTap: () {
+                            _pickDate();
+                          },
+                          child: DatePickerField(
+                              label: "Patient Date of Birth",
+                              controller: _customerDobController,
+                              onDateSelected: (date) {
+                                print("Selected date: $date");
+                              })
+                          // CustomTextField(
+                          //   title: "Pataint Date Of Birth",
+                          //   hintText: " Pataint Date Of Birth",
+                          //   controller: _customerDobController,
+                          //   isValidate: true,
+                          //   isEdit: false,
+                          //   validator: (value) => value == null || value.isEmpty
+                          //       ? " Pataint Date Of Birth"
+                          //       : null,
+                          //   focusNode: _supDobFocus,
+                          //   textInputAction: TextInputAction.next,
+                          //   onEditingComplete: () => _fieldFocusChange(
+                          //       context, _supDobFocus, _suppGroupFocus),
+                          // ),
+                          ),
                     ),
 
                     // Define a variable in your State
@@ -545,23 +598,23 @@ class _AddCustomerMasterPageState extends State<AddCustomerMasterPage> {
                       ),
                     ),
 
-                    SizedBox(
-                      width: constraints.maxWidth / columns - 20,
-                      child: CustomTextField(
-                        title: "Pataint Email ID",
-                        hintText: " Pataint Email ID",
-                        controller: _suppMailIdController,
-                        isValidate: true,
-                        validator: (value) => value == null || value.isEmpty
-                            ? " Pataint Email ID"
-                            : null,
-                        focusNode: _compMailIdFocus,
-                        textInputAction: TextInputAction.next,
-                        onEditingComplete: () => _fieldFocusChange(
-                            context, _compMailIdFocus, _compwebsiteFocus),
-                        autoFocus: true,
-                      ),
-                    ),
+                    // SizedBox(
+                    //   width: constraints.maxWidth / columns - 20,
+                    //   child: CustomTextField(
+                    //     title: "Pataint Email ID",
+                    //     hintText: " Pataint Email ID",
+                    //     controller: _suppMailIdController,
+                    //     isValidate: true,
+                    //     validator: (value) => value == null || value.isEmpty
+                    //         ? " Pataint Email ID"
+                    //         : null,
+                    //     focusNode: _compMailIdFocus,
+                    //     textInputAction: TextInputAction.next,
+                    //     onEditingComplete: () => _fieldFocusChange(
+                    //         context, _compMailIdFocus, _compwebsiteFocus),
+                    //     autoFocus: true,
+                    //   ),
+                    // ),
 
                     SizedBox(
                       width: constraints.maxWidth / columns - 20,
@@ -604,6 +657,14 @@ class _AddCustomerMasterPageState extends State<AddCustomerMasterPage> {
                           _suppGroupFocus,
                           _countryNameFocus,
                         ),
+                        addPage: AddCustomerGroupMasterPage(
+                          onSaved: (success) {
+                            if (success) {
+                              Navigator.pop(context, true);
+                            }
+                          },
+                        ),
+                        addTooltip: "Add Pataint Group",
                       ),
                     ),
 
@@ -680,8 +741,6 @@ class _AddCustomerMasterPageState extends State<AddCustomerMasterPage> {
                     //   ),
                     // ),
 
-                    
-
                     SizedBox(
                       width: constraints.maxWidth / columns - 20,
                       child: CustomTextField(
@@ -735,23 +794,23 @@ class _AddCustomerMasterPageState extends State<AddCustomerMasterPage> {
                       ),
                     ),
 
-                    SizedBox(
-                      width: constraints.maxWidth / columns - 20,
-                      child: CustomTextField(
-                        title: "Pataint Pin Code",
-                        hintText: " Pataint Pin Code",
-                        controller: _supppinCodeController,
-                        isValidate: true,
-                        validator: (value) => value == null || value.isEmpty
-                            ? " Pataint Pin Code"
-                            : null,
-                        focusNode: _pinCodeFocus,
-                        textInputAction: TextInputAction.next,
-                        onEditingComplete: () => _fieldFocusChange(
-                            context, _pinCodeFocus, _compMobileFocus),
-                        autoFocus: true,
-                      ),
-                    ),
+                    // SizedBox(
+                    //   width: constraints.maxWidth / columns - 20,
+                    //   child: CustomTextField(
+                    //     title: "Pataint Pin Code",
+                    //     hintText: " Pataint Pin Code",
+                    //     controller: _supppinCodeController,
+                    //     isValidate: true,
+                    //     validator: (value) => value == null || value.isEmpty
+                    //         ? " Pataint Pin Code"
+                    //         : null,
+                    //     focusNode: _pinCodeFocus,
+                    //     textInputAction: TextInputAction.next,
+                    //     onEditingComplete: () => _fieldFocusChange(
+                    //         context, _pinCodeFocus, _compMobileFocus),
+                    //     autoFocus: true,
+                    //   ),
+                    // ),
                     SizedBox(
                       width: constraints.maxWidth / columns - 20,
                       child: SearchableDropdown<master.States>(
@@ -787,7 +846,6 @@ class _AddCustomerMasterPageState extends State<AddCustomerMasterPage> {
                         addTooltip: "Add State",
                       ),
                     ),
-                    
 
                     const Divider(),
 

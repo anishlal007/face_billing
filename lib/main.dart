@@ -1,25 +1,29 @@
 import 'dart:ui_web';
 
 import 'package:facebilling/core/app_globals.dart';
-import 'package:facebilling/core/const.dart';
-import 'package:facebilling/core/preference_helper.dart';
-import 'package:facebilling/data/models/login_model.dart';
-import 'package:facebilling/ui/screens/masters/home/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
-import 'ui/screens/pages/login_page.dart';
-
-import 'package:flutter/material.dart';
-import 'package:flutter_web_plugins/url_strategy.dart';
-import 'package:facebilling/core/app_globals.dart';
-import 'package:facebilling/core/preference_helper.dart';
 import 'package:facebilling/core/route_manager.dart';
 
-Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  setUrlStrategy(const HashUrlStrategy()); // ✅ Keeps /#/home for web
+// Future<void> main() async {
+//   WidgetsFlutterBinding.ensureInitialized();
+//   setUrlStrategy(const HashUrlStrategy()); // ✅ Keeps /#/home for web
 
-  runApp(const MyApp());
+//   runApp(const MyApp());
+// }
+void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  setUrlStrategy(const HashUrlStrategy());
+
+  ErrorWidget.builder = (FlutterErrorDetails details) {
+    return Center(
+      child: Text(
+        details.exceptionAsString(),
+        style: const TextStyle(color: Colors.red),
+      ),
+    );
+  };
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
